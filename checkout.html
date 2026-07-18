@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<title>Litoralul Romanesc — Checkout (desktop redesign)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="litro.css">
+<style>body { background: #FCFBFA; }</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-7-6.1-7-11a7 7 0 1 1 14 0c0 4.9-7 11-7 11z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="10" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="16" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3.5 10h17M8 2.8V7M16 2.8V7" stroke="currentColor" stroke-width="2" fill="none"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 20c.5-3.4 3-5.4 6-5.4s5.5 2 6 5.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 5.4a3.2 3.2 0 0 1 0 5.9M18.2 14.9c1.7.8 2.6 2.3 2.9 4.6" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5.5 3.5h3l1.7 4.3-2 1.6a13 13 0 0 0 6.4 6.4l1.6-2 4.3 1.7v3a1.8 1.8 0 0 1-2 1.8C10.3 19.7 4.3 13.7 3.7 5.5a1.8 1.8 0 0 1 1.8-2z" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6.5h16M4 12h16M4 17.5h16" stroke="currentColor" stroke-width="2.2"/></symbol>
+    <symbol id="i-chev-d" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2"/></symbol>
+    <symbol id="i-check-g" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.6"/></symbol>
+    <symbol id="i-bed" viewBox="0 0 24 24"><path d="M3 18.5V6M3 14h18v4.5M3 11h18v-1a3 3 0 0 0-3-3H9" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="6.5" cy="8.5" r="1.6" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+    <symbol id="i-food" viewBox="0 0 24 24"><path d="M7 3v7M4.5 3v4.5a2.5 2.5 0 0 0 5 0V3M7 12v9M16.5 3c-1.8 1.5-2.5 4-2.5 6.5 0 1.5 1 2.5 2.5 2.5V21M16.5 3V12" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-pct" viewBox="0 0 24 24"><path d="M19 5 5 19" stroke="currentColor" stroke-width="2.2"/><circle cx="7.5" cy="7.5" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="16.5" cy="16.5" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+  </defs>
+</svg>
+
+<header class="header" style="border-bottom:1px solid #EFEDED">
+  <div class="container header-in" style="padding:14px 0">
+    <div class="logo">
+      <svg width="38" height="38" viewBox="0 0 42 42"><circle cx="19" cy="23" r="13" fill="none" stroke="#004B97" stroke-width="7"/><circle cx="33" cy="8.5" r="5.5" fill="#EB802D"/></svg>
+      <div class="logo-text"><div class="l1" style="font-size:20px">litoralul</div><div class="l2" style="font-size:13.5px">romanesc<b>.ro</b></div></div>
+    </div>
+    <div class="header-right">
+      <div class="h-phone">
+        <svg width="20" height="20" style="color:#004B97"><use href="#i-phone"/></svg>
+        <div><div class="num">0241 999 · 0241 837 777</div><div class="hrs">● Zilnic 08:00 – 20:00</div></div>
+      </div>
+      <div class="h-user"><span class="avatar">A</span> Ana <svg width="16" height="16"><use href="#i-chev-d"/></svg></div>
+      <span class="h-burger"><svg width="24" height="24"><use href="#i-menu"/></svg></span>
+    </div>
+  </div>
+</header>
+
+<div class="stepper-band">
+  <div class="container stepper">
+    <div class="step done"><span class="dot">✓</span> Alege cazarea</div>
+    <span class="step-line"></span>
+    <div class="step active"><span class="dot">2</span> Datele tale</div>
+    <span class="step-line"></span>
+    <div class="step todo"><span class="dot">3</span> Confirmare</div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="co-grid">
+    <main>
+      <div class="form-card">
+        <h2>Datele tale</h2>
+        <div class="f2">
+          <div class="fld"><label>Prenume</label><div class="inp"><b>Ana</b></div></div>
+          <div class="fld"><label>Nume</label><div class="inp"><b>Ionescu</b></div></div>
+        </div>
+        <div class="f2">
+          <div class="fld"><label>E-mail</label><div class="inp"><b>ana.ionescu@gmail.com</b></div><div class="f-note">Trimitem confirmarea rezervării pe acest e-mail.</div></div>
+          <div class="fld"><label>Telefon</label><div style="display:flex;gap:8px"><div class="inp" style="width:86px;flex:none">+40 ▾</div><div class="inp"><b>722 000 000</b></div></div></div>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <h2>Date de facturare</h2>
+        <div class="seg"><span class="on">Persoană fizică</span><span>Persoană juridică</span></div>
+        <div class="f2">
+          <div class="fld"><label>Țara</label><div class="inp"><b>România</b> <span style="float:right;color:#747679">▾</span></div></div>
+          <div class="fld"><label>Județ</label><div class="inp"><b>București</b> <span style="float:right;color:#747679">▾</span></div></div>
+        </div>
+        <div class="f2">
+          <div class="fld"><label>Oraș</label><div class="inp"><b>București</b></div></div>
+          <div class="fld"><label>Adresă (opțional)</label><div class="inp ph">Strada, numărul</div></div>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <h2>Cum vrei să plătești?</h2>
+        <div class="payopt">
+          <div class="pay-box on">
+            <span class="radio"></span>
+            <div class="t">Avans acum, restul mai târziu</div>
+            <div class="p">1 214 Lei <span style="font-size:13px;font-weight:700;color:#57585A">azi</span></div>
+            <div class="d">Restul de 2 832 Lei — online până la 22 mai sau la hotel</div>
+          </div>
+          <div class="pay-box">
+            <span class="radio"></span>
+            <div class="t">Plătește tot acum</div>
+            <div class="p">4 046 Lei</div>
+            <div class="d">O singură plată, zero griji la check-in</div>
+          </div>
+        </div>
+        <div class="fld"><label>Metoda de plată</label>
+          <div class="pm-row">
+            <span class="pm hl">💳 Card online</span>
+            <span class="pm">VISA</span><span class="pm">Mastercard</span>
+            <span class="pm"> Pay</span><span class="pm">G Pay</span>
+            <span class="pm">Transfer bancar</span>
+            <span class="pm hl">Card de vacanță — Edenred · Pluxee · Up</span>
+          </div>
+        </div>
+        <div class="trust-note" style="margin-top:8px"><svg width="14" height="14"><use href="#i-lock"/></svg> Plată securizată · confirmare instantanee a rezervării</div>
+      </div>
+
+      <div class="form-card">
+        <h2>Solicitări speciale <span style="color:#747679;font-size:13px;font-weight:500">(opțional)</span></h2>
+        <div class="textarea">De ex. cameră la etaj superior, check-in târziu, pătuț pentru copil…</div>
+        <div class="cnt-note">0 / 250</div>
+      </div>
+
+      <div class="agree"><span class="cb on" style="margin-top:1px"></span><span>Am citit și accept <a href="#">Termenii și condițiile</a> și <a href="#">Politica de confidențialitate</a>. Confirm că datele de mai sus sunt corecte.</span></div>
+      <div class="cta-row">
+        <span class="trust-note"><svg width="15" height="15"><use href="#i-check-g"/></svg> Anulare gratuită până la 20 mai</span>
+        <button class="btn btn-primary btn-big">Rezervă și plătește avansul →</button>
+      </div>
+    </main>
+
+    <aside>
+      <div class="sum-card">
+        <div class="ph"><img src="assets/pool-rooftop.jpg" alt=""></div>
+        <div class="sum-body">
+          <div class="rating-line" style="margin-bottom:6px"><span class="rate-badge">9.2</span><span class="rate-word">Excelent</span><span class="rate-count">157 recenzii</span></div>
+          <div class="hname">Complex Mediteranean <span class="stars">★★★★</span></div>
+          <div class="hmeta" style="margin:4px 0 0"><svg width="13" height="13"><use href="#i-pin"/></svg> Mamaia · 50 m de plajă</div>
+          <div class="sum-meta">
+            <div class="row"><span class="ic"><svg width="16" height="16"><use href="#i-cal"/></svg></span> 5 iun – 12 iun · 7 nopți</div>
+            <div class="row"><span class="ic"><svg width="16" height="16"><use href="#i-users"/></svg></span> 2 adulți + 2 copii</div>
+            <div class="row"><span class="ic"><svg width="16" height="16"><use href="#i-bed"/></svg></span> 1 × Cameră dublă vedere mare</div>
+            <div class="row"><span class="ic"><svg width="16" height="16"><use href="#i-food"/></svg></span> Mic dejun inclus</div>
+          </div>
+          <div class="green-band">✓ Anulare gratuită până la 20 mai · <a href="#" style="color:inherit;text-decoration:underline">vezi regulile</a></div>
+          <div class="price-lines">
+            <div class="pl"><span>Cazare · 7 nopți</span><span class="v">4 760 Lei</span></div>
+            <div class="pl disc"><span>Înscrieri Timpurii −15%</span><span class="v">−714 Lei</span></div>
+            <div class="pl total"><span class="l">Total</span><span class="v">4 046 <span style="font-size:15px">Lei</span></span></div>
+            <div class="pl small"><span>Prețul include taxele și micul dejun</span></div>
+          </div>
+          <div class="split-box">
+            <div class="pl"><span>De plătit azi (avans 30%)</span><span class="v">1 214 Lei</span></div>
+            <div class="pl"><span>Până la 22 mai / la hotel</span><span class="v">2 832 Lei</span></div>
+          </div>
+          <div class="credits" style="margin-top:10px">+ câștigi 28 credite FRIENDS după sejur</div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<footer class="footer" style="margin-top:30px">
+  <div class="container">
+    <div class="f-bottom" style="margin-top:0;padding-top:0;border-top:0">
+      <div>© 2008–2026 Litoralul Romanesc · Parte din Szallas Group. Toate drepturile rezervate.</div>
+      <div style="font-weight:700;color:#012B55">litoralul<span style="color:#EB802D">romanesc</span>.ro</div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
