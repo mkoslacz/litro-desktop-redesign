@@ -1,0 +1,909 @@
+[
+ {
+  "screen": "thankyou.html — post-booking confirmation (desktop redesign) vs live LITRO cancellation / storno / FRIENDS content",
+  "gaps": [
+   {
+    "feature": "Contractul cu turistul (tourist contract) delivery",
+    "status": "missing",
+    "severity": "blocker",
+    "why_it_matters": "LITRO trades as tour operator S.C. Creative Eye S.R.L. and sells its own chartered allotment, so under RO package-travel rules the traveller must receive the contract/package documentation at conclusion of the booking. The confirmation page is the legal delivery point. Without it every booking is contestable at ANPC and refund disputes have no agreed baseline — the worst possible exposure on inventory we have already paid the hotel for.",
+    "live_evidence": "Live footer on all three pages lists 'Contractul cu turistul' alongside 'Termeni si conditii' as a distinct client document (info_oferta_anulare_gratuita.txt l.296-297).",
+    "redesign_evidence": "Only 'Descarcă voucherul (PDF)' and 'chitanța e în e-mail'; the word contract appears nowhere in thankyou.html. Checkout only has a T&C checkbox (checkout.html l.118).",
+    "recommendation": "Add a 'Documentele tale' block: Contractul cu turistul (PDF, with contract nr. + date accepted), Voucher, Termeni și condiții, Politica de anulare — each downloadable and restated as sent by e-mail."
+   },
+   {
+    "feature": "Correct free-cancellation conditions (10 days + convert advance into a new booking + fully paid + case-by-case review)",
+    "status": "weakened",
+    "severity": "blocker",
+    "why_it_matters": "The redesign promises something the business does not actually offer. Live free cancellation is NOT a cash refund: it requires the request ≥10 days before check-in, the booking paid in full, applies only to standard offers, converts the paid amount into an advance for another stay, and each request is reviewed individually. Promising 'anulare gratuită până la 20 mai' on the confirmation page creates a written commitment to refund cash — chargebacks and ANPC complaints on charter rooms we cannot resell late.",
+    "live_evidence": "info_oferta_anulare_gratuita.txt l.136-145: cancellation at least 10 days before check-in; 'Transformi suma deja achitata in avans pentru o noua rezervare'; 'Rezervarea trebuie sa fie achitata integral'; applies to 'rezervarile cu oferta standard'; each request analysed individually by consultants.",
+    "redesign_evidence": "'✓ Anulare gratuită până la 20 mai, 23:59' and 'După 20 mai — se reține avansul' (thankyou.html l.144-145); no mention of the 10-day rule, of re-booking instead of refund, of full prepayment, of standard-offer-only, or of manual review.",
+    "recommendation": "Restate the actual policy on the confirmation: deadline computed as check-in minus 10 days, what you get back (credit toward a new stay vs. cash), the standard-offer condition, the full-payment condition, and 'fiecare cerere este analizată individual'. Flag explicitly when the booked rate is a non-standard/promo offer and therefore non-refundable."
+   },
+   {
+    "feature": "How to actually request a cancellation or change (channel + SLA)",
+    "status": "missing",
+    "severity": "major",
+    "why_it_matters": "Live cancellation is a human process — the customer must send a message via the contact section or Facebook and wait for a consultant. If the confirmation page implies a self-service cancel button that does not exist, customers who want out simply stop paying the balance instead of cancelling in time, and we lose the chance to re-sell the allotment.",
+    "live_evidence": "info_oferta_anulare_gratuita.txt l.146: requests are made via the site contact section or Facebook page and treated with priority by consultants.",
+    "redesign_evidence": "Generic 'Gestionează rezervarea' button (thankyou.html l.112) with no cancel/modify path, no channel, no response time.",
+    "recommendation": "Add an explicit 'Vrei să anulezi sau să modifici?' row: deadline date, the request channel (form / 0241 999 with 08:00–20:00 hours), and the expected reply time."
+   },
+   {
+    "feature": "Asigurare storno upsell after booking",
+    "status": "missing",
+    "severity": "major",
+    "why_it_matters": "Storno is the only real risk cover for the majority of LITRO bookings (non-standard offers get no free cancellation) and it is pure-margin attach revenue. The confirmation page is peak intent and, for LITRO specifically, still inside the eligibility window. Losing it costs both insurance commission and the refund-dispute deflection it buys us.",
+    "live_evidence": "info_asigurare_storno.txt l.130-140: storno available for any stay booked through Litoralulromanesc.ro regardless of resort, hotel or payment method, quoted personally on 0241 999.",
+    "redesign_evidence": "none found — no mention of storno or asigurare anywhere in thankyou.html or checkout.html.",
+    "recommendation": "Add a storno card on the confirmation with the concrete covered events (sudden illness, accident, family emergency, job loss, quarantine/pandemic), a price-on-request CTA to 0241 999 or an inline quote, and a note that the premium depends on stay value and traveller ages."
+   },
+   {
+    "feature": "Storno eligibility deadline (policy must be issued before stay start; max 3 working days after purchase for stays under 30 days out)",
+    "status": "missing",
+    "severity": "major",
+    "why_it_matters": "This is a hard, short deadline that only the confirmation page can communicate in time. A late-booking customer who is not told loses the option permanently, and we lose the sale. It is also the honest answer to 'ce fac dacă mă îmbolnăvesc' for bookings with no free cancellation.",
+    "live_evidence": "info_asigurare_storno.txt l.185-188: cover starts at policy issue and ends when the stay starts; for bookings made under 30 days before start, the policy can be concluded within max 3 working days of purchase.",
+    "redesign_evidence": "none found",
+    "recommendation": "When the stay is under 30 days away, show a dated deadline on the confirmation: 'Poți adăuga asigurarea storno până la <data>' with a one-click call/request action."
+   },
+   {
+    "feature": "Legal identity of the organising agency + ANPC / Ministry of Tourism contacts",
+    "status": "weakened",
+    "severity": "blocker",
+    "why_it_matters": "Mandatory disclosure for a Romanian tour operator, and the confirmation is the page customers save or print. The redesign footer replaces the operator with a group brand line, which also misstates who the traveller's counterparty is — the contract is with Creative Eye S.R.L., not with Szallas Group.",
+    "live_evidence": "Present on every live page: 'Agentia Organizatoare LitoralulRomanesc.ro S.C. Creative Eye.S.R.L., Nr. ROC: J13/2215/2003, Cod fiscal: RO15613488', Constanța address, ANPC 021-9551, Ministerul turismului 080 086 8282 (info_club_fidelitate.txt l.350-359).",
+    "redesign_evidence": "'© 2008–2026 Litoralul Romanesc · Parte din Szallas Group. Toate drepturile rezervate.' (thankyou.html l.156) — sole footer content.",
+    "recommendation": "Restore the organising-agency block (legal name, ROC, CUI, address, licence) plus ANPC and Ministry of Tourism phone numbers in the confirmation footer; keep the Szallas Group line as a secondary mention."
+   },
+   {
+    "feature": "FRIENDS credits: earning rule, value, validity and usage cap",
+    "status": "weakened",
+    "severity": "major",
+    "why_it_matters": "Repeat rate is the core economics of a ~500-property one-coast charter OTA — the credit must be understood to drive the next booking. '+28 credite' with no value anchor means nothing; the live programme translates it into a concrete 28 RON off, valid 5 years, up to 10% of a future booking, credited only after the stay is completed.",
+    "live_evidence": "info_club_fidelitate.txt l.203, 241-244: '1 credit = 1 RON reducere la checkout', 'poti achita pana la 10% din valoarea oricarei rezervari viitoare', 'valabile 5 ani de la data acumularii', credited automatically on stay completion.",
+    "redesign_evidence": "'+28 credite FRIENDS după sejur / Le folosești ca reducere la următoarea rezervare pe litoral.' (thankyou.html l.106-107).",
+    "recommendation": "State '28 credite = 28 Lei reducere, valabile 5 ani, folosibile pentru până la 10% dintr-o rezervare viitoare · se adaugă în cont după finalizarea sejurului', with a link to the FRIENDS account."
+   },
+   {
+    "feature": "FRIENDS tier status and progress to the next level",
+    "status": "missing",
+    "severity": "major",
+    "why_it_matters": "Tier progression (3 distinct check-ins/year → Good Friend, 5 → Best Friend) is the retention engine. The confirmation is the single best moment to say 'this stay was your 2nd — one more this year and you move up', which drives a second summer booking on inventory we already hold.",
+    "live_evidence": "info_club_fidelitate.txt l.151-167, 251-260: tier thresholds and benefits per level (2%/3%/5% credits, early access, partner-hotel perks, personalised gift).",
+    "redesign_evidence": "No tier name, no balance, no progress indicator anywhere on thankyou.html.",
+    "recommendation": "Add current tier badge, total credit balance after this booking, and a progress line to the next tier with the concrete benefit unlocked."
+   },
+   {
+    "feature": "FRIENDS enrolment CTA for guests who booked without an account",
+    "status": "missing",
+    "severity": "major",
+    "why_it_matters": "Enrolment is free and benefits start from the first booking, so the confirmation is the highest-yield acquisition point for the loyalty database. The redesign assumes a logged-in user ('Ana') and offers no path for the guest checkout case, which is where most first-time coast bookers land.",
+    "live_evidence": "info_club_fidelitate.txt l.108, 123, 265-269: 'Creeaza-ti cont FRIENDS', 'Inscrierea e gratuita', account created in under 2 minutes, benefits from the first booking.",
+    "redesign_evidence": "none found — only a passive credits line; header shows an already-logged-in avatar.",
+    "recommendation": "Show a guest-state variant: 'Creează-ți contul FRIENDS și cele 28 de credite intră în cont' with a one-field password set-up prefilled with the booking e-mail."
+   },
+   {
+    "feature": "What happens to credits if the booking is cancelled",
+    "status": "missing",
+    "severity": "minor",
+    "why_it_matters": "The confirmation promises credits in the same view as the cancellation policy. Without the caveat, a cancelling customer expects to keep them and support has an avoidable dispute.",
+    "live_evidence": "info_club_fidelitate.txt l.284-285: cancelling before check-in automatically voids the credits from that booking.",
+    "redesign_evidence": "'+28 credite FRIENDS după sejur' with no cancellation caveat.",
+    "recommendation": "One line under the credits block: 'Creditele se anulează dacă rezervarea este anulată înainte de check-in.'"
+   },
+   {
+    "feature": "Fiscal invoice (factură) delivery",
+    "status": "weakened",
+    "severity": "minor",
+    "why_it_matters": "Billing data is collected at checkout, and a material share of Romanian seaside bookings are paid with holiday cards or by companies that need a factură, not a chitanță. Not confirming it generates support contacts on every such booking.",
+    "live_evidence": "Live checkout collects billing identity and the operator's fiscal identity (CUI RO15613488) is published site-wide; redesign checkout has a 'Date de facturare' section (checkout.html l.72).",
+    "redesign_evidence": "'Tranzacția #TX-448291 · chitanța e în e-mail' (thankyou.html l.77) — receipt only, no invoice.",
+    "recommendation": "State when and how the factură is issued (and for the balance too), with a download slot once available."
+   },
+   {
+    "feature": "Paying the remaining balance in interest-free instalments",
+    "status": "missing",
+    "severity": "nice-to-have",
+    "why_it_matters": "'6 rate fără dobândă' is a standing live promise and the balance here is 2 832 Lei — surfacing it at the moment the balance is due reduces the risk of a non-paid balance on a chartered room.",
+    "live_evidence": "'Vacante fara griji in 6 rate fara dobanda' appears on every live page (info_club_fidelitate.txt l.333-334); storno page confirms instalment payment is a supported method (l.140).",
+    "redesign_evidence": "Balance can be paid 'online până la 22 mai sau direct la hotel' and 'Acceptăm și Card de vacanță' — no instalment option.",
+    "recommendation": "Add instalments as a third balance-payment route next to online card and pay-at-hotel."
+   }
+  ]
+ },
+ {
+  "screen": "homepage (home.html vs live litoralulromanesc.ro)",
+  "gaps": [
+   {
+    "feature": "Travel agency licence + legal operator identity block",
+    "status": "missing",
+    "severity": "blocker",
+    "why_it_matters": "LITRO is a licensed Romanian tour operator selling its own chartered allotment — under RO tourism law the organising agency's licence number, company identity and ANPC details must be displayed. It is also the single strongest trust signal for a charter OTA taking prepayment months before the stay. Losing it risks non-compliance and kills prepayment confidence.",
+    "live_evidence": "\"Site-ul este operat de Agentia organizatoare Litoralul Romanesc.ro, licentiata din anul 2005, detine Licenta de Turism nr.536, eliberata de Ministerul Turismului.\" plus \"S.C. Creative Eye.S.R.L. / Nr. ROC: J13/2215/2003 / Cod fiscal: RO15613488 / Adresa: Constanta, Bulevardul Mamaia, nr. 158\" and \"Autoritatea nationala pentru protectia consumatorului ... Telefon: 021 - 9551\", \"Directia de control - Ministerul turismului: 080 086 8282\"",
+    "redesign_evidence": "footer has only `<a href=\"#\">ANPC · SOL</a>` and `© 2008–2026 Litoralul Romanesc · Parte din Szallas Group` — no licence number, no legal entity, no CUI/ROC, no address",
+    "recommendation": "Add a legal/trust strip above the footer bottom: Licenta de Turism nr. 536 (Ministerul Turismului, din 2005), S.C. Creative Eye S.R.L., J13/2215/2003, RO15613488, Constanta address, ANPC + SOL links with the 021-9551 and 080 086 8282 numbers. Keep the licence badge visible, not buried in a link."
+   },
+   {
+    "feature": "Offer taxonomy breadth (15 named offer programmes with live counts)",
+    "status": "weakened",
+    "severity": "blocker",
+    "why_it_matters": "The offer programmes ARE the LITRO product. Charter inventory is monetised by slicing the same ~500 properties into named commercial programmes (Litoralul Pentru Toti, Zile Gratuite, Seniori, Extrasezon, Tratament, Nibiru...) that each target a different demand pocket and fill different weeks. Cutting 15 programmes down to 2 campaign tiles removes the main navigation path to low-season and niche inventory — exactly the stock that is hardest to sell and that the agency owns the risk on.",
+    "live_evidence": "\"Oferte Litoral 2026\" grid with Last Minute (Vezi 159 oferte), Oferta Verii (123), Extra Discount (8), Nibiru 2026 (48), Litoralul Pentru Toti (55), Oferta Speciala (89), Sfanta Maria (59), Start Summer (2), Extrasezon (25), Oferta cu tratament (6), Zile Gratuite de Vacanta (30), Seniori (5), Mare pentru cei mici (2), Festival Beach Please (1), plus \"Vezi toate ofertele\"",
+    "redesign_evidence": "only two campaign cards: \"Înscrieri Timpurii 2026 — Vezi cele 263 de oferte\" and \"Paște și 1 Mai pe litoral — Vezi cele 104 oferte\"",
+    "recommendation": "Add a dedicated \"Oferte Litoral 2026\" section below Promoții: a dense grid/carousel of all active programmes, each with name, one-line description and live offer count, ending in a \"Vezi toate ofertele\" link. The counts are proof of depth — keep them."
+   },
+   {
+    "feature": "Installments — 6 rate fără dobândă",
+    "status": "missing",
+    "severity": "blocker",
+    "why_it_matters": "Interest-free instalments are the core affordability lever for a Romanian seaside package bought 4-6 months ahead. It converts high-ticket early-booking (Înscrieri Timpurii) baskets that would otherwise be abandoned, and it is a differentiator vs Booking. The redesign pushes a 45% early-booking discount but never says the customer can split the payment.",
+    "live_evidence": "\"Vacante fara griji in / 6 rate fara dobanda\" banner plus footer link \"Vacante in rate\"",
+    "redesign_evidence": "none found — the \"Rezervă la noi!\" value-prop row covers FRIENDS, holiday cards, discounts and support, but no instalments",
+    "recommendation": "Add a fifth value-prop card (or replace the vaguest one, \"Reduceri exclusive\") with \"6 rate fără dobândă\" including the card issuers, and repeat it as a line under the Înscrieri Timpurii campaign tile where the high ticket is."
+   },
+   {
+    "feature": "Newsletter subscription form with benefit list and GDPR consent",
+    "status": "weakened",
+    "severity": "major",
+    "why_it_matters": "Email is the cheapest repeat channel for a one-coast operator with a short season — the list built in summer is what sells Înscrieri Timpurii in winter. Demoting a full on-page capture unit with 5 benefit bullets to a footer text link will cut signup rate by an order of magnitude.",
+    "live_evidence": "\"Cele mai bune oferte sunt pe e-mail!\" section with \"De ce sa ma abonez la newsletter\" and 5 bullets (best offers, personalised comms, first to know about promos/contests, exclusive offers, unsubscribe anytime), \"Ma abonez\" button and the consent line \"Sunt de acord cu prelucrarea datelor cu caracter personal...\"",
+    "redesign_evidence": "footer link only: `<a href=\"#\">Abonează-te la newsletter</a>`",
+    "recommendation": "Restore an inline newsletter band (email field + Mă abonez + 3-5 benefit bullets + GDPR consent checkbox linking the privacy policy) placed after the offer sections, before the footer."
+   },
+   {
+    "feature": "Latest bookings / live social proof feed",
+    "status": "missing",
+    "severity": "major",
+    "why_it_matters": "A timestamped \"most recent bookings\" feed is scarcity and liveness proof — it tells a hesitant user that other Romanians are booking this hotel right now, which is what a charter operator needs to accelerate commitment on allotment that expires. Cheap to render, high conversion effect.",
+    "live_evidence": "\"Cele mai recente rezervari de pe Litoralul Romanesc 2026/07/18 23:02:40\" listing Hotel Union, Camere Steluta, Hotel Dana Resort with descriptions",
+    "redesign_evidence": "none found — closest is \"Căutările tale recente\", which is the user's own history, not other people's bookings",
+    "recommendation": "Add a \"Cele mai recente rezervări\" strip (3-4 property cards with resort + relative timestamp, e.g. \"acum 12 minute\"). Keep it alongside, not instead of, the personal recent-searches row."
+   },
+   {
+    "feature": "Site-wide review average (9.0/10 across hotels)",
+    "status": "missing",
+    "severity": "major",
+    "why_it_matters": "An aggregate quality claim for the whole portfolio counters the main objection to the Romanian seaside (\"hotels are poor quality\"). Per-card scores only reassure about one property; the portfolio average reassures about choosing LITRO at all.",
+    "live_evidence": "\"Hotelurile de pe Litoralul Romanesc au o medie de 9.0 puncte din 10\"",
+    "redesign_evidence": "per-hotel badges only (e.g. `<span class=\"rate-badge\">9.2</span>` … `157 recenzii`); no aggregate figure anywhere",
+    "recommendation": "Add a stats band with 3-4 proof numbers: media 9.0/10, peste 500 structuri de cazare, 270.000 turisti in 2024, licenta din 2005. This also recovers the scale proof lost with the agency description."
+   },
+   {
+    "feature": "Destination coverage — 19 resorts",
+    "status": "weakened",
+    "severity": "major",
+    "why_it_matters": "Coverage of the whole 245 km coast is the credibility claim of a specialist. Showing 5 resorts makes LITRO look like a Mamaia site and hides secondary resorts (Saturn, Mangalia, Techirghiol, Navodari, Corbu, 23 August, Ovidiu) where the cheapest owned allotment usually sits — the inventory most in need of demand routing. It also removes 14 high-value SEO landing links.",
+    "live_evidence": "resort bar and footer both list 19: Mamaia, Mamaia Nord, Eforie Nord, Eforie Sud, Costinesti, Neptun-Olimp, Jupiter, Venus, Saturn, Mangalia, Constanta, Vama Veche 2 Mai, Techirghiol, Navodari, Tuzla, Corbu, 23 August, Piatra, Ovidiu — plus a per-resort \"Hoteluri X\" link set",
+    "redesign_evidence": "mosaic with 5 tiles (Mamaia, Eforie Nord, Costinești, Vama Veche, Neptun-Olimp) and one \"Toate stațiunile\" link",
+    "recommendation": "Keep the 5-tile visual mosaic but add a full text link list of all 19 stațiuni underneath (or in the footer), each linking to its cazare/hoteluri page with a property count."
+   },
+   {
+    "feature": "Per-resort hotel shortlists and full hotel list (\"Listă completă de hoteluri\")",
+    "status": "missing",
+    "severity": "major",
+    "why_it_matters": "Named-hotel links from the homepage are how LITRO ranks for \"hotel <name> litoral\" and how returning guests re-find last year's hotel — the highest-intent, lowest-CAC traffic a charter operator has. Removing all named-hotel entry points from the homepage strips that internal link equity.",
+    "live_evidence": "\"Destinatii recomandate litoral\" carousels (Sara Boutique, Savoy, Tomis / Aqvatonic, Mondial, Belvedere / …) and \"Destinatii populare litoral 2026 — Listă completă de hoteluri\" with Zenith (Hotel 4 Stele), Dunarea (3 Stele), Phoenicia Luxury, Steaua de Mare, Opal, Mures etc. grouped by resort",
+    "redesign_evidence": "hotel cards exist but are campaign-driven (\"Oferte Înscrieri Timpurii 2026\", \"Hoteluri all inclusive\"); no resort-grouped hotel name list, no \"listă completă\" link",
+    "recommendation": "Add a compact resort-grouped hotel index near the footer (resort heading + 3-6 hotel names with star class + \"Vezi toate hotelurile din X\"), plus a \"Listă completă de hoteluri\" link."
+   },
+   {
+    "feature": "SEO/content blocks: coast description, attractions, news",
+    "status": "missing",
+    "severity": "major",
+    "why_it_matters": "These blocks earn the informational traffic that fills the top of a seasonal funnel and support the \"specialist, not marketplace\" positioning. The news block also carries the current brand campaign (Adela Popescu ambassador) and the flexible early-booking PR — marketing spend the redesign no longer surfaces.",
+    "live_evidence": "\"Descriere litoral - Informatii despre litoralul romanesc\" (245 km coast copy), \"Obiective turistice si atractii la mare\" (Edificiul Roman cu Mozaic, Biserica Ingropata Istria, Biserica Greceasca Metamorphosis), \"Stiri de pe litoralul romanesc\" (Adela Popescu ambassador; \"Rezerva in siguranta, plateste relaxat!\"; \"8 din 10 romani intentioneaza sa mearga pe litoralul romanesc in vara 2026\")",
+    "redesign_evidence": "none found — only footer links \"Blog de litoral\" and \"Atracții și evenimente\"",
+    "recommendation": "Add two light content rows before the footer: 3 attraction cards and 3 news cards, plus a short expandable SEO paragraph about the Romanian coast. Low visual weight, high organic value."
+   },
+   {
+    "feature": "Coast/resort map entry point",
+    "status": "missing",
+    "severity": "minor",
+    "why_it_matters": "Seaside buyers choose geographically (distance to beach, north vs south, quiet vs party). A map is the natural disambiguator for someone who does not know Jupiter from Venus, and it feeds traffic into secondary resorts.",
+    "live_evidence": "\"Harta statiunilor pe litoralul romanesc — Vezi harta litoralului romanesc\" and footer \"Harti litoral\"",
+    "redesign_evidence": "none found",
+    "recommendation": "Add a \"Vezi harta litoralului\" entry — either an interactive map block or at minimum a card next to the resort mosaic."
+   },
+   {
+    "feature": "Ancillary programme links: vouchere vacanță, voucher cadou, asigurare storno, vacanțe în rate, club fidelitate",
+    "status": "weakened",
+    "severity": "major",
+    "why_it_matters": "These are the products that raise basket value and de-risk prepayment on non-refundable charter stock. Holiday vouchers (Edenred/Up/Pluxee) in particular are a large payment share in Romania; cancellation insurance is what makes an early non-refundable booking acceptable. Only one of the five survives, and only as a value-prop card without a page link.",
+    "live_evidence": "footer section \"Alte sectiuni de pe LitoralulRomanesc.ro\": Clubul LitoralulRomanesc, Vacante in rate, Vouchere vacanta, Asigurare storno, Voucher cadou; plus \"Agentia Litoralul Romanesc accepta vouchere de vacanta pentru toate hotelurile\"",
+    "redesign_evidence": "one card \"Acceptăm Card de vacanță\" (no link) and footer \"Program FRIENDS\"; no asigurare storno, no voucher cadou, no vacanțe în rate",
+    "recommendation": "Add a footer column \"Servicii și programe\" with Vacanțe în rate, Vouchere de vacanță, Voucher cadou, Asigurare storno, Anulare gratuită, Club FRIENDS — each linking its info page."
+   },
+   {
+    "feature": "Voucher acceptance scope claim",
+    "status": "weakened",
+    "severity": "minor",
+    "why_it_matters": "Live promises holiday vouchers at ALL hotels on the site; the redesign narrows it to \"hotelurile partenere\". For a charter operator that owns the allotment, universal acceptance is a genuine competitive advantage — weakening the wording gives it away and invites pre-booking support calls.",
+    "live_evidence": "\"Agentia Litoralul Romanesc accepta vouchere de vacanta pentru toate hotelurile prezente pe site-ul litoralulromanesc.ro\"",
+    "redesign_evidence": "\"Plătește online cu cardul de vacanță Edenred, Up sau Pluxee la hotelurile partenere.\"",
+    "recommendation": "Restore the stronger, accurate claim: \"la toate hotelurile de pe site\" (verify with ops before shipping)."
+   },
+   {
+    "feature": "Delta Dunării as a second destination brand",
+    "status": "missing",
+    "severity": "major",
+    "why_it_matters": "Delta Dunării is a separate destination the group sells and is a persistent top-level nav item on live, appearing twice. Dropping it from the redesign removes a whole revenue line's entry point and shrinks the perceived catalogue.",
+    "live_evidence": "top nav \"Litoral Romania (current) / Delta Dunarii\" and footer \"Litoral România / Delta Dunării\"",
+    "redesign_evidence": "none found — header contains only logo, phone, user and a burger",
+    "recommendation": "Add the destination switch (Litoral România | Delta Dunării) to the header, and mirror it in the footer."
+   },
+   {
+    "feature": "Category navigation in the header (offers, all-inclusive, hotel lists)",
+    "status": "moved",
+    "severity": "major",
+    "why_it_matters": "Live exposes the whole commercial taxonomy as always-visible nav; the redesign collapses everything behind an unlabelled burger on a 1440px desktop. Desktop users rarely open a hamburger, so browse-driven demand (the majority of pre-season traffic that has no fixed dates yet) loses its path and is funnelled only through the date-required search box.",
+    "live_evidence": "persistent nav rows: \"Oferte litoral / Last minute / Oferta Verii / WEEKEND NIBIRU / Litoralul Pentru Toti / Extra Discount / Hoteluri all inclusive / Hoteluri Litoral 2026\" and \"Hoteluri pe litoral\" with 19 resort links; plus \"Despre noi / Harta site / Lista Hoteluri Litoral / Pentru parteneri / Suport Clienti\"",
+    "redesign_evidence": "`<span class=\"h-burger\">` icon only; no visible nav items in the header",
+    "recommendation": "Add a visible desktop nav bar under the header with 5-7 items (Oferte, Stațiuni, Hoteluri all inclusive, Last minute, Litoralul Pentru Toți, FRIENDS, Contact), keeping the burger for overflow."
+   },
+   {
+    "feature": "Language switcher (RO / EN)",
+    "status": "missing",
+    "severity": "minor",
+    "why_it_matters": "Live offers an English version; the redesign exposes only a currency selector. Losing EN cuts off diaspora and non-Romanian-speaking residents booking Black Sea stays, and drops the hreflang surface.",
+    "live_evidence": "\"LimbaRomână\" in top nav and \"Selectati Limba — Engleză / Română\" near the footer",
+    "redesign_evidence": "footer has only `RON` currency selector",
+    "recommendation": "Add a language selector next to the currency control in the footer and in the header utility area."
+   },
+   {
+    "feature": "Children in the search occupancy control",
+    "status": "weakened",
+    "severity": "major",
+    "why_it_matters": "The Romanian seaside is a family-holiday market and child age drives both price and eligibility for family offers (\"Mare pentru cei mici\", family rooms). Live surfaces the children count in the collapsed search state; the redesign shows only adults and rooms, so families may not realise child ages are configurable and will get wrong prices or bounce.",
+    "live_evidence": "search widget summary reads \" 2 Adulti  0 Copii\"",
+    "redesign_evidence": "`<div class=\"s-value\">2 adulți, 1 cameră</div>` — no children token in the collapsed state",
+    "recommendation": "Render the occupancy summary as \"2 adulți · 0 copii · 1 cameră\" and ensure the expanded picker asks for child ages."
+   },
+   {
+    "feature": "Cookie consent / cookie settings",
+    "status": "missing",
+    "severity": "minor",
+    "why_it_matters": "GDPR-required for the analytics and personalised advertising cookies the live site sets. Likely a platform layer rather than a design concern, but the redesign should reserve space so the banner does not collide with the promo bar and search card on first load.",
+    "live_evidence": "\"Acest website folosește cookie-uri ... MODUL COOKIE / ACCEPTA TOT / DOAR NECESARE\"",
+    "redesign_evidence": "footer link `<a href=\"#\">Setări cookie</a>` only; no banner in the mock",
+    "recommendation": "Mock the consent banner in the design so its interaction with the promo bar and hero search is designed, not accidental."
+   },
+   {
+    "feature": "Call-centre opening hours accuracy",
+    "status": "weakened",
+    "severity": "minor",
+    "why_it_matters": "The redesign advertises hours materially wider than live. If ops cannot staff 08:00-20:00 daily, this creates unanswered calls at exactly the moment a hesitant charter buyer wants human reassurance — a trust loss worse than showing shorter hours honestly.",
+    "live_evidence": "\"Program extins 10:00 - 18:00\"",
+    "redesign_evidence": "`<div class=\"hrs\">● Zilnic 08:00 – 20:00</div>` and value-prop card \"îți răspunde în maximum 30 de secunde\"",
+    "recommendation": "Bind the hours (and the response-time claim) to the real call-centre SLA, ideally driven by data with a live open/closed state rather than hard-coded copy."
+   },
+   {
+    "feature": "Scale proof — 500+ properties, 270.000 tourists, specialist positioning",
+    "status": "missing",
+    "severity": "major",
+    "why_it_matters": "This is the differentiating claim against Booking: not a global marketplace but the largest specialist on this one coast, with volume history. Without it the redesign reads as a generic small OTA and loses the reason to book direct rather than compare on an aggregator.",
+    "live_evidence": "\"cel mai mare site specializat pe turismul de litoral ... oferte de vacanta in peste 500 de structuri de cazare, de la unitati de o stea pana la cele de cinci stele\"; \"In sezonul estival 2024, peste 270.000 de turisti au ales serviciile noastre.\"",
+    "redesign_evidence": "only the micro-line `Inventar propriu · confirmare instantanee` under the search box",
+    "recommendation": "Promote these into the stats band suggested above and keep a short \"Despre agenția organizatoare\" paragraph before the footer for both trust and SEO."
+   }
+  ]
+ },
+ {
+  "screen": "checkout.html (booking form / Datele tale) vs live inline booking form on hotel page + info_vacanta_in_rate + info_vouchere_vacanta",
+  "gaps": [
+   {
+    "feature": "Promo code / gift card (card cadou) entry field",
+    "status": "missing",
+    "severity": "blocker",
+    "why_it_matters": "LITRO runs a permanent campaign calendar (Oferta Verii, Extra Discount, Black Friday, Litoralul Pentru Toti, Nibiru) and sells gift vouchers as a product with its own landing page. With no redemption field anywhere in checkout, every gift-voucher already sold becomes unredeemable online and every promo-code campaign loses its landing mechanic — customers are pushed to the call centre or abandon. On charter inventory, discount codes are also the main lever for shifting unsold allotment, so removing the input disables the primary yield tool.",
+    "live_evidence": "Live booking form contains a dedicated block: \"Adauga un cod promo sau card cadou\" with an input and an \"Aplica\" button, positioned directly above \"Date personale\"; a separate product page info_vouchere_cadou.txt sells the gift vouchers.",
+    "redesign_evidence": "none found — checkout.html has no promo/voucher input; the price panel only shows a hard-coded \"Înscrieri Timpurii −15% / −714 Lei\" line with no way to enter a code",
+    "recommendation": "Add a collapsed \"Ai un cod promo sau card cadou?\" link under the price summary in the aside, expanding to input + Aplică; on success render an extra discount line in .price-lines with the code label and a remove control, and re-render both the Total and the \"De plătit azi\" split."
+   },
+   {
+    "feature": "Installments / \"Vacanță în rate\" — 6 rate fără dobândă",
+    "status": "missing",
+    "severity": "blocker",
+    "why_it_matters": "A 7-night Mamaia stay at ~4 046 Lei is a major discretionary purchase for the Romanian market; interest-free instalments are LITRO's headline affordability message, repeated in the site-wide footer of every live page (\"Vacante fara griji in 6 rate fara dobanda\") and on the pre-booking pages. Dropping it at the exact moment the user sees the full price removes the objection-handler at the highest-drop-off step and pushes price-sensitive families toward cheaper competitors or to abandoning.",
+    "live_evidence": "info_vacanta_in_rate.txt: \"beneficiezi de achitarea rezervarii tale pana la 6 rate fara dobanda\", \"6 rate fara dobanda cu StarCard\", \"pana la 6 rate prin Bonus Card\", \"pana la 5 rate prin Card Avantaj\" (BT StarCARD, Credit Europe CardAvantaj, Garanti Bonus Card); repeated in the global footer band \"Vacante fara griji in 6 rate fara dobanda\".",
+    "redesign_evidence": "none found — the \"Cum vrei să plătești?\" card offers only \"Avans acum, restul mai târziu\" and \"Plătește tot acum\"; the .pm-row lists Card online, VISA, Mastercard, Apple Pay, G Pay, Transfer bancar, Card de vacanță — no instalment option and no \"rate\" wording anywhere in the file",
+    "recommendation": "Add a third pay-box option \"Plătește în rate — până la 6 rate fără dobândă\" with the per-month figure computed from the total (e.g. \"6 × 674 Lei, 0% dobândă\"), the accepted issuer logos (BT StarCARD / CardAvantaj / Bonus Card), and an inline note stating that the instalment plan is chosen on the bank's payment page."
+   },
+   {
+    "feature": "Installments are call-centre-gated on live — the redesign must decide and state the mechanism",
+    "status": "missing",
+    "severity": "major",
+    "why_it_matters": "Today instalments are not self-service: the customer must tell a travel consultant, who then sends a special payment link. If the redesign presents a fully self-service card checkout with no instalment path and no callback trigger, the entire instalment revenue stream silently disappears rather than merely changing channel. The redesign has to either surface an online instalment plan or explicitly offer \"vreau plata în rate — sunați-mă\".",
+    "live_evidence": "info_vacanta_in_rate.txt step 1: \"In momentul efectuarii rezervarii, mentioneaza consultantului tau de turism ca doresti sa achiti in rate si vei primi un link special de plata, securizat de partenerii nostri (Euplatesc.ro, Plationline.ro, Mobil Pay).\"",
+    "redesign_evidence": "none found — checkout.html contains no consultant callback affordance and no \"link de plată\" concept; the only phone number is the generic header \"0241 999 · 0241 837 777\"",
+    "recommendation": "If online instalments are not ready for launch, add a checkbox inside the payment card: \"Vreau să plătesc în rate — un consultant mă contactează pentru linkul de plată\" that switches the CTA to \"Trimite rezervarea\" and suppresses the immediate card charge."
+   },
+   {
+    "feature": "Holiday-voucher (card de vacanță) payment is only a logo — no balance / split-payment flow",
+    "status": "weakened",
+    "severity": "major",
+    "why_it_matters": "Holiday vouchers are capped (800 Lei/year in the public sector from 01.01.2026) while an average LITRO stay is several thousand Lei, so in practice almost every voucher booking is a split payment. Showing only the issuer names implies the voucher pays the whole stay; when it does not, the user hits a dead end at the payment step. Voucher traffic is a large, legally price-protected acquisition channel for a Romanian seaside OTA and mishandling it at checkout kills conversion on exactly the highest-intent segment.",
+    "live_evidence": "info_vouchere_vacanta.txt: \"Poti folosi voucherele exact in limita valorii disponibile – daca sejurul depaseste suma, achiti diferenta\", and question 5 lists the top-up channels (depunere numerar BT/UniCredit, PayPoint, card debit/credit online, transfer bancar pe proforma, plata in rate). Hotel FAQ: \"Rezervarile efectuate la acest hotel pot fi achitate numerar conform specificatiilor de pe factura, prin transfer bancar in conturile agentiei, online cu cardul de vacanta.\"",
+    "redesign_evidence": "a single chip: <span class=\"pm hl\">Card de vacanță — Edenred · Pluxee · Up</span> with no selected state, no amount, no difference-payment explanation",
+    "recommendation": "Make the holiday card a first-class payment method: selecting it reveals \"Valoarea voucherului\" input and an auto-computed \"Diferență de plată\" line plus a picker for how the difference is settled (card, transfer bancar pe proformă, rate). Add the reassurance line \"Prețul este identic indiferent de metoda de plată\" — it is a legal guarantee and a strong conversion argument."
+   },
+   {
+    "feature": "Resort tax (taxă de stațiune) payable at reception",
+    "status": "missing",
+    "severity": "blocker",
+    "why_it_matters": "This is an extra charge the guest pays on arrival and it is hotel-specific. The redesign not only omits it but actively asserts the opposite — \"Prețul include taxele\" — which is a price-transparency breach under Romanian/EU consumer rules for package travel and the classic source of check-in disputes, chargebacks and one-star reviews. For a charter operator that owns the guest relationship end-to-end, arrival-desk surprises are a direct reputational and refund cost.",
+    "live_evidence": "hotel_dates.txt \"Alte specificatii\": \"Pentru acest hotel se achita la receptie in ziua cazarii, o Taxa de statiune in valoare de 1% din valoarea tarifului de cazare fara T.V.A pentru intreg sejurul\"",
+    "redesign_evidence": "checkout.html price panel reads <div class=\"pl small\"><span>Prețul include taxele și micul dejun</span></div> — no at-property charges disclosed",
+    "recommendation": "Add a \"De plătit la hotel\" line in .price-lines listing the resort tax (value or formula) and any other on-site charges, visually separated from the online total, and change the reassurance copy to \"Prețul include TVA și micul dejun. Taxa de stațiune se achită la recepție.\""
+   },
+   {
+    "feature": "Link to \"Contractul cu turistul\" (tourist contract)",
+    "status": "missing",
+    "severity": "blocker",
+    "why_it_matters": "LITRO sells as Agenția Organizatoare (Creative Eye SRL) under Romanian package-travel law; the tourist contract is a mandatory pre-contractual document distinct from generic T&Cs, and every cancellation/refund penalty referenced elsewhere on the site points back to it. Launching a checkout whose consent text does not incorporate it undermines the legal basis for cancellation fees and no-show charges — on charter inventory, where LITRO carries the cost of unsold rooms, unenforceable penalties are a direct P&L hit.",
+    "live_evidence": "Live submit block: \"Prin apasarea butonului “Trimite rezervarea” sunteti de acord cu: Termenii si Conditiile de Rezervare si Contractul cu turistul\" (two distinct links; info_contract.txt is the separate contract document).",
+    "redesign_evidence": "<div class=\"agree\">… Am citit și accept <a href=\"#\">Termenii și condițiile</a> și <a href=\"#\">Politica de confidențialitate</a>. Confirm că datele de mai sus sunt corecte.</div> — no contract link",
+    "recommendation": "Add \"Contractul cu turistul\" as a third link in the consent line (and expose the cancellation-penalty grid behind \"vezi regulile\" in the green band, which currently points to #)."
+   },
+   {
+    "feature": "Pre-ticked acceptance checkbox",
+    "status": "weakened",
+    "severity": "blocker",
+    "why_it_matters": "The redesign ships the legal acceptance box already checked. Pre-ticked consent is invalid under GDPR and is the exact pattern EU consumer authorities fine; it also destroys the evidentiary value of the acceptance if a guest later disputes a cancellation penalty. On live the acceptance is implicit-by-submit, which is at least defensible; a pre-ticked box is strictly worse than either.",
+    "live_evidence": "Live uses submit-implies-acceptance wording under the button and a separate, unchecked marketing consent checkbox.",
+    "redesign_evidence": "<span class=\"cb on\" style=\"margin-top:1px\"></span> — the .cb has the \"on\" (checked) state by default in the mockup",
+    "recommendation": "Ship the box unchecked, block the CTA until it is ticked, and show an inline error on attempted submit. Keep it a single unbundled tick covering T&C + tourist contract only."
+   },
+   {
+    "feature": "Separate marketing / newsletter consent opt-in",
+    "status": "missing",
+    "severity": "major",
+    "why_it_matters": "Checkout is the single highest-yield opt-in point LITRO has — the customer is at peak trust and the email is already typed. Losing it starves the CRM that drives repeat bookings, early-booking campaigns and last-minute allotment clearance, which is how a charter operator fills rooms it has already paid for. Rebuilding that list through paid acquisition is far more expensive.",
+    "live_evidence": "Live form: \"Sunt de acord sa primesc prin e-mail, SMS si alte canale electronice oferte, newslettere, recomandari personalizate si alte comunicari de marketing din partea LitoralulRomanesc.ro. Pot sa-mi retrag consimtamantul oricand\" (separate, optional checkbox).",
+    "redesign_evidence": "none found — checkout.html has exactly one checkbox, the legal acceptance one",
+    "recommendation": "Add a second, clearly optional, unchecked checkbox below the legal one with the same withdrawal wording, and a short benefit line (\"primești primul ofertele de early booking și last minute\")."
+   },
+   {
+    "feature": "Number of rooms (Nr. camere) selection",
+    "status": "moved",
+    "severity": "major",
+    "why_it_matters": "Multi-room bookings — two families travelling together, extended families, small groups — are a meaningful share of Romanian seaside demand and a disproportionate share of revenue per transaction. Live lets the user pick 1–5 rooms plus \"Mai multe\" inside the booking form itself. The redesign hard-codes \"1 × Cameră dublă vedere mare\" in a read-only summary with no quantity control and no edit link, so any group booking either has to restart on the hotel page or call.",
+    "live_evidence": "Live form: \"Nr. camere\" select with options 1, 2, 3, 4, 5, \"Mai multe\".",
+    "redesign_evidence": "<div class=\"row\">… 1 × Cameră dublă vedere mare</div> inside .sum-meta — static text, no stepper, no \"modifică\" link",
+    "recommendation": "If room selection legitimately moved to hotel.html, still add a \"Modifică\" link on the room row of the summary card, and for quantity >1 render a per-room guest-name block (occupancy is per-room on charter allotment). Add a \"mai multe camere? sună-ne\" escape for >5."
+   },
+   {
+    "feature": "Room type selector inside the booking form",
+    "status": "moved",
+    "severity": "minor",
+    "why_it_matters": "Live lets the guest switch room type (Cameră dublă, Cameră dublă family, Studio 4* Vila 30, Apartament 4*) without leaving the form — a cheap upsell surface, since the family/studio/apartment tiers carry higher ADR. Moving it entirely to the hotel page is defensible, but the checkout gives no route back, so an upgrade impulse at the payment moment is lost.",
+    "live_evidence": "Live form \"Tipul\" select: \"Alegeti tipul camerei / Camera dubla + 2 sezlonguri incluse la plaja / Camera dubla family + 2 sezlonguri incluse la plaja / Camera dubla family / Studio 4* Vila 30 / Apartament 4* Vila 30\".",
+    "redesign_evidence": "no room-type control; only the static summary row \"1 × Cameră dublă vedere mare\"",
+    "recommendation": "Add a low-key \"Schimbă tipul camerei\" link on the room row, or a single upsell strip above the CTA (\"Studio 4* cu terasă, +340 Lei — upgradează\")."
+   },
+   {
+    "feature": "Child ages at booking",
+    "status": "missing",
+    "severity": "major",
+    "why_it_matters": "On this inventory the price and even the legality of the occupancy depend on child age bands (0-9.99 vs 0-13.99 years), and room capacity is expressed in those bands. A checkout that carries \"2 adulți + 2 copii\" without ages either produces a repriced booking after the fact or an over-capacity room refused at reception — both are refund and complaint generators, and both land on LITRO because it owns the allotment.",
+    "live_evidence": "hotel_dates.txt room descriptions: \"Capacitatea maxima de cazare a camerei este de 2 adulti si 2 copii 0-13.99 ani sau 3 adulti si 1 copil 0-9.99 ani\" (repeated per room type); live form carries Adulti/Copii counts through from search.",
+    "redesign_evidence": "<div class=\"row\">… 2 adulți + 2 copii</div> — no ages shown or captured",
+    "recommendation": "Show the ages in the summary row (\"2 adulți + 2 copii (7, 11 ani)\") sourced from search, with a \"Modifică\" link; if ages were never captured upstream, collect them here before allowing submit."
+   },
+   {
+    "feature": "Full payment-method set: cash at bank branch, PayPoint, proforma invoice bank transfer",
+    "status": "weakened",
+    "severity": "major",
+    "why_it_matters": "Romania still has a substantial cash-preferring and card-averse segment, and B2B/corporate bookings settle on a proforma invoice. Live explicitly supports cash deposit at BT/UniCredit, PayPoint cash, and transfer against a proforma. The redesign reduces this to card + generic \"Transfer bancar\" with no proforma concept, cutting off both the cash segment and the company-billing segment — and the redesign itself adds a \"Persoană juridică\" billing toggle that has no matching payment method.",
+    "live_evidence": "info_vouchere_vacanta.txt Q5: \"Depunere de numerar la orice sucursala a Bancii Transilvania sau Unicredit / Plata numerar prin Pay Point / Online cu cardul de debit/credit / Prin transfer bancar in conturile stipulate in factura proforma\"; hotel FAQ: \"pot fi achitate numerar conform specificatiilor de pe factura, prin transfer bancar in conturile agentiei\".",
+    "redesign_evidence": "<span class=\"pm\">Transfer bancar</span> only; no cash, no PayPoint, no proforma wording",
+    "recommendation": "Under \"Transfer bancar\" add the sub-line \"pe baza facturii proforma — o primești pe e-mail\", and add a \"Plată numerar (PayPoint / sucursală BT, UniCredit)\" option gated to the deposit path. Wire \"Persoană juridică\" to auto-select proforma."
+   },
+   {
+    "feature": "Booking-length / availability guardrail messaging",
+    "status": "missing",
+    "severity": "minor",
+    "why_it_matters": "Live validates and explains booking constraints inside the form. Silent rejection after the user has entered card details is the most expensive place to fail a booking.",
+    "live_evidence": "Live form contains an inline error component: \"Ne pare rau , dar rezervarile pentru mai mult de 30 de zile nu sunt posibile.\"",
+    "redesign_evidence": "none found — checkout.html has no validation or error surface of any kind",
+    "recommendation": "Define inline error states for the form card (field-level + a form-level banner slot above the CTA) and carry over the max-stay rule from live."
+   },
+   {
+    "feature": "Agency legal identity and consumer-protection details near the purchase",
+    "status": "weakened",
+    "severity": "minor",
+    "why_it_matters": "Buying a several-thousand-Lei package from an OTA is a trust decision; live puts the organising agency's legal name, registration, fiscal code, address, ANPC and Ministry of Tourism contacts in the footer of every page including the booking page. The redesign's checkout footer is a one-line copyright, removing exactly the reassurance signals that matter at the moment money changes hands, and removing information a package organiser is expected to display.",
+    "live_evidence": "Live footer on the hotel/booking page: \"Agentia Organizatoare LitoralulRomanesc.ro / S.C. Creative Eye.S.R.L. / Nr. ROC: J13/2215/2003 / Cod fiscal: RO15613488 / Adresa: Constanta, Bulevardul Mamaia, nr. 158 … / Autoritatea nationala pentru protectia consumatorului Telefon: 021 - 9551\".",
+    "redesign_evidence": "<div>© 2008–2026 Litoralul Romanesc · Parte din Szallas Group. Toate drepturile rezervate.</div> — nothing else",
+    "recommendation": "Keep the checkout footer visually light but include agency legal name + ROC/CIF and the ANPC line, or a compact \"Agenție licențiată · Creative Eye SRL · detalii\" disclosure."
+   },
+   {
+    "feature": "\"Instant confirmation\" claim vs. the live request-based flow",
+    "status": "weakened",
+    "severity": "blocker",
+    "why_it_matters": "Live submits a booking request (\"Trimite rezervarea\") and voucher customers are told \"vei fii contactat de catre un specialist\"; we could not open /reservation/unit/, so what actually happens after submit — whether a card is charged and whether availability is confirmed instantly — is unknown. The redesign asserts an immediate deposit charge and \"confirmare instantanee a rezervării\". If the back end is still request-and-confirm, this is a promise the system cannot keep: money taken against unconfirmed availability, or a confirmation email that later becomes a decline. Either outcome is a chargeback and a trust failure, and it is the one thing that must be resolved before launch.",
+    "live_evidence": "Live CTA is \"Trimite rezervarea\" (send the booking) with the consent sentence attached; info_vouchere_vacanta.txt: \"trebuie doar sa completezi formularul de rezervare. Apoi, vei fii contactat de catre un specialist de-al nostru.\" The payment step behind /reservation/unit/ was not opened and remains unknown.",
+    "redesign_evidence": "<button class=\"btn btn-primary btn-big\">Rezervă și plătește avansul →</button> and <div class=\"trust-note\">… Plată securizată · confirmare instantanee a rezervării</div>",
+    "recommendation": "Confirm with the booking back end whether charter allotment returns instant confirmation. If yes, keep the claim and state it precisely (\"confirmare pe loc pentru acest hotel\"). If not, revert the CTA to a request semantic (\"Trimite rezervarea — confirmăm în max. X ore, plătești după confirmare\") and remove the instant-confirmation badge."
+   },
+   {
+    "feature": "IMPROVED — worth keeping: explicit deposit vs. pay-in-full choice with both amounts and the balance deadline",
+    "status": "improved",
+    "severity": "nice-to-have",
+    "why_it_matters": "Live never states an avans amount or a balance due date in the form; the redesign turns the payment decision into two priced, comparable options plus a split box in the summary (\"De plătit azi (avans 30%) 1 214 Lei\" / \"Până la 22 mai / la hotel 2 832 Lei\"). Lowering the cash-today figure while keeping the full price visible is the single strongest conversion lever on a high-ticket seaside package.",
+    "live_evidence": "No deposit/balance breakdown anywhere in the live booking form.",
+    "redesign_evidence": "<div class=\"payopt\"> two .pay-box options + <div class=\"split-box\"> with today/later amounts",
+    "recommendation": "Keep as designed; just make the balance date dynamic and consistent with the cancellation deadline shown in the green band (currently 22 mai vs 20 mai — reconcile the two)."
+   },
+   {
+    "feature": "IMPROVED — worth keeping: persistent priced booking summary with cancellation terms in the sidebar",
+    "status": "improved",
+    "severity": "nice-to-have",
+    "why_it_matters": "Live shows only \"Sosire / Plecare / Adulti / Copii\" with no price, no property, no cancellation rule during the form — the user fills in personal data blind to what they are buying. The redesign's sticky summary (photo, rating, dates, occupancy, board, itemised price, discount line, free-cancellation band) removes the main source of checkout anxiety and abandonment.",
+    "live_evidence": "Live \"Detalii rezervare\" block contains only dates and pax counts, no price.",
+    "redesign_evidence": "<aside><div class=\"sum-card\"> … .price-lines, .green-band \"✓ Anulare gratuită până la 20 mai\"",
+    "recommendation": "Keep. Make \"vezi regulile\" open the actual cancellation-penalty grid from the tourist contract rather than a placeholder link."
+   },
+   {
+    "feature": "IMPROVED — worth keeping: individual vs. company billing toggle and structured billing address",
+    "status": "improved",
+    "severity": "nice-to-have",
+    "why_it_matters": "Live only collects Țară/Județ/Oraș with a full 200-country list and no company path, so corporate bookings and correct invoicing are handled off-line. The redesign's \"Persoană fizică / Persoană juridică\" segment plus a proper address block makes company invoicing a self-service case — relevant for team trips and voucher-adjacent corporate demand.",
+    "live_evidence": "Live \"Date personale\": Tara (global list), Judet, Oras only; no company fields.",
+    "redesign_evidence": "<div class=\"seg\"><span class=\"on\">Persoană fizică</span><span>Persoană juridică</span></div> plus Țara / Județ / Oraș / Adresă",
+    "recommendation": "Keep, and complete it: the juridic branch needs Denumire firmă, CUI, Nr. Reg. Com. and should auto-select proforma payment. Also default Țara to România and drop the irrelevant long country list."
+   }
+  ]
+ },
+ {
+  "screen": "hotel",
+  "gaps": [
+   {
+    "feature": "Resort tax (Taxa de statiune) disclosure",
+    "status": "missing",
+    "severity": "blocker",
+    "why_it_matters": "Live discloses a mandatory 1% resort tax payable at reception. The redesign not only omits it, it asserts the opposite: 'Prețul include taxele'. That is a false total-price statement under RO/EU price-transparency rules, and it guarantees front-desk disputes and chargebacks on charter stays the OTA is financially on the hook for.",
+    "live_evidence": "'Pentru acest hotel se achita la receptie in ziua cazarii, o Taxa de statiune in valoare de 1% din valoarea tarifului de cazare fara T.V.A pentru intreg sejurul'",
+    "redesign_evidence": "book-card price-note: 'Prețul include taxele și micul dejun' — no pay-at-property line anywhere",
+    "recommendation": "Add a 'De plătit la hotel' line under every rate price and in the book card: resort tax amount/formula, pet fee, extra-bed fee. Change 'Prețul include taxele' to 'Preț total; taxa de stațiune (1%) se achită la recepție'."
+   },
+   {
+    "feature": "Offer catalogue / named campaigns as rate names",
+    "status": "missing",
+    "severity": "blocker",
+    "why_it_matters": "LITRO's entire charter merchandising runs on named offers — the live page carries a dozen (Oferta Verii, Last Minute, Litoralul Pentru Toti, Extra Discount, Nibiru, Sfanta Maria, Extrasezon, Oferta cu tratament, Seniori, Mare pentru cei mici, Zile Gratuite). The redesign invents a single generic 'Înscrieri Timpurii'. Without the offer taxonomy there is no way to move unsold allotment into shoulder weeks, no landing-page-to-rate continuity, and the whole promo calendar becomes unshippable.",
+    "live_evidence": "'Oferte speciale disponibile: Oferta Verii / Oferta Last Minute / Litoralul Pentru Toti'; nav list 'Oferta Verii, Extra Discount, Oferta Nibiru 2026, Oferta Speciala, Oferta Sfanta Maria, Oferta Extrasezon, Oferta cu tratament, Zile Gratuite de Vacanta Litoral, Oferta Seniori Litoral, Oferta Mare pentru cei mici'",
+    "redesign_evidence": "only '<span class=\"pill pill-teal\">Înscrieri Timpurii −15%</span>' repeated on two rows; plus one 'Oferte speciale' concept absent entirely",
+    "recommendation": "Add an 'Oferte speciale disponibile' chip row under the hotel title that lists the actual live offer names and filters the rate table, and render the real offer name as the primary label of each rate row instead of a generic early-bird pill."
+   },
+   {
+    "feature": "Sunbeds-included in the room/offer name",
+    "status": "missing",
+    "severity": "major",
+    "why_it_matters": "On the Romanian seaside 'cu 2 șezlonguri incluse la plajă' is the single strongest differentiator between two otherwise identical double rooms, and it is how the live inventory is actually named at the bookable-unit level. Dropping it flattens the merchandising and forces guests to a competitor page to find out whether beach loungers are paid.",
+    "live_evidence": "booking form room types: 'Camera dubla + 2 sezlonguri incluse la plaja', 'Camera dubla family + 2 sezlonguri incluse la plaja' (vs. plain 'Camera dubla family'); search row headline is the same string",
+    "redesign_evidence": "room names 'Cameră dublă vedere mare' / 'Apartament familial cu balcon'; no lounger token in any rate row (only a guest review mentions șezlonguri)",
+    "recommendation": "Allow the unit name to carry the inclusion, and add a beach-inclusion perk chip ('2 șezlonguri incluse la plajă') to the rate row's 'Alegerile tale' column."
+   },
+   {
+    "feature": "Meal-plan definitions (All Inclusive / breakfast package contents)",
+    "status": "missing",
+    "severity": "major",
+    "why_it_matters": "Live spells out meal windows, exactly which drinks are included at restaurant vs pool bar, that the first meal is dinner and the last is lunch, and that buffet requires 60+ guests. For charter inventory this text is the contract that prevents on-site complaints and refund demands — and it is the reason a guest picks All Inclusive over half-board (a several-hundred-lei upsell per booking). The redesign reduces meal plans to unexplained filter chips.",
+    "live_evidence": "'Pachetul All inclusive ... cuprinde: mic-dejun (08:00-10:00), pranz (13:00-15:00), cina (19:00-21.00) ... bauturi in timpul meselor si la piscina (09.00-19.00) ... In prima zi de cazare – prima masa va fi cina'",
+    "redesign_evidence": "meal-chips 'Toate / Fără masă / Mic dejun / Demipensiune / All inclusive' and rate labels 'Demipensiune', 'All inclusive' with no definition anywhere on the page",
+    "recommendation": "Make each meal-plan label a hover/expand that renders the hotel-specific package definition, and add a 'Ce include All Inclusive aici' block in the Servicii area with times, drinks and first/last-meal rules."
+   },
+   {
+    "feature": "Per-rate FRIENDS credits earned",
+    "status": "weakened",
+    "severity": "major",
+    "why_it_matters": "Live shows a concrete credit amount on every priced result ('Primesti: 159 credite') plus a hotel-level '2% din valoarea rezervarii daca faci rezervarea fiind logat' nudge — that is the login/loyalty engine and the main defence of direct margin. The redesign shows credits once, in the booking card, at an implausibly small number, so the comparison incentive between rates and the log-in prompt both disappear.",
+    "live_evidence": "'Primesti : 159 credite'; 'poti primi un credit echivalent cu 2% din valoarea rezervarii daca faci rezervarea fiind logat in contul tau' + 'Intra in cont' CTA",
+    "redesign_evidence": "single line '+ câștigi 28 credite FRIENDS' in book-card; no credits column in the rates table, no logged-out 'Intra in cont' prompt",
+    "recommendation": "Add a credits line to every rate row (scaled to that rate's value, ~2%) and a logged-out banner near the rate table: 'Autentifică-te și primești X credite pentru această rezervare'."
+   },
+   {
+    "feature": "Campaign 'Litoralul Romanesc te rasplateste'",
+    "status": "missing",
+    "severity": "major",
+    "why_it_matters": "A prize draw that automatically enrols any booking of 4+ nights is a direct lever on length-of-stay, the metric that matters most for filling a weekly charter allotment. It is also LITRO-owned (not hotel-owned) proof of why to book here rather than on a global OTA. Nothing in the redesign carries it.",
+    "live_evidence": "'Acest hotel participa la Campania Litoralul romanesc te rasplateste ... Fiecare rezervare de minim 4 nopti la Hotel Complex Mediteranean te inscrie automat in cursa pentru castigarea unui sejur ... pentru Sezonul Estival 2027!'",
+    "redesign_evidence": "none found",
+    "recommendation": "Add a campaign strip between the gallery and the rate table with the campaign name, the 4-night qualifier, and a modal for full conditions; repeat the qualifier as a nudge on rate rows shorter than 4 nights."
+   },
+   {
+    "feature": "Campaign 'Jurasica Park Neptun' free child ticket",
+    "status": "missing",
+    "severity": "major",
+    "why_it_matters": "Free child admission with clear eligibility (booking includes a child, age 0–14, stay 1 May–30 Sep) is a family-segment conversion driver on a coast whose core customer is families with kids — and the redesign's own search state is '2 adulți + 2 copii'. Losing it removes a free-perk reason to book that costs LITRO nothing.",
+    "live_evidence": "'Rezervi vacanta si ai intrare gratuita la Jurasica Park Neptun ... Rezervarea include cel putin un copil / Copilul trebuie sa aiba varsta cuprinsa intre 0-14 ani'",
+    "redesign_evidence": "none found",
+    "recommendation": "Render qualifying campaign perks as a badge on the hotel head and as a green perk line inside the rate rows the search party actually qualifies for, with a 'vezi detaliile' modal."
+   },
+   {
+    "feature": "'ANULARE GRATUITA' programme badge (hotel-level)",
+    "status": "weakened",
+    "severity": "major",
+    "why_it_matters": "Live carries a LITRO-branded programme badge with a link to its conditions — that is a trust asset owned by the OTA, distinct from a per-rate date. The redesign only has a bare per-rate 'Anulare flexibilă până la 20 mai' with no link to terms, so the guest cannot verify what free cancellation means, and the programme stops being a brand differentiator.",
+    "live_evidence": "'Acest hotel este inclus in programul ANULARE GRATUITA - vezi conditiile'",
+    "redesign_evidence": "rate rows: '<span style=\"color:#0E804B;font-weight:700\">Anulare flexibilă</span> până la 20 mai' — no programme badge, no conditions link",
+    "recommendation": "Add the programme badge next to the hotel title, link 'Anulare flexibilă' in every rate row to the conditions modal, and state the penalty after the deadline."
+   },
+   {
+    "feature": "Holiday-voucher (card de vacanță) acceptance",
+    "status": "moved",
+    "severity": "major",
+    "why_it_matters": "Vouchers are a major payment share in Romanian domestic leisure; on live the acceptance statement appears twice above the fold and again in the FAQ, because it is a go/no-go filter for a large employer-benefit segment. In the redesign it survives only as one line inside a four-column policy grid far below the rate table — most users decide before they ever scroll there.",
+    "live_evidence": "'Pentru rezervari la Hotel Complex Mediteranean, acceptam plata cu card de vacanta' (shown near the title and repeated in FAQ: 'Da, se poate plati atat cu card de vacanta.')",
+    "redesign_evidence": "Politici generale → Opțiuni de plată: 'Card de vacanță: <b>Edenred, Pluxee, Up</b>'",
+    "recommendation": "Surface a voucher-accepted badge next to the hotel title and inside the booking card, keeping the policy-grid entry as detail."
+   },
+   {
+    "feature": "'De ce aleg oamenii ...?' reason block + best-rated dimension callout",
+    "status": "missing",
+    "severity": "major",
+    "why_it_matters": "A short, machine-generated list of concrete reasons (50 m from beach, All Inclusive available, outdoor pool, private beach sector) plus the highest-scoring review dimension is the cheapest persuasion unit on the page and the one that survives skim-reading. The redesign replaces it with a generic six-icon amenity row that says nothing about why this property in particular.",
+    "live_evidence": "'De ce aleg oamenii Complex Mediteranean ? Hotel aproape de plaja ( 50 m de plaja ) / Hotelul ofera servicii de masa All Inclusive. ...' and 'Pozitionare 9.3 — Oaspetii au apreciat cel mai mult pozitionarea'",
+    "redesign_evidence": "'Facilități populare' icon row (Plajă privată, Piscină exterioară, ...); review bars show scores but no 'best dimension' callout",
+    "recommendation": "Add a 'De ce aleg oamenii X' card above the rate table with 3–5 property-specific reasons, and promote the top review dimension as a labelled highlight next to the 9.2 badge."
+   },
+   {
+    "feature": "'Preț pe noapte de la ... în perioada ...' cheapest-period teaser",
+    "status": "weakened",
+    "severity": "major",
+    "why_it_matters": "Live tells a visitor with unaffordable dates that the same hotel costs 405 Lei/night in a specific September window under a named offer — that is the single most important demand-shifting tool for charter inventory, because it rescues the session instead of losing it. The redesign's flexi strip only shifts ±3 days around the current dates and never reaches the cheap shoulder weeks or names the offer that makes them cheap.",
+    "live_evidence": "'Pret pe noapte de la 405 Lei in perioada 06/09/2026 - 12/09/2026 cu Litoralul Pentru Toti'",
+    "redesign_evidence": "flexi-strip cells 1–8 iun … 7–14 iun, cheapest '3 640 / −10%'; no season-wide cheapest window, no offer name",
+    "recommendation": "Keep the flexi strip but add a season-level teaser line above it: cheapest nightly price, its date window, and the offer name, as a one-click date swap."
+   },
+   {
+    "feature": "Room-type detail depth (m², bed config, occupancy by child age band)",
+    "status": "weakened",
+    "severity": "major",
+    "why_it_matters": "Live gives per-unit prose with exact surface, bed layout and legally-worded capacity rules using age bands (0–9.99 / 0–13.99 years) that determine both price and whether a family is refused at check-in. The redesign compresses this to four pills and a dead 'Detalii cameră →' link, so the age-band rules — the most frequent source of overbooked-child disputes on charter stays — are simply gone.",
+    "live_evidence": "'Camera dubla standard 3* are 17,50 mp ... Capacitatea maxima de cazare a camerei este de 2 adulti si 2 copii 0-13.99 ani sau 3 adulti si 1 copil 0-9.99 ani. Pentru un confort sporit, se recomanda achizitionarea unui pat suplimentar'",
+    "redesign_evidence": "room-pills '24 m² / Max. 2 adulți + 1 copil / 1 pat dublu / Balcon' plus '<a class=\"rlink\">Detalii cameră →</a>'",
+    "recommendation": "Design the room-detail drawer this link opens: full description, bed matrix, capacity permutations with child age bands, extra-bed recommendation and price, and the 'rooms allocated at reception' caveat."
+   },
+   {
+    "feature": "Instant-confirmation truth / availability status per rate",
+    "status": "weakened",
+    "severity": "major",
+    "why_it_matters": "Live exposes 'Doar cu confirmare instanta' as an explicit filter, which implies part of the inventory is request-based. The redesign promises 'confirmare imediată' unconditionally under every booking, which will be false for a share of charter/request rates and turns a UX line into a broken promise at the worst moment.",
+    "live_evidence": "filter option 'Disponibilitate instantă' / 'Doar cu confirmare instanta'",
+    "redesign_evidence": "bk-note: 'Nu plătești nimic acum · confirmare imediată' (unconditional, no per-rate confirmation state)",
+    "recommendation": "Make confirmation type a per-rate attribute ('confirmare instantă' vs 'confirmare în max. X ore') and drive the booking-card note from the selected rate rather than hard-coding it."
+   },
+   {
+    "feature": "House rules / property restrictions (pets, wristband, pool rules)",
+    "status": "missing",
+    "severity": "major",
+    "why_it_matters": "Live states pets are not allowed at all and imposes a mandatory wristband plus pool rules. The redesign's policy grid instead invents a permissive pet policy (10 kg, 45 Lei/night). Shipping a contradictory restriction is worse than omitting it: a guest arriving with a dog on the strength of the page has a legitimate claim against the agency.",
+    "live_evidence": "'Nu este permis accesul in complex cu animale de companie.' / 'Turistii sunt obligati sa poarte bratara pe care o primesc la cazare pe toata perioada sejurului.'",
+    "redesign_evidence": "Politici generale → 'Câini și pisici acceptate până la <b>10 kg</b> · 45 Lei / noapte / animal'",
+    "recommendation": "Bind the pets card to real property data including the 'not allowed' state, and add a 'Reguli casei' block for wristband/pool/towel restrictions rather than hard-coding a permissive placeholder."
+   },
+   {
+    "feature": "'Dotări generale' hotel inventory list",
+    "status": "weakened",
+    "severity": "minor",
+    "why_it_matters": "Live quantifies the property (280 rooms, 12 apartments, restaurant with 600 seats, 3 playgrounds, tennis court, free cot, free own parking subject to availability). For a family audience these numbers are what make a 3-star complex feel credible, and the 'in limita disponibilitatii' caveats protect the agency. Six generic icons carry none of that.",
+    "live_evidence": "'280 de camere duble standard si family / Restaurant si terase acoperite (600 de locuri) / 3 locuri de joaca pentru copii / Patut tip tarc gratuit (in limita disponibilitatii)'",
+    "redesign_evidence": "'Facilități populare' 6 icons + 'Vezi toate cele 35'",
+    "recommendation": "Add a quantified 'Dotări generale' list section (or make the 'Vezi toate cele 35' target this) preserving availability caveats."
+   },
+   {
+    "feature": "In-page sticky navigation (Tarife / Rezervă / Detalii / Servicii / Dotări / Recenzii)",
+    "status": "missing",
+    "severity": "minor",
+    "why_it_matters": "The live hotel page is very long and offers an anchor bar so a user can jump straight to rates or reviews. The redesign is equally long but has only breadcrumbs, so users who scroll past the rate table have no cheap way back to the only converting element on the page.",
+    "live_evidence": "'Tarife | Rezerva | Suna acum | Detalii hotel | Servicii | Dotari | Parerile oaspetilor'",
+    "redesign_evidence": "crumbs only: 'Litoral România › Mamaia › Complex Mediteranean'; no section anchors",
+    "recommendation": "Add a sticky section nav under the hotel head that collapses into a compact 'de la X Lei · Vezi tarife' bar once the booking card scrolls out of view."
+   },
+   {
+    "feature": "Phone-booking CTA in context",
+    "status": "weakened",
+    "severity": "minor",
+    "why_it_matters": "Live repeats the reservations number inside the hotel body and offers a 'Suna acum' action, because a meaningful share of LITRO's charter bookings still close by phone with an agent who can shift a guest to another allotment week. The redesign keeps a phone number only in the header, so the call intent has to survive the whole scroll.",
+    "live_evidence": "'0241 999' repeated in the hotel body plus 'Suna acum' in the section nav; 'Rezervati online sau la telefon ... Program extins 10:00 - 18:00'",
+    "redesign_evidence": "header only: 'h-phone ... 0241 999 · 0241 837 777 / Zilnic 08:00 – 20:00'; nothing near the rate table or booking card",
+    "recommendation": "Add a 'Rezervă prin telefon' secondary action inside the booking card and a call link in the rate-table empty/sold-out state."
+   },
+   {
+    "feature": "Offer expiry / recency urgency signals",
+    "status": "missing",
+    "severity": "minor",
+    "why_it_matters": "Live pairs each special offer with a countdown ('expira in 15 zile') and shows the timestamp of the most recent booking at this hotel. Both are honest, data-backed scarcity signals that matter most on fixed allotment where a week genuinely sells out. The redesign has no urgency layer at all beyond one greyed 'Ocupat' cell.",
+    "live_evidence": "'Oferta speciala ( expira in 15 zile )' and 'Cea mai recenta rezervare la Hotel Complex Mediteranean: 18.07.2026 ora 22:53'",
+    "redesign_evidence": "one flexi cell 'Ocupat'; no expiry, no recency, no rooms-left counter",
+    "recommendation": "Add offer-expiry text to promotional rate rows and a discreet recency/last-booking line near the booking card, both driven by real data."
+   },
+   {
+    "feature": "Hotel FAQ block",
+    "status": "missing",
+    "severity": "minor",
+    "why_it_matters": "The live FAQ answers the six questions that generate most support calls (room types, payment methods, own restaurant, check-in times, facilities, voucher acceptance) and is a meaningful organic-search asset for a site whose traffic is heavily SEO-driven. It has no counterpart in the redesign.",
+    "live_evidence": "'Intrebari frecvente pentru Complex Mediteranean Mamaia: Ce tipuri de camere sunt disponibile ... Care sunt modalitatile de plata ... Se poate plati cu card de vacanta ...'",
+    "redesign_evidence": "none found",
+    "recommendation": "Add a collapsible FAQ section below Policies, generated from the same structured data as the policy grid so answers cannot drift."
+   },
+   {
+    "feature": "Cross-sell breadth: recently viewed, category browse, transport, email-the-list",
+    "status": "weakened",
+    "severity": "minor",
+    "why_it_matters": "Live gives several recovery paths when this hotel does not fit: undecided-user rail of other 3-star Mamaia hotels, star-category browse, recently viewed, 'send list by e-mail', transport info and a hotel map. With ~500 own-allotment properties the goal is to keep the session inside the inventory; the redesign offers a single four-card 'nearby alternatives' row.",
+    "live_evidence": "'Nu te-ai decis? Verifica preturile si la alte hoteluri de 3 stele din Mamaia', 'Ultimele hoteluri vizitate', 'Trimite lista pe E-mail', 'Transport Litoral', 'Harta hotelurilor din Mamaia'",
+    "redesign_evidence": "one 'Alternative în apropiere, din inventarul nostru' row of 4 cards + 'Toate cazările din Mamaia'",
+    "recommendation": "Add a same-category/same-price-band rail and a 'Vizitate recent' strip; keep the map entry point. Save/e-mail-the-shortlist can be a later phase."
+   },
+   {
+    "feature": "Promo code / gift-card entry",
+    "status": "moved",
+    "severity": "minor",
+    "why_it_matters": "Live accepts a promo code or gift card inside the hotel booking form, i.e. before the user commits to the payment step, so the discount is visible while they are still comparing rates. The redesign's hotel page has no field; it may exist on checkout.html, but if it only appears after commitment the perceived-price advantage of holding a code is lost at the comparison moment. Flagged as moved, not missing, pending the checkout screen.",
+    "live_evidence": "booking form: 'Adauga un cod promo sau card cadou' + 'Aplica'",
+    "redesign_evidence": "none on hotel.html",
+    "recommendation": "Confirm the field exists on checkout; additionally expose a lightweight 'Ai un cod promo?' toggle in the booking card so the reduced price is shown before the user leaves the hotel page."
+   },
+   {
+    "feature": "Content-accuracy disclaimer",
+    "status": "missing",
+    "severity": "nice-to-have",
+    "why_it_matters": "Live carries an explicit statement that property descriptions come from hotel partners and may change — cheap legal cover for an agency that resells third-party charter inventory and is the contractual organiser of the trip.",
+    "live_evidence": "'ne bazam pe partenerii nostri hotelieri in furnizarea de informatii corecte si relevante ... ne rezervam dreptul de a face actualizarile necesare'",
+    "redesign_evidence": "footer only: '© 2008–2026 Litoralul Romanesc · Parte din Szallas Group'",
+    "recommendation": "Add the disclaimer as fine print at the end of the description/policies area, alongside the organiser identity (Creative Eye SRL, licence numbers) that also appears on live."
+   },
+   {
+    "feature": "IMPROVED — structured rate table with old price, refundability and per-rate CTA",
+    "status": "improved",
+    "severity": "nice-to-have",
+    "why_it_matters": "Live buries rates behind 'Alegeti datele pentru a vedea tarifele' and a legacy dropdown form; the redesign's four-column table (Alegerile tale / Oaspeți / Prețul tău / Alege camera) with strikethrough old price and explicit 'Nerambursabil · plată în avans' is a genuine comprehension and conversion win. Keep it — just add the missing columns (credits, resort tax, offer name, confirmation type).",
+    "live_evidence": "'Alegeti datele pentru a vedea tarifele' + 'Tipul: Alegeti tipul camerei' select-driven flow",
+    "redesign_evidence": "table.rates with header row and per-row 'Alege' buttons",
+    "recommendation": "Keep as the anchor pattern; extend rather than replace."
+   },
+   {
+    "feature": "IMPROVED — flexible-dates price strip",
+    "status": "improved",
+    "severity": "nice-to-have",
+    "why_it_matters": "Showing ±3 days of 7-night prices with a sold-out state and cheapest-day markers is a real availability-truth improvement over live, which has no date-flexibility surface at all. Very valuable on fixed allotment. Only gap: it needs to reach season-level cheap windows too (covered above).",
+    "live_evidence": "no equivalent on live",
+    "redesign_evidence": "'flexi-strip' with cells 1–8 iun … 7–14 iun, 'Ocupat' state and '−10%' markers",
+    "recommendation": "Keep; extend with the named-offer cheapest-window teaser."
+   },
+   {
+    "feature": "IMPROVED — structured review breakdown",
+    "status": "improved",
+    "severity": "nice-to-have",
+    "why_it_matters": "Live shows only an aggregate 8.9/911 plus a single 'Pozitionare 9.3' callout. The redesign's six-dimension bar chart plus three dated, city-tagged review cards is materially stronger trust content for a domestic audience that books on peer proof.",
+    "live_evidence": "'Foarte Bine 8.9 / 911 recenzii' and 'Pozitionare 9.3'",
+    "redesign_evidence": "rev-bars for Curățenie/Locație/Personal/Raport calitate-preț/Confort/Facilități + 3 rev-cards",
+    "recommendation": "Keep; re-add the 'best-rated dimension' callout as a headline above the bars."
+   }
+  ]
+ },
+ {
+  "screen": "search results / listing (Cazare Mamaia)",
+  "gaps": [
+   {
+    "feature": "Guest review quote on every result card (\"Ce apreciaza turistii la acest hotel\" + \"Nota 10/10\" + verbatim sentence)",
+    "status": "missing",
+    "severity": "major",
+    "why_it_matters": "This is the single strongest trust element on the live listing and it appears on EVERY card. For a charter OTA whose ~500 properties are mid-market Romanian seaside hotels with weak brand recognition, the quote is what converts a name like \"Hotel Siret\" into a bookable choice. A bare 8.7/184 recenzii carries a fraction of the persuasive weight of \"Curatenie, mic dejun foarte bun, pozitionarea foarte buna - aproape de plaja si terase\". Removing it flattens all 81 results into interchangeable numbers and pushes shoppers to Booking to read reviews — where they may also book.",
+    "live_evidence": "Every card: \"Ce apreciaza turistii la acest hotel / Nota 10/10 / Curatenie, mic dejun foarte bun, pozitionarea foarte buna - aproape de plaja si terase\" (Hotel Sulina); \"Personalul, amabilitatea, curățenia, dotările, poziția\" (Hotel Delta); \"Amplasarea, spatii de joaca, piscine.\" (Complex Mediteranean)",
+    "redesign_evidence": "Only the numeric block: `<div class=\"rate-word\">Excelent</div><div class=\"rate-count\">157 recenzii</div><span class=\"rate-badge\">9.2</span>` — no quote anywhere in listing.html",
+    "recommendation": "Add a 1–2 line truncated top-review quote block to `.lc-mid` or under `.rating-top`, with the reviewer's sub-score label (\"Nota 10/10\") as a small caption. Reserve fixed height so cards stay aligned; fall back to the property's editorial description (live does exactly this for Hotel Albatros / OBA Luxury / Yza Maria when no reviews exist)."
+   },
+   {
+    "feature": "Offer expiry countdown (\"Oferta speciala ( expira in 15 zile )\")",
+    "status": "missing",
+    "severity": "major",
+    "why_it_matters": "Charter inventory has to be sold before departure or it is a sunk cost — urgency is not a dark pattern here, it is the actual commercial reality. The live listing carries a real, per-offer deadline on roughly half the cards, ranging from \"expira in 4 zile\" to \"expira in 105 zile\", which both creates urgency and makes the discount credible (it explains WHY the price is cut). The redesign shows a naked \"−15%\" pill with no reason and no deadline, which reads as permanent fake-discount decoration and is also weaker under EU price-indication rules.",
+    "live_evidence": "\"Oferta speciala ( expira in 15 zile )\" (Complex Mediteranean), \"( expira in 4 zile )\" (Hotel Florida), \"( expira in 105 zile )\" (Hotel Zenith), \"( expira in 73 zile )\" (Hotel Aurora)",
+    "redesign_evidence": "`<span class=\"pill pill-red\">−15%</span>` and `<span class=\"pill pill-green\">O ofertă specială disponibilă</span>` — no expiry, no deadline anywhere",
+    "recommendation": "Attach an expiry line to the discount pill in `.lc-price` (e.g. \"−15% · expiră în 4 zile\"), with visual escalation under ~7 days. Keep it data-driven from the real offer end date, never synthetic."
+   },
+   {
+    "feature": "\"Vezi toate tipurile de camera\" — per-property expansion to all room types / rate plans",
+    "status": "missing",
+    "severity": "major",
+    "why_it_matters": "LITRO sells allotment: one hotel typically has 4–15 contracted room types at very different prices (\"Camera dubla economy\" vs \"Camera dubla cu vedere la mare + 2 sezlonguri\"). The live card shows the cheapest one and lets the user open the rest without leaving the listing. Removing that link forces a full page load per property to discover the actual product range, which kills comparison depth and hides higher-ADR rooms — a direct mix/upsell loss on the highest-margin inventory.",
+    "live_evidence": "Present on all 81 cards: \"Camera dubla economy / Vezi toate tipurile de camera\" (Hotel Victoria); \"Bellevue Suite (Front Sea View) / Vezi toate tipurile de camera\" (Riva Aparthotel)",
+    "redesign_evidence": "`<div class=\"lc-room\"><div class=\"rt\">Cameră dublă vedere mare</div><div class=\"rd\">1 pat dublu · 2 șezlonguri incluse pe plajă</div></div>` — single room, no expansion affordance",
+    "recommendation": "Add an inline expander under `.lc-room` (\"Vezi toate tipurile de cameră (7)\") that reveals the other rate rows with price deltas in-card, ideally with a count so users see inventory depth."
+   },
+   {
+    "feature": "Availability-truth filters: \"Camere disponibile\", \"Disponibilitate tarife / Doar hotelurile cu tarife\"",
+    "status": "missing",
+    "severity": "blocker",
+    "why_it_matters": "With chartered allotment, a large share of the ~500 properties have no loaded rate or no free rooms for a given date range, and the live listing exposes this as an explicit user control. Without it, the redesign will show sold-out or rate-less properties mixed with bookable ones, users click through, hit dead ends, and lose trust in every price on the page. This is the availability-truth issue, not a nice-to-have filter.",
+    "live_evidence": "Filter rail: \"Camere disponibile\" and section \"Disponibilitate tarife / Doar hotelurile cu tarife\"",
+    "redesign_evidence": "none found — the rail has Reduceri, Preț, Filtre populare, Distanța, Card de vacanță, Masă, Tip de cazare, Recenzii, Plată și anulare; no availability section",
+    "recommendation": "Add an \"Disponibilitate\" fbox at the TOP of the rail with \"Doar cazări disponibile\" (default on) and \"Doar cu tarife afișate\", plus an explicit card state for properties shown without live rates (\"Cere ofertă / sună\") so the listing never implies bookability it does not have."
+   },
+   {
+    "feature": "\"Doar cu confirmare instanta\" filter",
+    "status": "missing",
+    "severity": "major",
+    "why_it_matters": "Instant confirmation is LITRO's structural advantage over the agency-request model that dominates Romanian seaside booking — it is exactly what own allotment buys you. The redesign name-drops it once as decorative text in the results header but gives the user no way to filter to it, so the differentiator is asserted rather than usable. Buyers who specifically want no-waiting bookings cannot isolate them.",
+    "live_evidence": "Filter rail: \"Doar cu confirmare instanta\"",
+    "redesign_evidence": "Only prose in the header: `<span class=\"trust-note\">... inventar propriu, confirmare instantanee</span>` — no filter, and no per-card instant-confirmation badge",
+    "recommendation": "Add \"Doar cu confirmare instantanee (N)\" to the \"Plată și anulare\" fbox AND a per-card badge in `.lc-perks`, so the claim is verifiable at the card level rather than a global slogan."
+   },
+   {
+    "feature": "Per-card phone number (\"0241 999\") / phone-booking affordance",
+    "status": "weakened",
+    "severity": "major",
+    "why_it_matters": "LITRO's live site repeats the call-centre number on every single result card and again in a floating \"Nu te poti decide? Consultantii nostri sunt aici\" block. Romanian seaside buyers, especially the older and family segments buying 7-night all-inclusive stays worth 5–10k Lei, convert heavily by phone. Demoting the number to a single small header item removes the call trigger exactly at the moment of hesitation — when a specific hotel is being considered — and phone revenue is measurable, not theoretical.",
+    "live_evidence": "\"0241 999\" printed on all 81 cards; plus \"Nu te poti decide ? Consultantii nostri sunt aici pentru tine. Suna acum 0241 999 / 0241 837 777\"",
+    "redesign_evidence": "Header only: `<div class=\"num\">0241 999 · 0241 837 777</div>` inside `.h-phone`",
+    "recommendation": "Add a low-emphasis \"Rezervă și la telefon: 0241 999\" line next to the card CTA (or on CTA hover/secondary), and keep a sticky/inline consultant block after the first ~6 results mirroring the live \"Nu te poți decide?\" prompt."
+   },
+   {
+    "feature": "FRIENDS credit amount stated as a real total per booking (\"Primesti : 159 credite\")",
+    "status": "weakened",
+    "severity": "major",
+    "why_it_matters": "The live site states the concrete credit reward for THIS stay — 159, 203, 173 credite — a number large enough to feel like money and to justify logging in. The redesign restates it as \"+ 4 credite FRIENDS / noapte\", which for a 7-night stay implies 28 and understates the actual reward by an order of magnitude. Loyalty enrolment and logged-in booking rate are the whole point of the credits mechanic; shrinking the perceived value undercuts the login prompt sitting right below it.",
+    "live_evidence": "\"Primesti : 159 credite\" (Complex Mediteranean, 7993 Lei), \"Primesti : 203 credite\" (Savoy), \"Primesti : 43 credite\" (Astoria); also the inline nudge \"Stiai ca ... poti primi credite cadou daca faci rezervarea fiind logat in contul tau\"",
+    "redesign_evidence": "`<div class=\"credits\">+ 4 credite FRIENDS / noapte</div>`",
+    "recommendation": "Show the stay total as the primary figure (\"Primești 159 credite FRIENDS pentru acest sejur\") and optionally the per-night rate as secondary. Add the Lei equivalent if the conversion is fixed."
+   },
+   {
+    "feature": "Named commercial programmes on cards (\"Oferta Verii\", \"Oferta Last Minute\", \"Zile Gratuite de Vacanta\", \"Litoralul Pentru Toti\", \"Extra Discount\", \"Long Stay\") including stay conditions",
+    "status": "weakened",
+    "severity": "major",
+    "why_it_matters": "These are LITRO's own negotiated charter campaigns with years of media spend and brand recall in Romania — \"Litoralul pentru toți\" in particular is a nationally recognised programme. The live cards also carry the conditions inline (\"minim 5 nopti\", \"minim 3 nopti\", \"plata integrala\", \"Nerambursabila\"). The redesign collapses all of it into two generic pills, so the campaign equity disappears and the qualifying conditions only surface later — a classic late-disclosure drop-off at checkout.",
+    "live_evidence": "\"Oferta Verii\", \"Zile Gratuite de Vacanta\", \"Oferta Speciala a Verii Flexibil 20.07.2026 minim 5 nopti - Oferta Extra discount plata integrala 20.07.2026\", \"Oferta Standard 2026 minim 3 nopti\", \"Oferta Speciala Nerambursabila 2026 (MD)\"; top nav also lists \"Oferte litoral / Last minute / Oferta Verii / Litoralul Pentru Toti / Extra Discount\"",
+    "redesign_evidence": "`<span class=\"pill pill-teal\">Înscrieri Timpurii</span>` and `<span class=\"pill pill-green\">O ofertă specială disponibilă</span>`",
+    "recommendation": "Render the real programme name in the pill (branded per campaign) and put the binding condition as a short caption under the price (\"minim 5 nopți · plată integrală · nerambursabil\"). Keep the campaign entry points in the header nav too."
+   },
+   {
+    "feature": "Full facilities filter block (~50 amenities with counts)",
+    "status": "weakened",
+    "severity": "major",
+    "why_it_matters": "Romanian seaside demand segments hard on amenities the redesign has no way to express: \"Baza tratament\" (balneo/treatment base — a whole customer segment and a state-voucher use case), \"Piscina pentru copii\", \"Loc de joaca\", \"Patut tip tarc pentru bebelus\", \"Adults Only\", \"Piscina interioara\", \"Spa\", \"Priza de incarcare masini electrice\", \"Rampa de acces persoane cu dizabilitati\". Cutting from ~50 filters to 6 chips with no overflow forces those users to scan 81 cards manually or leave. On a one-coast, 500-property inventory, amenity filtering IS the primary differentiation axis — there is no geography to filter on.",
+    "live_evidence": "\"Facilitati\" block lists ~50 entries with counts: All Inclusive (11), Piscina (26), Plaja privata (35), Baza tratament (2), Piscina pentru copii (17), Loc de joaca (31), Spa (10), Adults Only (1), Patut tip tarc pentru bebelus (37), Camera pentru persoane cu dizabilitati (11), Self check-in (1), Sauna (11), Jacuzzi (9) …",
+    "redesign_evidence": "`Filtre populare` fbox with exactly 6 chips: Piscină (84), Mic dejun inclus (197), Pe plajă (52), Parcare (143), Aer condiționat (228), Animale acceptate (61) — no \"Vezi toate\" / overflow",
+    "recommendation": "Keep the 6-chip \"Filtre populare\" as the fast path but add \"Vezi toate facilitățile (48)\" opening a grouped, searchable panel (Piscine / Familie / Wellness & tratament / Accesibilitate / Servicii). Also surface \"All inclusive\" and \"Plajă privată\" as first-class filters — both are core LITRO charter propositions absent from the rail."
+   },
+   {
+    "feature": "Destination aggregate review score (\"Hotelurile din Mamaia au o medie de 8.7 puncte din 10, din 11395 recenzii\") and the site-wide 9.0 equivalent",
+    "status": "missing",
+    "severity": "major",
+    "why_it_matters": "11 395 reviews is LITRO's proof that it is not a thin affiliate feed — it is first-party volume accumulated over 20+ years of actually operating these stays. That single number is the cheapest available answer to \"why book here instead of Booking.com\", and it also props up every individual property score below it. The redesign replaces it with an unsourced assertion of own inventory.",
+    "live_evidence": "\"Hotelurile din Mamaia au o medie de 8.7 puncte din 10 / din 11395 recenzii\"; footer \"Hotelurile de pe Litoralul Romanesc au o medie de 9.0 puncte din 10\"",
+    "redesign_evidence": "`<span class=\"trust-note\">inventar propriu, confirmare instantanee</span>` — no aggregate score, no review volume",
+    "recommendation": "Put the destination aggregate next to the H1/result count: \"Cazare Mamaia · 81 cazări · 8.7/10 din 11 395 recenzii verificate\" and repeat the site-wide figure in the footer trust strip."
+   },
+   {
+    "feature": "Result count and unit-type taxonomy match real inventory",
+    "status": "weakened",
+    "severity": "blocker",
+    "why_it_matters": "The live search returns \"81 unitati de cazare in Mamaia\" split \"Hoteluri (70) / Apartamente (7) / Camere (4)\". The redesign header claims \"319 rezultate\" and the rail invents \"Vile și case de vacanță (72)\", \"Pensiuni (37)\", \"Apartamente (84)\", \"2 stele (17)\" — categories and volumes that do not exist in LITRO's Mamaia allotment. If those filter rows ship, most return zero results and the site looks broken; more importantly the whole layout has been sized for marketplace-scale inventory that a 500-property charter operator does not have. Facet counts must be generated from real data before any of this is signed off.",
+    "live_evidence": "\"81 unitati de cazare in Mamaia\"; \"Tipul unitatii: Hoteluri (70) / Apartamente (7) / Camere (4)\"; stars: (1)/(29)/(45)/(6)",
+    "redesign_evidence": "`<span class=\"res-count\">319 rezultate</span>`; `Vile și case de vacanță <span class=\"cnt\">(72)</span>`, `Pensiuni <span class=\"cnt\">(37)</span>`, `Apartamente <span class=\"cnt\">(84)</span>`",
+    "recommendation": "Re-derive every facet from production data, drop unit types LITRO does not contract in that destination, and hide zero-count rows entirely. Validate that the layout still reads well at 81 results, not 319."
+   },
+   {
+    "feature": "Review-classification filter labels aligned with the card labels",
+    "status": "weakened",
+    "severity": "minor",
+    "why_it_matters": "Live uses one vocabulary end-to-end — \"Exceptional (48) / Foarte Bine (28) / Satisfacator (5)\" in the rail and the same words on cards. The redesign filters on numeric bands (9.5+/9.0+/8.0+) while cards say \"Excelent / Foarte bine / Bine\", so a user filtering \"Excelent 9.5+\" gets cards labelled \"Excelent\" at 9.2. Small, but it makes the scoring system look unreliable, and score credibility is load-bearing when the score is your main trust asset.",
+    "live_evidence": "\"Clasificare reviews: Exceptional (48) / Foarte Bine (28) / Satisfacator (5)\" matching card labels \"Exceptional\", \"Foarte Bine\"",
+    "redesign_evidence": "Rail: `Excelent 9.5+ (38)`, `Foarte bine 9.0+ (102)`, `Bine 8.0+ (187)`; cards: `Excelent` at 9.2, `Foarte bine` at 8.0",
+    "recommendation": "Pick one band definition and use identical words plus thresholds in rail, cards and hotel page. Keep the numeric threshold visible in the filter, it is a genuine improvement — just make the card label derive from the same function."
+   },
+   {
+    "feature": "Map of the destination including tourist objectives",
+    "status": "weakened",
+    "severity": "minor",
+    "why_it_matters": "Live offers a real map layer combining hotels and \"obiectivele turistice de pe Litoralul Romanesc\". On a single coastal strip where every property is 10–570 m from the same beach, micro-location (Cazino vs Nord vs Satul de Vacanță, proximity to Aqua Magic / telegondolă) is the main differentiator a shopper reasons about. The redesign reduces the map to a decorative grey placeholder with a button, and each card links out to a separate map view instead of a synchronised listing↔map interaction.",
+    "live_evidence": "\"Harta hotelurilor din Mamaia / Si a obiectivelor turistice de pe Litoralul Romanesc\"",
+    "redesign_evidence": "`<div class=\"map-card\"><div class=\"grid-lines\"></div><button class=\"btn\">📍 Vezi pe hartă</button></div>` — static placeholder; per-card `Vezi pe hartă` links",
+    "recommendation": "Specify a real map mode: pins priced, hover-sync with the result list, and a POI layer (plajă, telegondolă, Aqua Magic, Cazino) since micro-location is the primary comparison axis on one coast."
+   },
+   {
+    "feature": "Legal / operator identity footer (travel agency licence, ANPC, Ministry of Tourism, GDPR registry, T&C, tourist contract)",
+    "status": "missing",
+    "severity": "blocker",
+    "why_it_matters": "LITRO is the organising travel agency (agenție organizatoare), not a listing platform. Romanian consumer and tourism law requires the licence and identification details plus ANPC contact to be reachable from the site; the tourist contract and T&C must be accessible before booking. The redesign footer is a single copyright line. This cannot launch as-is regardless of design intent.",
+    "live_evidence": "\"Agentia Organizatoare LitoralulRomanesc.ro / S.C. Creative Eye.S.R.L. / Nr. ROC: J13/2215/2003 / Cod fiscal: RO15613488 / Adresa: Constanta, Bulevardul Mamaia, nr. 158 …\"; \"Autoritatea nationala pentru protectia consumatorului Telefon: 021 - 9551\"; \"Directia de control - Ministerul turismului: 080 086 8282\"; \"Termeni si conditii / Contractul cu turistul / Politica de confidentialitate / Intrebari frecvente\"",
+    "redesign_evidence": "`© 2008–2026 Litoralul Romanesc · Parte din Szallas Group. Toate drepturile rezervate.` — nothing else",
+    "recommendation": "Restore a full legal footer: operator entity + ROC + CUI + address, ANPC and Ministry of Tourism contacts, GDPR registry number, and links to Termeni și condiții, Contractul cu turistul, Politica de confidențialitate, Întrebări frecvente. Treat as launch-blocking sign-off with legal."
+   },
+   {
+    "feature": "Cookie consent banner / cookie preferences",
+    "status": "missing",
+    "severity": "blocker",
+    "why_it_matters": "GDPR/ePrivacy consent for analytics and personalised advertising cookies is mandatory before those scripts fire. Live has a compliant banner with granular options. If the redesign ships without it, either the site breaks the law or marketing tags get blocked — and LITRO's paid acquisition depends on those tags.",
+    "live_evidence": "\"Acest website folosește cookie-uri … folosim și cookie-uri analitice și de publicitate personalizată (inclusiv de la terți) … MODUL COOKIE / ACCEPTA TOT / DOAR NECESARE\"",
+    "redesign_evidence": "none found",
+    "recommendation": "Add the consent layer to the design system (banner + preferences modal), styled to the new tokens, and show it in the spec so it is not treated as an engineering afterthought that lands unstyled."
+   },
+   {
+    "feature": "Installments messaging on the listing (\"Vacante fara griji in 6 rate fara dobanda\") and cancellation insurance / holiday-voucher entry points",
+    "status": "missing",
+    "severity": "major",
+    "why_it_matters": "A 7-night Mamaia stay in the live data ranges 2 150–12 985 Lei. Interest-free instalments are a genuine affordability unlock at those tickets and the live site advertises them on the listing page itself, at the moment of price shock. The same applies to Edenred/Up/Pluxee holiday vouchers, a large share of Romanian seaside payment volume. The redesign has a voucher-brand filter but never states that instalments, storno insurance or gift vouchers exist on this screen.",
+    "live_evidence": "\"Vacante fara griji in 6 rate fara dobanda\"; footer links \"Vacante in rate / Vouchere vacanta / Asigurare storno / Voucher cadou\"",
+    "redesign_evidence": "Only `Card de vacanță` filter (Edenred / Pluxee / Up România); no instalment, storno or gift-voucher messaging",
+    "recommendation": "Add a compact payment-reassurance strip near the price rail or between result groups: \"6 rate fără dobândă · plată cu carduri de vacanță · asigurare storno\", each linking to the info page. Consider a per-card \"de la X Lei/lună\" for high-ticket stays."
+   },
+   {
+    "feature": "Resort navigation across the whole coast (19 destinations) and the \"Hoteluri pe stațiuni\" SEO block",
+    "status": "weakened",
+    "severity": "major",
+    "why_it_matters": "With one coast and ~500 properties, cross-resort navigation is how LITRO recovers a search that found nothing suitable in Mamaia — and the stațiuni link blocks are significant organic-traffic assets. The redesign offers 3 curated nearby cards, which is nicer to look at but drops 16 destinations and the crawlable link surface. That is a measurable SEO and internal-navigation loss, not a cosmetic one.",
+    "live_evidence": "Top strip and footer list 19 resorts (Mamaia, Mamaia Nord, Eforie Nord/Sud, Costinesti, Neptun-Olimp, Jupiter, Venus, Saturn, Mangalia, Constanta, Vama Veche 2 Mai, Techirghiol, Navodari, Tuzla, Corbu, 23 August, Piatra, Ovidiu); plus \"Hoteluri pe statiuni\" and \"Destinatii populare litoral 2026 / Listă completă de hoteluri\" blocks",
+    "redesign_evidence": "`near-band` with 3 cards (Mamaia Nord, Eforie Nord, Costinești) and header crumbs only",
+    "recommendation": "Keep the 3 editorial near-cards as the visual layer, but restore a full crawlable resort index in the footer and a destination switcher in the header. Confirm the change with SEO before removing the \"Hoteluri pe stațiuni\" block."
+   },
+   {
+    "feature": "Campaign landing entry points in navigation (Last minute, Oferta Verii, Litoralul Pentru Toti, Extra Discount, Hoteluri all inclusive) and the second product line (Delta Dunării)",
+    "status": "missing",
+    "severity": "major",
+    "why_it_matters": "These are separately merchandised, separately advertised inventory pools. Losing the nav means paid and returning traffic has no on-site path back into the campaign that brought them, and \"Hoteluri all inclusive\" in particular is a high-intent, high-ADR entry. Delta Dunării is an entire second destination business that vanishes from the IA.",
+    "live_evidence": "Header nav: \"Oferte litoral / Last minute / Oferta Verii / WEEKEND NIBIRU / Litoralul Pentru Toti / Extra Discount / Hoteluri all inclusive / Hoteluri Litoral 2026\"; \"Litoral Romania / Delta Dunarii\"",
+    "redesign_evidence": "Header contains logo, phone, user chip and a burger icon only — no visible nav items",
+    "recommendation": "Define the header nav explicitly in the redesign rather than leaving a burger placeholder: product-line switch (Litoral / Delta Dunării), campaign menu, and account. A hidden nav on desktop at 1440px is an unforced traffic loss."
+   },
+   {
+    "feature": "Language switcher (EN/RO) and accessibility statement",
+    "status": "missing",
+    "severity": "minor",
+    "why_it_matters": "Live serves an English audience and exposes an accessibility page. Dropping the language switch cuts off non-Romanian demand (including diaspora and neighbouring markets) and the accessibility link is increasingly an EAA compliance expectation.",
+    "live_evidence": "\"LimbaRomână\" in header; \"Selectati Limba / Engleză Română\"; \"Accesibilitate\"",
+    "redesign_evidence": "none found",
+    "recommendation": "Add a locale switcher to the header (or user menu) and an accessibility link in the footer legal row."
+   },
+   {
+    "feature": "Newsletter capture with explicit GDPR consent",
+    "status": "missing",
+    "severity": "nice-to-have",
+    "why_it_matters": "Email is a cheap re-marketing channel for a seasonal business where the browse-to-book window is weeks long. Live captures on the listing page itself, at the point of highest intent, with a proper consent checkbox.",
+    "live_evidence": "\"Cele mai bune oferte sunt pe e-mail! Vrei sa le primesti si tu? Inscrie-te acum! / Sunt de acord cu prelucrarea datelor cu caracter personal…\"",
+    "redesign_evidence": "none found",
+    "recommendation": "Add a low-friction capture block after the results (or as an exit-intent), reusing the FRIENDS band styling, with an explicit unticked consent checkbox."
+   },
+   {
+    "feature": "Editorial property description as fallback for properties without reviews",
+    "status": "missing",
+    "severity": "minor",
+    "why_it_matters": "New charter properties launch every season with 0–5 reviews. The live listing handles this gracefully by swapping the review quote for a written description; the redesign has neither, so a new property renders as an empty, untrustworthy card exactly when LITRO most needs to sell it.",
+    "live_evidence": "Hotel Albatros, OBA Luxury Boutique, Nicolas House, Beach Vibe Central and Yza Maria all show a description paragraph instead of a review quote (\"Hotel Albatros 3*** Mamaia este situat in zona centrala a statiunii…\")",
+    "redesign_evidence": "none found — no description slot and no zero-review card state",
+    "recommendation": "Specify the zero/low-review card state: description snippet in place of the quote, plus a \"Nou pe litoralulromanesc.ro\" badge so low review counts read as new rather than bad."
+   },
+   {
+    "feature": "Flexible-dates price strip",
+    "status": "improved",
+    "severity": "nice-to-have",
+    "why_it_matters": "Worth keeping. Live has nothing equivalent — users who cannot find their price must re-search blindly. Showing ±3 days with a cheapest marker directly monetises charter flexibility and salvages searches that would otherwise bounce on price.",
+    "live_evidence": "no equivalent in the live listing",
+    "redesign_evidence": "`flexi-strip` with 7 date cells, `cheap` and `sel` states (\"3 – 10 iun / 512 Lei / cel mai ieftin\")",
+    "recommendation": "Keep. Make sure the prices are real availability-backed totals for the same occupancy, otherwise it becomes a trust liability rather than an asset."
+   },
+   {
+    "feature": "Price histogram with dual-handle range",
+    "status": "improved",
+    "severity": "nice-to-have",
+    "why_it_matters": "Worth keeping. Replaces live's three coarse buckets (305-687 / 687-1068 / 1068-1452 Lei) with a continuous distribution, which both filters better and communicates where the inventory actually sits — useful when the spread is 2 148 to 12 985 Lei for the same week.",
+    "live_evidence": "\"Buget: 305-687 Lei pe noapte(52) / 687-1068 (19) / 1068-1452 (10)\"",
+    "redesign_evidence": "`fbox` \"Preț pe noapte\" with `histo` bars, `range-line` and Min/Max inputs",
+    "recommendation": "Keep. Ensure the axis unit (per night vs per stay) is labelled unambiguously — live prices on cards are stay totals, so a per-night filter against stay-total cards will confuse."
+   },
+   {
+    "feature": "FRIENDS loyalty band and grouped payment/cancellation filters",
+    "status": "improved",
+    "severity": "nice-to-have",
+    "why_it_matters": "Worth keeping. Live scatters the loyalty message as a plain-text interstitial (\"Stiai ca … credite cadou daca faci rezervarea fiind logat\") with no visual weight; the redesign turns it into a proper enrolment CTA. Similarly, live's \"Plata la receptie\" sits orphaned in the unit-type block while the redesign groups payment and cancellation into one coherent decision set.",
+    "live_evidence": "\"Stiai ca pentru rezervarile … poti primi credite cadou daca faci rezervarea fiind logat in contul tau de pe site ? / Intra in cont\"; \"Plata la receptie (7)\" under Tipul unitatii",
+    "redesign_evidence": "`loyal-band` with \"Intră în programul FRIENDS / Înscrie-te gratuit\"; `fbox` \"Plată și anulare\" with Anulare gratuită / Fără plată în avans / Plată online",
+    "recommendation": "Keep both. Ensure \"Fără plată în avans\" maps explicitly to the live \"plata la recepție\" concept in the copy, since that is the term Romanian users search for."
+   }
+  ]
+ }
+]
