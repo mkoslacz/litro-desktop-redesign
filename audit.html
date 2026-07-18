@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>LITRO redesign — production gap audit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'DM Sans',sans-serif; color:#1E1E1E; background:#F7F5F3; padding:44px 20px 80px; font-size:15px; line-height:1.5; }
+  .wrap { max-width:1120px; margin:0 auto; }
+  h1 { font-family:'Outfit',sans-serif; font-size:36px; margin-bottom:6px; letter-spacing:-.4px; }
+  h1 b { color:#004B97; } h1 span { color:#EB802D; }
+  .sub { color:#57585A; font-size:16px; max-width:820px; }
+  h2 { font-family:'Outfit',sans-serif; font-size:26px; margin:44px 0 6px; letter-spacing:-.2px; }
+  h2 .n { color:#EB802D; }
+  h3 { font-family:'Outfit',sans-serif; font-size:19px; margin:26px 0 10px; }
+  .lead { color:#57585A; margin-bottom:16px; max-width:860px; }
+  .stats { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin:26px 0 8px; }
+  .stat { background:#fff; border:1px solid #EFEDED; border-radius:14px; padding:16px 18px; box-shadow:0 2px 8px rgba(30,30,30,.05); }
+  .stat .v { font-family:'Outfit',sans-serif; font-size:30px; font-weight:800; color:#004B97; line-height:1.05; }
+  .stat .l { font-size:13px; color:#57585A; margin-top:4px; }
+  table { width:100%; border-collapse:collapse; background:#fff; border-radius:14px; overflow:hidden; box-shadow:0 2px 8px rgba(30,30,30,.05); margin-bottom:6px; }
+  th { text-align:left; background:#012B55; color:#fff; padding:10px 14px; font-size:13px; font-weight:700; }
+  td { padding:11px 14px; border-bottom:1px solid #EFEDED; vertical-align:top; font-size:14px; }
+  tr:last-child td { border-bottom:0; }
+  td.sev { white-space:nowrap; width:96px; }
+  .pill { display:inline-block; font-size:11.5px; font-weight:700; border-radius:100px; padding:3px 9px; letter-spacing:.2px; }
+  .p-block { background:#FEE9E9; color:#B4232B; }
+  .p-major { background:#FDF0E3; color:#B4650F; }
+  .p-minor { background:#EEF4FB; color:#00447F; }
+  .p-ok    { background:#EAF7F0; color:#0E804B; }
+  code { font-family:ui-monospace,Menlo,monospace; font-size:12.5px; background:#F2F0EE; border-radius:5px; padding:1px 6px; }
+  .ro { color:#004B97; font-weight:600; }
+  .note { background:#EEF4FB; border:1px solid #CBDEF2; border-radius:14px; padding:16px 20px; color:#012B55; margin-top:18px; }
+  .warn { background:#FEF3F3; border:1px solid #F4C9C9; border-radius:14px; padding:16px 20px; color:#7A1B22; margin-top:18px; }
+  .good { background:#EAF7F0; border:1px solid #BFE5D2; border-radius:14px; padding:16px 20px; color:#0B5E38; margin-top:18px; }
+  ul { margin:8px 0 0 20px; } li { margin-bottom:6px; }
+  .two { display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:start; }
+  .card { background:#fff; border:1px solid #EFEDED; border-radius:14px; padding:18px 20px; box-shadow:0 2px 8px rgba(30,30,30,.05); }
+  .card h4 { font-family:'Outfit',sans-serif; font-size:17px; margin-bottom:8px; }
+  .meta { font-size:13px; color:#747679; margin-top:26px; border-top:1px solid #E1DEDE; padding-top:14px; }
+  .trigger { font-size:13px; color:#57585A; }
+  .trigger b { color:#1E1E1E; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1><b>litoralul</b><span>romanesc</span>.ro — production gap audit</h1>
+<p class="sub">The live booking funnel was walked end-to-end (homepage → search results → hotel details → booking form) on 18–19 July 2026, search: <b>Mamaia, 5–12 August 2026, 2 adults</b>. Every feature and information element was catalogued and compared against the five redesign screens. The booking <i>payment</i> step (<code>/reservation/unit/</code>) was deliberately not opened — submitting the form would have created a real reservation in production.</p>
+
+<div class="stats">
+  <div class="stat"><div class="v">450</div><div class="l">live features &amp; info elements catalogued</div></div>
+  <div class="stat"><div class="v">98</div><div class="l">candidate gaps found, adversarially re-checked</div></div>
+  <div class="stat"><div class="v">7</div><div class="l">blockers: factually wrong or legally risky <i>in the designs</i></div></div>
+  <div class="stat"><div class="v">85×</div><div class="l">phone number on one search-results page (81 hotels)</div></div>
+</div>
+
+<h2><span class="n">A.</span> Blockers — things the designs currently get <i>wrong</i>, not just missing</h2>
+<p class="lead">These are not omissions. The designs make statements that contradict what the business actually does. They must be corrected before dev handoff, otherwise they get implemented as-is.</p>
+
+<table>
+  <tr><th>What</th><th>Live reality</th><th>What our design says</th><th>Fix</th></tr>
+  <tr>
+    <td><b>Resort tax</b> (<span class="ro">taxa de stațiune</span>)</td>
+    <td>“<span class="ro">TVA inclus, taxa de stațiune 80 Lei se achită la recepție</span>” on every rate; the hotel page states 1% of the accommodation tariff ex-VAT for the whole stay.</td>
+    <td>“Prețul include taxele” on both hotel and checkout — the opposite claim.</td>
+    <td>Add a <b>“De plătit la hotel”</b> line (resort tax, pet fee, extra bed) visually separated from the online total; change the reassurance copy.</td>
+  </tr>
+  <tr>
+    <td><b>Pre-ticked consent</b></td>
+    <td>Live ships the acceptance unticked; “Pasul următor” gates the submit.</td>
+    <td><code>checkout.html</code> ships the T&amp;C checkbox <b>already ticked</b>.</td>
+    <td>Unticked by default, CTA disabled until ticked, inline error on submit. Pre-ticked consent is invalid under GDPR.</td>
+  </tr>
+  <tr>
+    <td><b>Invented house rules</b></td>
+    <td>Complex Mediteranean: “<span class="ro">Nu este permis accesul în complex cu animale de companie</span>” + mandatory wristband, pool rules.</td>
+    <td>Our hotel page invents “Câini și pisici acceptate până la 10 kg · 45 Lei/noapte”.</td>
+    <td>Bind policy cards to real property data incl. the “not allowed” state; add a “Reguli casei” block. Mark all placeholder copy as such in the Figma file.</td>
+  </tr>
+  <tr>
+    <td><b>“Confirmare imediată”</b> promised unconditionally</td>
+    <td>Live exposes a filter “<span class="ro">Doar cu confirmare instanta</span>” — i.e. part of the inventory is <i>request-based</i>; voucher bookings say “<span class="ro">vei fi contactat de către un specialist</span>”.</td>
+    <td>Checkout and thank-you promise instant confirmation for every booking.</td>
+    <td>Make confirmation type a <b>per-rate attribute</b> and drive the booking-card note from the selected rate. Verify with the booking back end which allotment is truly instant.</td>
+  </tr>
+  <tr>
+    <td><b>Call-centre hours</b></td>
+    <td>“<span class="ro">Program extins 10:00 – 18:00</span>”.</td>
+    <td>Header says “Zilnic 08:00 – 20:00” and thank-you promises a 30-second answer.</td>
+    <td>Bind to the real SLA; ideally a live open/closed state instead of hard-coded copy.</td>
+  </tr>
+  <tr>
+    <td><b>Legal operator identity</b></td>
+    <td>Every page footer: Agenția Organizatoare, <b>S.C. Creative Eye S.R.L.</b>, ROC J13/2215/2003, CUI RO15613488, Constanța address, <b>Licența de Turism nr. 536</b> (since 2005), ANPC + Ministry of Tourism phone numbers, GDPR registry nr. 22071.</td>
+    <td>Footer replaced by “Parte din Szallas Group”. Licence, ANPC, company identity gone.</td>
+    <td>Restore the legal block on all screens, and especially on the confirmation page (the page customers print). Keep the group line as secondary.</td>
+  </tr>
+  <tr>
+    <td><b>Result counts / facets</b></td>
+    <td>“<span class="ro">81 unități de cazare în Mamaia</span>” — Hoteluri 70 / Apartamente 7 / Camere 4, for those dates.</td>
+    <td>“319 rezultate” and a facet list including unit types LITRO does not contract there.</td>
+    <td>Re-derive every count and facet from production data; hide zero-count rows; check the layout still reads at ~81 results.</td>
+  </tr>
+</table>
+
+<h2><span class="n">B.</span> Commercial machinery we dropped</h2>
+<p class="lead">This is what the live site does to monetise a small, chartered inventory. Most of it is missing from the redesign — grouped by screen, worst first.</p>
+
+<h3>Listing — the result card lost its selling power</h3>
+<table>
+  <tr><th class="sev">Severity</th><th>What we lost</th><th>Why it costs money</th></tr>
+  <tr><td class="sev"><span class="pill p-block">blocker</span></td><td><b>Availability-truth filters</b>: “<span class="ro">Camere disponibile</span>”, “<span class="ro">Doar cu confirmare instanta</span>”, “<span class="ro">Doar hotelurile cu tarife</span>”, “<span class="ro">Plata la recepție</span>”</td><td>With charter allotment a large share of properties have no rate or no rooms for given dates. Without these controls the user browses fiction and the funnel leaks to the phone.</td></tr>
+  <tr><td class="sev"><span class="pill p-major">major</span></td><td><b>Guest review quote on every card</b> — “<span class="ro">Ce apreciază turiștii la acest hotel · Nota 10/10 · „Amplasarea, spații de joacă, piscine.”</span>” (76 of 81 cards had one)</td><td>The single strongest trust element on the live listing. For mid-market seaside hotels with weak brand recall, the quote is what makes a card credible.</td></tr>
+  <tr><td class="sev"><span class="pill p-major">major</span></td><td><b>Offer expiry countdown</b> — “<span class="ro">Oferta specială ( expiră în 15 zile )</span>”</td><td>Charter stock unsold before departure is a sunk cost. This is honest, data-backed urgency, not a dark pattern.</td></tr>
+  <tr><td class="sev"><span class="pill p-major">major</span></td><td><b>“<span class="ro">Vezi toate tipurile de cameră</span>”</b> — in-card expansion to all contracted room types</td><td>One hotel has 4–15 contracted room types at very different prices. Showing one hides the cheaper and the upsell options alike.</td></tr>
+  <tr><td class="sev"><span class="pill p-major">major</span></td><td><b>Real campaign names on cards</b> — Oferta Verii, Last Minute, Zile Gratuite de Vacanță, Litoralul Pentru Toți, Extra Discount, Long Stay — with their binding conditions</td><td>These are LITRO’s own negotiated programmes with years of media spend and national recall. We replaced them with a generic “Înscrieri Timpurii” chip.</td></tr>
+  <tr><td class="sev"><span class="pill p-major">major</span></td><td><b>Credits as a real number</b> — “<span class="ro">Primești: 159 credite</span>” (1 credit = 1 RON)</td><td>159 feels like money and justifies logging in; our “+4 credite/noapte” does not. Login-gated credits are how the CRM gets fed.</td></tr>
+  <tr><td class="sev"><span class="pill p-major">major</span></td><td><b>Destination aggregate score</b> — “<span class="ro">Hotelurile din Mamaia au o medie de 8.7 din 10, din 11 395 recenzii</span>”</td><td>11 395 first-party reviews is the proof LITRO is an operator, not a thin affiliate feed.</td></tr>
+  <tr><td class="sev"><span class="pill p-major">major</span></td><td><b>Full facility filters</b> (~50 with counts), incl. <span class="ro">Bază tratament</span>, <span class="ro">Piscină încălzită</span>, <span class="ro">Adults Only</span>, <span class="ro">Self check-in</span>, <span class="ro">Rampă de acces</span></td><td>Balneo/treatment is a whole customer segment (and a state-voucher use case). Our 6 chips cannot express it.</td></tr>
+  <tr><td class="sev"><span class="pill p-minor">minor</span></td><td>Editorial description as the <b>zero-review card state</b>; review-label vocabulary consistency (Excepțional / Foarte Bine / Satisfăcător); map with tourist POIs</td><td>New charter properties launch every season with 0–5 reviews and must not read as “bad”.</td></tr>
+</table>
+
+<h3>Hotel page — the merchandising layer</h3>
+<table>
+  <tr><th class="sev">Severity</th><th>What we lost</th><th>Why it costs money</th></tr>
+  <tr><td class="sev"><span class="pill p-major">major</span></td><td><b>Named offers as rate names</b> + an “<span class="ro">Oferte speciale disponibile</span>” chip row</td><td>The entire charter merchandising runs on named offers; a rate called “Standard” sells nothing.</td></tr>
+  <tr><td class="sev"><span class="pill p-major">major</span></td><td><b>Sunbeds in the unit name</b> — “<span class="ro">Cameră dublă + 2 șezlonguri incluse la plajă</span>”</td><td>On this coast it is <i>the</i> differentiator between two otherwise identical doubles.</td></tr>
+  <tr><td class="sev"><span class="pill p-major">major</span></td><td><b>Meal-plan definitions</b> — AI windows (08–10 / 13–15 / 19–21), which drinks at restaurant vs pool bar, first meal = dinner, buffet only from 60 guests</td><td>All-inclusive is the main price driver here; ambiguity turns into support calls and on-site disputes.</td></tr>
+  <tr><td class="sev"><span class="pill p-major">major</span></td><td><b>Own campaigns</b>: “<span class="ro">Litoralul Românesc te răsplătește</span>” (any 4+ night booking enters a prize draw) and “<span class="ro">Jurasica Park Neptun</span>” free child ticket (0–14 y, 1 May–30 Sep)</td><td>The 4-night qualifier is a direct lever on length of stay — the metric that fills a weekly allotment. The child ticket converts the family segment.</td></tr>
+  <tr><td class="sev"><span class="pill p-major">major</span></td><td><b>“<span class="ro">De ce aleg oamenii …?</span>”</b> reason block + best-rated dimension callout (“<span class="ro">Poziționare 9.3</span>”)</td><td>Cheapest persuasion asset on the page, generated from data we already own.</td></tr>
+  <tr><td class="sev"><span class="pill p-major">major</span></td><td><b>Cheapest-period teaser</b> — “<span class="ro">Preț pe noapte de la 405 Lei în perioada 06–12/09/2026 cu Litoralul Pentru Toți</span>”</td><td>The single most important demand-shifting tool when the user’s dates are unaffordable or sold out. Our flexible-dates strip is a good start but only covers ±3 days.</td></tr>
+  <tr><td class="sev"><span class="pill p-major">major</span></td><td><b>Programme badges</b>: “<span class="ro">ANULARE GRATUITĂ</span>” and “<span class="ro">acceptăm plata cu card de vacanță</span>” above the fold</td><td>Both are go/no-go filters for a large share of Romanian buyers; ours are buried in the policy grid.</td></tr>
+  <tr><td class="sev"><span class="pill p-minor">minor</span></td><td>Room-detail depth (m², bed matrix, capacity by child age band 0–9.99 / 0–13.99), quantified “<span class="ro">Dotări generale</span>”, in-page sticky nav, hotel FAQ, “recently viewed”, content-accuracy disclaimer</td><td>Age bands decide price <i>and</i> whether a family is refused at reception. The FAQ answers the six questions that generate most calls.</td></tr>
+</table>
+
+<h3>Checkout &amp; thank-you — payment and legal</h3>
+<table>
+  <tr><th class="sev">Severity</th><th>What we lost</th><th>Why it costs money</th></tr>
+  <tr><td class="sev"><span class="pill p-block">blocker</span></td><td><b>Promo code / gift card field</b> — “<span class="ro">Adaugă un cod promo sau card cadou</span>”</td><td>LITRO runs a permanent campaign calendar and sells gift vouchers as a product. No field = codes redeemed by phone, or not at all.</td></tr>
+  <tr><td class="sev"><span class="pill p-major">major</span></td><td><b>Instalments — “<span class="ro">6 rate fără dobândă</span>”</b> (BT StarCARD 6×, Card Avantaj 5×)</td><td>A 7-night Mamaia stay runs 2 150–12 985 Lei. Instalments are the affordability unlock for early-booking baskets. Live advertises them site-wide; our designs never mention them.</td></tr>
+  <tr><td class="sev"><span class="pill p-major">major</span></td><td><b>Holiday cards as a real payment flow</b>, not a logo</td><td>Vouchers are capped (800 Lei/yr public sector from 01.01.2026) vs a multi-thousand-Lei stay — in practice <i>every</i> voucher booking is a split payment. Live promises acceptance at <b>all</b> hotels; we narrowed it to “hotelurile partenere”.</td></tr>
+  <tr><td class="sev"><span class="pill p-major">major</span></td><td><b>Real cancellation terms</b> — free cancellation means: request ≥10 days before check-in, standard offers only, booking paid in full, reviewed case by case by consultants</td><td>Our confirmation promises something the business does not offer. This is a complaint and chargeback generator.</td></tr>
+  <tr><td class="sev"><span class="pill p-major">major</span></td><td><b>Tourist contract</b> (“<span class="ro">Contractul cu turistul</span>”) as a distinct document, and a separate <b>marketing consent</b></td><td>Mandatory pre-contractual document for a Romanian tour operator; marketing opt-in bundled into T&amp;C acceptance is not valid consent — and checkout is the highest-yield opt-in point we have.</td></tr>
+  <tr><td class="sev"><span class="pill p-minor">minor</span></td><td>Child ages, room count / room-type switch in the form, cash &amp; proforma payment routes, FRIENDS mechanics (1 credit = 1 RON, 5 years, max 10% per booking, forfeited on cancellation), tier progress, storno upsell with its deadline</td><td>Storno is the only real risk cover for non-standard offers and is pure-margin attach revenue; the confirmation page is peak intent.</td></tr>
+</table>
+
+<h3>Homepage — the specialist proof and the offer catalogue</h3>
+<table>
+  <tr><th class="sev">Severity</th><th>What we lost</th><th>Why it costs money</th></tr>
+  <tr><td class="sev"><span class="pill p-major">major</span></td><td><b>The offer catalogue</b> — 15 named programmes with live counts (Last Minute 159, Oferta Verii 123, Litoralul Pentru Toți 55, Sfânta Maria 59, Nibiru 48, Zile Gratuite 30, Extrasezon 25, Extra Discount 8, Seniori 5, cu tratament 6, Beach Please 1…)</td><td>These programmes <i>are</i> the product: the same ~500 properties sliced into commercial packages. Our two campaign banners replace a whole catalogue.</td></tr>
+  <tr><td class="sev"><span class="pill p-major">major</span></td><td><b>Scale &amp; trust proof</b> — 500+ properties, 270 000 tourists in 2024, site-wide 9.0/10, licensed since 2005</td><td>The answer to “why not Booking”. Without it the site reads as a small generic OTA.</td></tr>
+  <tr><td class="sev"><span class="pill p-major">major</span></td><td><b>Coast coverage</b> — 19 resorts in nav + footer, per-resort hotel shortlists, full hotel list, <b>Delta Dunării</b> as a second product line</td><td>Named-hotel links are the highest-intent, lowest-CAC traffic a charter operator has (returning guests re-finding last year’s hotel). Our 5-tile mosaic makes LITRO look like a Mamaia site.</td></tr>
+  <tr><td class="sev"><span class="pill p-major">major</span></td><td><b>Ancillary programme entry points</b> — vacanțe în rate, vouchere de vacanță, voucher cadou, asigurare storno, club FRIENDS</td><td>These raise basket value and de-risk prepayment on non-refundable stock.</td></tr>
+  <tr><td class="sev"><span class="pill p-minor">minor</span></td><td>Newsletter block with benefits + GDPR consent, “<span class="ro">Cele mai recente rezervări</span>” live feed, coast map, SEO/attractions/news rows, RO/EN switcher, cookie consent layer, visible desktop nav instead of a burger</td><td>Email is what sells early-booking in winter; the burger hides the entire commercial taxonomy on a 1440px screen.</td></tr>
+</table>
+
+<div class="good">
+  <b>What the redesign genuinely improves — keep it.</b>
+  <ul>
+    <li><b>One search box instead of three.</b> Live has separate search widgets per page with different fields; ours is one persistent bar.</li>
+    <li><b>Flexible dates + the price strip around the chosen dates.</b> Live has nothing like it — it only hints at a cheaper period in one line of text. This is the single best answer to thin inventory.</li>
+    <li><b>Cross-resort recovery</b> (“stațiunile din apropiere”, “alternative în apropiere din inventarul nostru”) — live only cross-sells within the same star class in a sidebar.</li>
+    <li><b>Rate comparison in a table</b> instead of stacked cards — makes the 4–15 room types actually comparable.</li>
+    <li><b>Legible price hierarchy</b>: one price, one discount pill, one “what’s included” line, instead of the live page’s competing red/orange/green blocks.</li>
+  </ul>
+</div>
+
+<h2><span class="n">C.</span> Call centre vs e-commerce</h2>
+
+<div class="two">
+  <div class="card">
+    <h4>How hard the phone is pushed today</h4>
+    <ul>
+      <li><b>85 occurrences</b> of <code>0241 999</code> on a single search-results page — one on <b>every one of the 81 hotel cards</b>, plus header, plus footer.</li>
+      <li>An <b>auto-firing overlay</b> on the results page: “<span class="ro">Nu te poți decide? Consultanții noștri sunt aici pentru tine. Sună acum</span>” — it covers the header before the user has scrolled.</li>
+      <li>Header on every page: “<span class="ro">Rezervați online sau la telefon</span>” — the phone is presented as an equal-rank channel, first among equals.</li>
+      <li>Hotel page: the number sits in the middle column next to the description, plus a “<span class="ro">Sună acum</span>” item in the section tab bar.</li>
+      <li>Coverage: <b>10:00–18:00</b> only.</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h4>What you literally cannot do without calling</h4>
+    <ul>
+      <li><b>Instalments.</b> “<span class="ro">…menționează consultantului tău de turism că dorești să achiți în rate și vei primi un link special de plată</span>”. The headline affordability product is phone-gated.</li>
+      <li><b>Holiday-card bookings.</b> “<span class="ro">…vei fi contactat de către un specialist de-al nostru</span>”.</li>
+      <li><b>Gift vouchers.</b> “<span class="ro">Comanda ta va fi preluată în cel mai scurt timp de unul dintre consultanții noștri</span>”.</li>
+      <li><b>Cancellations.</b> Message via contact form or Facebook; “<span class="ro">fiecare solicitare … echipa noastră de consultanți analizează</span>”.</li>
+      <li><b>Storno insurance.</b> Sold on request, with a hard deadline most buyers never hear about.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="warn">
+  <b>Why this caps the business.</b> The phone is a fixed-capacity channel priced per conversation, so growth costs headcount — and it is exactly the resource that is scarcest right now, mid-season, after the July departures. It is open 10:00–18:00 while a meaningful share of leisure shopping happens in the evening; those users hit a number that nobody answers, and the site offers them no self-service alternative for instalments, vouchers or a cancellation. It also blinds measurement: any funnel instrumentation stops at “user saw a phone number”, which is precisely the visibility gap that already froze the Hotel Details rollout at 10%. And with the number repeated 85 times on one page, the site actively teaches its best-converting users to bypass the funnel we are trying to optimise.
+</div>
+
+<div class="note">
+  <b>Why the phone is nonetheless a genuine USP here — and must not be deleted.</b> LITRO does not resell a global marketplace; it sells its own chartered allotment on one 245 km coast. That means (a) inventory runs out, and when it does, a human can move the guest to another hotel in the same allotment in one call — a website that says “no results” just loses the booking; (b) the product has real complexity that is hard to self-serve: sunbeds included or not, resort tax at reception, room allocation decided at check-in, child age bands that decide both price and admission; (c) a large part of the audience is families and older buyers paying several thousand Lei to a licensed agency — for them a human voice <i>is</i> the trust product, and the “licență din 2005 · 270 000 turiști” story only lands when someone picks up; (d) the phone rescues the transactions the site can’t yet do — vouchers, instalments, split payments. The correct move is not to remove the phone. It is to stop using it as the default and start using it as a <b>scalpel</b>.
+</div>
+
+<h3>The scalpel model — where the phone appears, and only there</h3>
+<table>
+  <tr><th>Component</th><th>Where</th><th>Trigger — appears only when…</th><th>What it says</th></tr>
+  <tr><td><b>Sold-out rescue</b></td><td>Listing (empty/thin results), hotel page (no rates for dates)</td><td>0 results, or the chosen hotel has no availability for the dates</td><td>“Nu găsim camere pentru aceste date. Consultanții noștri au acces la tot inventarul nostru — sună 0241 999 sau lasă-ne numărul și te sunăm în 15 min.”</td></tr>
+  <tr><td><b>Callback slot</b> (not a raw number)</td><td>Same states, plus checkout errors</td><td>Outside 10:00–18:00, or the call centre is at capacity</td><td>Phone field + time-window picker. Converts an unanswered call into a lead instead of a bounce.</td></tr>
+  <tr><td><b>Instalments assist</b></td><td>Checkout, payment card</td><td>Basket over ~2 000 Lei <b>and</b> online instalments not yet live</td><td>“Vreau să plătesc în rate — un consultant îmi trimite linkul de plată.” Ticking it switches the CTA to “Trimite cererea de rezervare”. Removed the day instalments go self-service.</td></tr>
+  <tr><td><b>Voucher assist</b></td><td>Checkout, when Card de vacanță is selected</td><td>Voucher value &lt; total (i.e. a split payment is required)</td><td>Voucher amount input + auto-computed difference; phone only as fallback if the split cannot be processed online.</td></tr>
+  <tr><td><b>Complex-party helper</b></td><td>Search / hotel, occupancy picker</td><td>3+ rooms, or 3+ children, or a stay over the max length</td><td>“Grup mai mare? Îți facem oferta la telefon.” These are the cases the form genuinely cannot price.</td></tr>
+  <tr><td><b>Post-booking human line</b></td><td>Thank-you page</td><td>Always — but as one line, not a banner</td><td>“Vrei să modifici sau să anulezi? 0241 999 (10:00–18:00) sau formular — răspundem în 24h.” With the real deadline date computed.</td></tr>
+</table>
+<p class="trigger" style="margin-top:10px"><b>And what disappears:</b> the phone number on all 81 result cards, the auto-firing “Nu te poți decide?” overlay, and “Rezervați online sau la telefon” as the header’s primary message. The number stays in the header — once, quiet, with a live open/closed state.</p>
+
+<div class="note">
+  <b>How you know it worked.</b> Instrument it before changing it, otherwise this is a religious argument: share of bookings completed without human contact; calls per 100 sessions (should fall) and conversion of the calls that remain (should rise, because they are now the hard cases); callback-slot fill rate outside opening hours; instalment and voucher bookings completed self-service; and the cost per booking split by channel. Given the GA4/Growthbook measurement problem that already froze the Hotel Details rollout at 10%, fixing measurement is a precondition for this whole shift, not a follow-up.
+</div>
+
+<h2><span class="n">D.</span> Backlog for the design files</h2>
+
+<h3>Must-have before dev handoff</h3>
+<table>
+  <tr><th>Screen</th><th>Change</th></tr>
+  <tr><td>hotel + checkout</td><td>“De plătit la hotel” line (resort tax, extra fees); remove “Prețul include taxele”.</td></tr>
+  <tr><td>checkout</td><td>Consent unticked + CTA gated; split marketing consent into its own optional tick; add “Contractul cu turistul” link; add promo/gift-card field.</td></tr>
+  <tr><td>all</td><td>Legal footer: Creative Eye SRL, ROC, CUI, licence 536, ANPC, Ministry of Tourism. Real call-centre hours.</td></tr>
+  <tr><td>hotel</td><td>Confirmation type per rate (instant vs request); real house rules incl. “pets not allowed” state; mark placeholder copy as placeholder.</td></tr>
+  <tr><td>listing</td><td>Availability filters (“doar disponibile”, “confirmare instantanee”, “doar cu tarife”); counts from real data.</td></tr>
+  <tr><td>thank-you</td><td>Real cancellation terms + how to request one; documents block (voucher, contract, invoice).</td></tr>
+</table>
+
+<h3>Next iteration — the revenue machinery</h3>
+<table>
+  <tr><th>Screen</th><th>Change</th></tr>
+  <tr><td>listing</td><td>Review quote on card; offer-expiry countdown; “vezi toate tipurile de cameră” expander; real campaign names + conditions; credits as a stay total; destination aggregate score; full facility panel.</td></tr>
+  <tr><td>hotel</td><td>Named offers as rate names + offer chip row; sunbeds in unit names; meal-plan definitions; “De ce aleg oamenii…”; cheapest-period teaser; ANULARE GRATUITĂ + card de vacanță badges above the fold.</td></tr>
+  <tr><td>checkout</td><td>Instalments (self-service or consultant-assisted); holiday card as a split-payment flow; child ages; room count/type switch.</td></tr>
+  <tr><td>home</td><td>Offer catalogue section (15 programmes with counts); trust/scale stats band; 19-resort index + Delta Dunării; ancillary programme links; visible desktop nav.</td></tr>
+  <tr><td>all</td><td>The six “scalpel” call-centre components above, as design-system components with their trigger states.</td></tr>
+</table>
+
+<h3>Later</h3>
+<p class="lead">Storno upsell with its deadline logic; FRIENDS tier progress and enrolment states; newsletter capture; recent-bookings feed; map with POIs; hotel FAQ; “send my shortlist by e-mail”; RO/EN; cookie-consent layer designed rather than bolted on.</p>
+
+<div class="meta">
+  Method: live funnel walked and captured 18–19 July 2026 (Mamaia, 5–12 Aug 2026, 2 adults, 81 units). 450 live features inventoried, 98 candidate gaps generated per screen, then re-checked against the redesign source — a claim only counts as a gap if the live evidence is verbatim and the feature is absent from <i>all five</i> screens. The payment step behind “Pasul următor” was not opened, so anything about it is marked as unknown rather than assumed. Placeholder photos and copy in the redesign are not counted as gaps.
+</div>
+
+</div>
+</body>
+</html>
