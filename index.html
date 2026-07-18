@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>LITRO desktop redesign — overview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'DM Sans',sans-serif; color:#1E1E1E; background:#F7F5F3; padding:50px 20px; }
+  .wrap { max-width:1080px; margin:0 auto; }
+  h1 { font-family:'Outfit',sans-serif; font-size:38px; margin-bottom:6px; }
+  h1 b { color:#004B97; } h1 span { color:#EB802D; }
+  .sub { color:#57585A; font-size:16px; margin-bottom:34px; max-width:760px; line-height:1.5; }
+  .pages { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-bottom:44px; }
+  .pg { background:#fff; border-radius:16px; overflow:hidden; border:1px solid #EFEDED; box-shadow:0 2px 10px rgba(30,30,30,.06); }
+  .pg img { width:100%; height:300px; object-fit:cover; object-position:top; border-bottom:1px solid #EFEDED; }
+  .pg .b { padding:16px 18px; }
+  .pg h3 { font-family:'Outfit',sans-serif; font-size:19px; margin-bottom:4px; }
+  .pg p { color:#57585A; font-size:13.5px; margin-bottom:12px; }
+  .pg a { display:inline-block; background:#EB802D; color:#fff; font-weight:700; font-size:14px; padding:9px 18px; border-radius:10px; text-decoration:none; }
+  h2 { font-family:'Outfit',sans-serif; font-size:24px; margin:34px 0 14px; }
+  table { width:100%; border-collapse:collapse; background:#fff; border-radius:14px; overflow:hidden; font-size:14.5px; box-shadow:0 2px 10px rgba(30,30,30,.05); }
+  th { text-align:left; background:#012B55; color:#fff; padding:11px 16px; font-size:13.5px; }
+  td { padding:11px 16px; border-bottom:1px solid #EFEDED; vertical-align:top; }
+  tr:last-child td { border-bottom:0; }
+  .sw { display:inline-block; width:13px; height:13px; border-radius:4px; vertical-align:-2px; margin-right:6px; border:1px solid rgba(0,0,0,.12); }
+  .note { background:#EEF4FB; border:1px solid #CBDEF2; border-radius:14px; padding:16px 20px; color:#012B55; font-size:14.5px; line-height:1.55; margin-top:26px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1><b>litoralul</b><span>romanesc</span>.ro — desktop redesign</h1>
+  <p class="sub">New desktop designs for litoralulromanesc.ro, built on the approved <b>Szallas Group redesign</b> (Redesign sandbox) — the same move as the Hotely.cz re-skin in the sandbox file: identical layout &amp; components, LITRO brand skin, Romanian seaside content. Branding decisions follow the already-refreshed LITRO <i>mobile</i> redesign (navy rating badge, orange stars, red discount pill, navy price, FRIENDS credits).</p>
+
+  <div class="pages">
+    <div class="pg"><img src="preview-home.png" alt=""><div class="b"><h3>Homepage</h3><p>Hero search, inspiration, campaigns, FRIENDS value props, hotel carousels, resort mosaic.</p><a href="home.html">Open page</a></div></div>
+    <div class="pg"><img src="preview-listing.png" alt=""><div class="b"><h3>Hotel Listing</h3><p>Filter sidebar (incl. beach distance &amp; Card de vacanță), horizontal result cards, FRIENDS band.</p><a href="listing.html">Open page</a></div></div>
+    <div class="pg"><img src="preview-hotel.png" alt=""><div class="b"><h3>Hotel Details</h3><p>Gallery + booking card, amenities, room rate tables, policies, reviews, location.</p><a href="hotel.html">Open page</a></div></div>
+  </div>
+
+  <h2>Brand mapping — Szallas DS → LITRO</h2>
+  <table>
+    <tr><th>Element</th><th>Szallas redesign</th><th>LITRO desktop (this proposal)</th></tr>
+    <tr><td>Primary CTA (Search, Book, Select)</td><td><span class="sw" style="background:#D20000"></span>brand red / <span class="sw" style="background:#F74F18"></span>orange (Hotely)</td><td><span class="sw" style="background:#EB802D"></span>LITRO orange #EB802D</td></tr>
+    <tr><td>Brand / links / accents</td><td>per-brand color</td><td><span class="sw" style="background:#004B97"></span>LITRO navy #004B97</td></tr>
+    <tr><td>Top promo bar</td><td><span class="sw" style="background:#42CEF6"></span>teal</td><td><span class="sw" style="background:#004B97"></span>navy, orange link</td></tr>
+    <tr><td>Rating badge</td><td><span class="sw" style="background:#13A260"></span>green square</td><td><span class="sw" style="background:#004B97"></span>navy square — per LITRO mobile redesign</td></tr>
+    <tr><td>Price</td><td>red, bold</td><td>navy, bold — per LITRO mobile redesign</td></tr>
+    <tr><td>Discount pill</td><td>red</td><td>red (unchanged)</td></tr>
+    <tr><td>Stars</td><td><span class="sw" style="background:#F4CF00"></span>yellow</td><td><span class="sw" style="background:#EB802D"></span>orange — per LITRO mobile redesign</td></tr>
+    <tr><td>Perks (breakfast, cancellation)</td><td>green text</td><td>green text (unchanged)</td></tr>
+    <tr><td>Typography</td><td>Outfit (titles) + DM Sans (body)</td><td>same — DS fonts kept</td></tr>
+    <tr><td>Neutrals, radii, spacing, shadows</td><td>gray-200 #F7F5F3, radius 12/16…</td><td>same — DS tokens kept</td></tr>
+    <tr><td>VIP program</td><td>VIP discount / SZÉP card</td><td>FRIENDS + credits / Card de vacanță (Edenred, Pluxee, Up)</td></tr>
+    <tr><td>Litoral-specific additions</td><td>—</td><td>“Distance to beach” filter group, “X m de plajă” in card meta, sun-beds included line</td></tr>
+  </table>
+
+  <h2>Inventory-aware features (charter inventory ≠ marketplace)</h2>
+  <table>
+    <tr><th>Where</th><th>What</th><th>Why</th></tr>
+    <tr><td>Search (home)</td><td>Flexible-dates chips: exact / ±1 day / ±3 days / weekend / whole month</td><td>steer demand to dates where allotment exists</td></tr>
+    <tr><td>Listing + hotel</td><td>Date-price strip “prices around your dates” — 7 date pairs, cheapest in green, sold-out marked <i>Ocupat</i></td><td>fewer properties → sell the calendar, not just the list</td></tr>
+    <tr><td>Listing header</td><td>“Inventar propriu · confirmare instantanee” trust line</td><td>charter inventory as a selling point (guaranteed rooms, instant confirmation)</td></tr>
+    <tr><td>Listing bottom</td><td>“Explorează și stațiunile din apropiere” — Mamaia Nord / Eforie / Costinești with km, counts and from-prices</td><td>cross-link demand between resorts</td></tr>
+    <tr><td>Hotel bottom</td><td>“Alternative în apropiere din inventarul nostru” carousel with distance tags (la 400 m / la 14 km)</td><td>keep the user inside our inventory when a hotel doesn’t fit</td></tr>
+  </table>
+
+  <h2>Handoff — back to Figma &amp; to dev</h2>
+  <div class="note" style="margin-top:10px">
+    <b>To Figma:</b> use <b>html.to.design</b> — the same plugin the team already used to capture the live site into “LITRO Master Pages” (the imports are labeled with it). Two routes: (1) install the html.to.design <b>Chrome extension</b>, open each page locally (<code>home.html</code>, <code>listing.html</code>, <code>hotel.html</code>) and capture at 1440 — it lands in Figma as editable frames with proper layers, text and exact sizes; or (2) host this folder on any static URL and use the Figma plugin’s “Import from URL”. Import once, then link the layers to LITRO variables.<br><br>
+    <b>To dev:</b> <code>litro.css</code> is the token sheet (colors, radii, shadows, type as CSS variables — all values in px) and <a href="specs.html"><b>specs.html</b></a> is the measurement spec (component-by-component). The HTML files themselves are reference implementations — paddings, gaps and font sizes can be lifted 1:1.
+  </div>
+
+  <div class="note"><b>Scope note.</b> These are the 3 priority templates (per the priorities noted in the LITRO Figma: booking flow → hotel details → listing). Checkout &amp; thank-you desktop screens follow the same Szallas sandbox layouts with this skin — to be produced next once this direction is confirmed. Photos are placeholders taken from the sandbox assets; swap for real LITRO property photos in production.</div>
+</div>
+</body>
+</html>

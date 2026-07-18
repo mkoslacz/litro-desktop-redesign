@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<title>Litoralul Romanesc — Hotel Details (desktop redesign)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="litro.css">
+<style>body { background: #FCFBFA; }</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-7-6.1-7-11a7 7 0 1 1 14 0c0 4.9-7 11-7 11z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="10" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="16" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3.5 10h17M8 2.8V7M16 2.8V7" stroke="currentColor" stroke-width="2" fill="none"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 20c.5-3.4 3-5.4 6-5.4s5.5 2 6 5.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 5.4a3.2 3.2 0 0 1 0 5.9M18.2 14.9c1.7.8 2.6 2.3 2.9 4.6" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15.6 15.6 21 21" stroke="currentColor" stroke-width="2.4"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5.5 3.5h3l1.7 4.3-2 1.6a13 13 0 0 0 6.4 6.4l1.6-2 4.3 1.7v3a1.8 1.8 0 0 1-2 1.8C10.3 19.7 4.3 13.7 3.7 5.5a1.8 1.8 0 0 1 1.8-2z" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6.5h16M4 12h16M4 17.5h16" stroke="currentColor" stroke-width="2.2"/></symbol>
+    <symbol id="i-chev-d" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20.3S4 15 4 9.6A4.4 4.4 0 0 1 12 7a4.4 4.4 0 0 1 8 2.6c0 5.4-8 10.7-8 10.7z" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.2"/></symbol>
+    <symbol id="i-pct" viewBox="0 0 24 24"><path d="M19 5 5 19" stroke="currentColor" stroke-width="2.2"/><circle cx="7.5" cy="7.5" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="16.5" cy="16.5" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-check-g" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.6"/></symbol>
+    <symbol id="i-share" viewBox="0 0 24 24"><circle cx="6" cy="12" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.5" cy="5.5" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.5" cy="18.5" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/><path d="m8.4 10.8 6.8-4M8.4 13.2l6.8 4" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-umbrella" viewBox="0 0 24 24"><path d="M12 3a9 9 0 0 1 9 9H3a9 9 0 0 1 9-9zM12 12v7a2 2 0 0 0 4 .5" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-pool" viewBox="0 0 24 24"><path d="M3 17c1.5 1.2 3 1.2 4.5 0s3-1.2 4.5 0 3 1.2 4.5 0 3-1.2 4.5 0M3 21c1.5 1.2 3 1.2 4.5 0s3-1.2 4.5 0 3 1.2 4.5 0 3-1.2 4.5 0" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 14V5.5a2 2 0 0 1 4 0M9 8h4" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-parking" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9.5 16.5v-9h3.2a2.8 2.8 0 1 1 0 5.6H9.5" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-food" viewBox="0 0 24 24"><path d="M7 3v7M4.5 3v4.5a2.5 2.5 0 0 0 5 0V3M7 12v9M16.5 3c-1.8 1.5-2.5 4-2.5 6.5 0 1.5 1 2.5 2.5 2.5V21M16.5 3V12" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-wifi" viewBox="0 0 24 24"><path d="M3 9.5a13.5 13.5 0 0 1 18 0M6.5 13a8.5 8.5 0 0 1 11 0M10 16.5a3.8 3.8 0 0 1 4 0" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="19.5" r="1.4" fill="currentColor"/></symbol>
+    <symbol id="i-snow" viewBox="0 0 24 24"><path d="M12 2.5v19M4 7l16 10M20 7 4 17M12 2.5 9.5 5M12 2.5 14.5 5M12 21.5 9.5 19M12 21.5l2.5-2.5" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.5V12l3 2.4" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-card" viewBox="0 0 24 24"><rect x="3" y="5.5" width="18" height="13" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 10h18M7 14.5h4" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-paw" viewBox="0 0 24 24"><circle cx="7" cy="8.5" r="2" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="6.5" r="2" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="17" cy="8.5" r="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 11.5c-2.8 0-5.5 2.6-5.5 5 0 1.4 1.1 2.5 2.5 2.5 1.1 0 2-.6 3-.6s1.9.6 3 .6c1.4 0 2.5-1.1 2.5-2.5 0-2.4-2.7-5-5.5-5z" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3.5 12h17M12 3.5c2.5 2.3 3.8 5.2 3.8 8.5s-1.3 6.2-3.8 8.5c-2.5-2.3-3.8-5.2-3.8-8.5s1.3-6.2 3.8-8.5z" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-bed" viewBox="0 0 24 24"><path d="M3 18.5V6M3 14h18v4.5M3 11h18v-1a3 3 0 0 0-3-3H9" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="6.5" cy="8.5" r="1.6" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+    <symbol id="i-ruler" viewBox="0 0 24 24"><rect x="2.5" y="9" width="19" height="6" rx="1.5" transform="rotate(-45 12 12)" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m8 12.5 1.5 1.5M11 9.5l1.5 1.5M14 6.5 15.5 8" stroke="currentColor" stroke-width="1.8"/></symbol>
+    <symbol id="i-balcony" viewBox="0 0 24 24"><path d="M4 11h16v9H4zM7 11v9M12 11v9M17 11v9M12 3a5.5 5.5 0 0 1 5.5 5.5V11h-11V8.5A5.5 5.5 0 0 1 12 3z" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+  </defs>
+</svg>
+
+<header class="header" style="border-bottom:1px solid #EFEDED">
+  <div class="container header-in" style="padding:14px 0">
+    <div class="logo">
+      <svg width="38" height="38" viewBox="0 0 42 42"><circle cx="19" cy="23" r="13" fill="none" stroke="#004B97" stroke-width="7"/><circle cx="33" cy="8.5" r="5.5" fill="#EB802D"/></svg>
+      <div class="logo-text"><div class="l1" style="font-size:20px">litoralul</div><div class="l2" style="font-size:13.5px">romanesc<b>.ro</b></div></div>
+    </div>
+    <div class="header-right">
+      <div class="h-phone">
+        <svg width="20" height="20" style="color:#004B97"><use href="#i-phone"/></svg>
+        <div><div class="num">0241 999 · 0241 837 777</div><div class="hrs">● Zilnic 08:00 – 20:00</div></div>
+      </div>
+      <div class="h-user"><span class="avatar">A</span> Ana <svg width="16" height="16"><use href="#i-chev-d"/></svg></div>
+      <span class="h-burger"><svg width="24" height="24"><use href="#i-menu"/></svg></span>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+  <div class="search-wrap" style="padding-top:16px">
+    <div class="search-card" style="padding:6px">
+      <div class="s-field" style="padding:6px 16px">
+        <span class="ic"><svg width="20" height="20"><use href="#i-pin"/></svg></span>
+        <div><div class="s-value" style="font-size:15px">Mamaia</div></div>
+        <span class="s-clear"><svg width="15" height="15"><use href="#i-x"/></svg></span>
+      </div>
+      <div class="s-field" style="padding:6px 16px">
+        <span class="ic"><svg width="20" height="20"><use href="#i-cal"/></svg></span>
+        <div><div class="s-value" style="font-size:15px">5 iun – 12 iun</div></div>
+      </div>
+      <div class="s-field" style="padding:6px 16px">
+        <span class="ic"><svg width="20" height="20"><use href="#i-users"/></svg></span>
+        <div><div class="s-value" style="font-size:15px">2 adulți + 2 copii, 2 camere</div></div>
+      </div>
+      <button class="btn btn-primary" style="padding:0 30px;min-height:46px;font-size:15.5px">Caută <svg width="17" height="17"><use href="#i-search"/></svg></button>
+    </div>
+  </div>
+
+  <div class="crumbs"><a href="#">Litoral România</a> › <a href="#">Mamaia</a> › <b>Complex Mediteranean</b></div>
+
+  <div class="hp-head">
+    <div>
+      <div class="hp-title">Complex Mediteranean <span class="stars">★★★★</span></div>
+      <div class="hp-sub"><svg width="15" height="15" style="color:#004B97"><use href="#i-pin"/></svg> Mamaia, zona Cazino, str. Faleza Mării 21 · 50 m de plajă · <a href="#">Vezi pe hartă</a></div>
+    </div>
+    <div class="review-cap">
+      <div class="w"><div class="a">Excelent</div><div class="b">157 recenzii</div></div>
+      <span class="rate-badge">9.2</span>
+    </div>
+  </div>
+
+  <div class="hp-grid">
+    <div class="gallery">
+      <div class="hero">
+        <img src="assets/pool-rooftop.jpg" alt="">
+        <div class="g-actions">
+          <span><svg width="18" height="18"><use href="#i-heart"/></svg></span>
+          <span><svg width="18" height="18"><use href="#i-share"/></svg></span>
+        </div>
+      </div>
+      <div class="thumbs">
+        <div class="th"><img src="assets/room-seaview.jpg" alt=""></div>
+        <div class="th"><img src="assets/aerial-hotel.jpg" alt=""></div>
+        <div class="th"><img src="assets/jacuzzi-view.jpg" alt=""></div>
+        <div class="th th-more"><img src="assets/room-double.jpg" alt=""></div>
+      </div>
+    </div>
+
+    <aside>
+      <div class="friends-band">
+        <span class="ic"><svg width="19" height="19"><use href="#i-pct"/></svg></span>
+        <div>
+          <div class="t">Prețuri reduse pentru membrii FRIENDS</div>
+          <div class="d">Înscriere gratuită · durează 2 minute</div>
+        </div>
+      </div>
+      <div class="book-card">
+        <h3>Rezervarea ta</h3>
+        <span class="pill pill-teal" style="margin-bottom:10px">Înscrieri Timpurii</span>
+        <div class="bk-room" style="margin-top:10px">
+          <div>
+            <div class="rn">1 × Cameră dublă vedere mare</div>
+            <div class="lc-perks" style="margin-top:8px">
+              <span class="perk"><svg width="15" height="15"><use href="#i-check-g"/></svg> Mic dejun inclus</span>
+              <span class="perk"><svg width="15" height="15"><use href="#i-check-g"/></svg> Anulare gratuită până la 20 mai</span>
+            </div>
+          </div>
+          <span style="color:#E02020;font-weight:700">✕</span>
+        </div>
+        <div class="bk-price">
+          <span class="pill pill-red">−15%</span>
+          <div style="margin-top:6px"><span class="old-price">4 760 Lei</span></div>
+          <div class="price">4 046 <span class="cur">Lei</span></div>
+          <div class="price-note">2 adulți, 7 nopți cu mic dejun<br>Prețul include taxele și micul dejun</div>
+          <div class="credits">+ câștigi 28 credite FRIENDS</div>
+        </div>
+        <button class="btn btn-primary bk-cta">Rezervă acum</button>
+        <div class="bk-note">Nu plătești nimic acum · confirmare imediată</div>
+      </div>
+    </aside>
+  </div>
+
+  <section class="section">
+    <div class="sec-head">
+      <h2 class="sec-title">Facilități populare</h2>
+      <a class="link-more" href="#">Vezi toate cele 35</a>
+    </div>
+    <div class="amen-row">
+      <div class="amen"><span class="ic"><svg width="20" height="20"><use href="#i-umbrella"/></svg></span> Plajă privată</div>
+      <div class="amen"><span class="ic"><svg width="20" height="20"><use href="#i-pool"/></svg></span> Piscină exterioară</div>
+      <div class="amen"><span class="ic"><svg width="20" height="20"><use href="#i-parking"/></svg></span> Parcare gratuită</div>
+      <div class="amen"><span class="ic"><svg width="20" height="20"><use href="#i-food"/></svg></span> Restaurant</div>
+      <div class="amen"><span class="ic"><svg width="20" height="20"><use href="#i-wifi"/></svg></span> Wi-Fi gratuit</div>
+      <div class="amen"><span class="ic"><svg width="20" height="20"><use href="#i-snow"/></svg></span> Aer condiționat</div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="sec-head"><h2 class="sec-title">Camere și prețuri</h2></div>
+
+    <div class="stay-bar">
+      <div class="f"><span class="ic"><svg width="19" height="19"><use href="#i-cal"/></svg></span> 5 iun – 12 iun</div>
+      <div class="f"><span class="ic"><svg width="19" height="19"><use href="#i-users"/></svg></span> 2 adulți + 2 copii</div>
+      <div class="f"><span class="ic"><svg width="19" height="19"><use href="#i-bed"/></svg></span> 2 camere</div>
+      <button class="btn btn-outline">Modifică</button>
+    </div>
+
+    <div class="flexi-strip">
+      <div class="cap"><svg width="15" height="15" style="color:#004B97"><use href="#i-cal"/></svg> Prețuri pentru 7 nopți în jurul datelor tale — camera dublă, mic dejun inclus</div>
+      <div class="flexi-cells">
+        <div class="fx-cell"><div class="d">1 – 8 iun</div><div class="p">3 780</div><div class="s">&nbsp;</div></div>
+        <div class="fx-cell"><div class="d">2 – 9 iun</div><div class="p">3 890</div><div class="s">&nbsp;</div></div>
+        <div class="fx-cell cheap"><div class="d">3 – 10 iun</div><div class="p">3 640</div><div class="s">−10%</div></div>
+        <div class="fx-cell"><div class="d">4 – 11 iun</div><div class="p">3 970</div><div class="s">&nbsp;</div></div>
+        <div class="fx-cell sel"><div class="d">5 – 12 iun</div><div class="p">4 046</div><div class="s">datele tale</div></div>
+        <div class="fx-cell soldout"><div class="d">6 – 13 iun</div><div class="p">Ocupat</div><div class="s">&nbsp;</div></div>
+        <div class="fx-cell cheap"><div class="d">7 – 14 iun</div><div class="p">3 820</div><div class="s">−6%</div></div>
+      </div>
+    </div>
+
+    <div class="meal-chips">
+      <span class="mchip on">Toate</span>
+      <span class="mchip">Fără masă</span>
+      <span class="mchip">Mic dejun</span>
+      <span class="mchip">Demipensiune</span>
+      <span class="mchip">All inclusive</span>
+    </div>
+
+    <div class="room-card">
+      <h3>Cameră dublă vedere mare</h3>
+      <div class="room-grid">
+        <div class="room-left">
+          <img src="assets/room-seaview.jpg" alt="">
+          <div class="room-pills">
+            <span class="rpill"><svg width="13" height="13"><use href="#i-ruler"/></svg> 24 m²</span>
+            <span class="rpill"><svg width="13" height="13"><use href="#i-users"/></svg> Max. 2 adulți + 1 copil</span>
+            <span class="rpill"><svg width="13" height="13"><use href="#i-bed"/></svg> 1 pat dublu</span>
+            <span class="rpill"><svg width="13" height="13"><use href="#i-balcony"/></svg> Balcon</span>
+          </div>
+          <a class="rlink" href="#">Detalii cameră →</a>
+        </div>
+        <div>
+          <table class="rates">
+            <tr><th>Alegerile tale</th><th>Oaspeți</th><th style="text-align:right">Prețul tău</th><th style="text-align:right">Alege camera</th></tr>
+            <tr>
+              <td class="ch">
+                <span class="pill pill-teal" style="margin-bottom:5px">Înscrieri Timpurii −15%</span>
+                <b><span style="color:#0E804B">✓</span> Mic dejun inclus</b>
+                <span style="color:#57585A">Nerambursabil · plată în avans</span>
+              </td>
+              <td><span class="guests-ic">👤👤</span></td>
+              <td style="text-align:right"><span class="old-pill">4 760 Lei</span><div class="price">4 046 <span class="cur">Lei</span></div></td>
+              <td style="text-align:right"><button class="btn btn-primary btn-select">Alege</button></td>
+            </tr>
+            <tr>
+              <td class="ch">
+                <b><span style="color:#0E804B">✓</span> Mic dejun inclus</b>
+                <span style="color:#0E804B;font-weight:700">Anulare flexibilă</span> <span style="color:#57585A">până la 20 mai</span>
+              </td>
+              <td><span class="guests-ic">👤👤</span></td>
+              <td style="text-align:right"><div class="price">4 760 <span class="cur">Lei</span></div></td>
+              <td style="text-align:right"><button class="btn btn-primary btn-select">Alege</button></td>
+            </tr>
+            <tr>
+              <td class="ch">
+                <b><span style="color:#0E804B">✓</span> Demipensiune</b>
+                <span style="color:#0E804B;font-weight:700">Anulare flexibilă</span> <span style="color:#57585A">până la 20 mai</span>
+              </td>
+              <td><span class="guests-ic">👤👤</span></td>
+              <td style="text-align:right"><div class="price">5 490 <span class="cur">Lei</span></div></td>
+              <td style="text-align:right"><button class="btn btn-primary btn-select">Alege</button></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="room-card">
+      <h3>Apartament familial cu balcon</h3>
+      <div class="room-grid">
+        <div class="room-left">
+          <img src="assets/apartment-family.jpg" alt="">
+          <div class="room-pills">
+            <span class="rpill"><svg width="13" height="13"><use href="#i-ruler"/></svg> 44 m²</span>
+            <span class="rpill"><svg width="13" height="13"><use href="#i-users"/></svg> Max. 5 persoane</span>
+            <span class="rpill"><svg width="13" height="13"><use href="#i-bed"/></svg> 2 paturi duble, 1 canapea</span>
+          </div>
+          <a class="rlink" href="#">Detalii cameră →</a>
+        </div>
+        <div>
+          <table class="rates">
+            <tr><th>Alegerile tale</th><th>Oaspeți</th><th style="text-align:right">Prețul tău</th><th style="text-align:right">Alege camera</th></tr>
+            <tr>
+              <td class="ch">
+                <span class="pill pill-teal" style="margin-bottom:5px">Înscrieri Timpurii −15%</span>
+                <b><span style="color:#0E804B">✓</span> Mic dejun inclus</b>
+                <span style="color:#57585A">Nerambursabil · plată în avans</span>
+              </td>
+              <td><span class="guests-ic">👤👤👤👤</span></td>
+              <td style="text-align:right"><span class="old-pill">6 860 Lei</span><div class="price">5 831 <span class="cur">Lei</span></div></td>
+              <td style="text-align:right"><button class="btn btn-primary btn-select">Alege</button></td>
+            </tr>
+            <tr>
+              <td class="ch">
+                <b><span style="color:#0E804B">✓</span> All inclusive</b>
+                <span style="color:#0E804B;font-weight:700">Anulare flexibilă</span> <span style="color:#57585A">până la 20 mai</span>
+              </td>
+              <td><span class="guests-ic">👤👤👤👤</span></td>
+              <td style="text-align:right"><div class="price">8 120 <span class="cur">Lei</span></div></td>
+              <td style="text-align:right"><button class="btn btn-primary btn-select">Alege</button></td>
+            </tr>
+          </table>
+          <div class="show-more"><a href="#">Afișează încă 6 opțiuni ↓</a></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="sec-head"><h2 class="sec-title">Politici generale</h2></div>
+    <div class="pol-grid">
+      <div class="pol">
+        <h4><span class="ic"><svg width="19" height="19"><use href="#i-clock"/></svg></span> Sosire / Plecare</h4>
+        <p>Check-in: între <b>15:00 – 24:00</b></p>
+        <p>Check-out: între <b>8:00 – 11:00</b></p>
+        <p>Recepție deschisă 24 de ore</p>
+      </div>
+      <div class="pol">
+        <h4><span class="ic"><svg width="19" height="19"><use href="#i-card"/></svg></span> Opțiuni de plată</h4>
+        <p>Numerar: <b>RON (Lei)</b> · Transfer bancar</p>
+        <p>Card de vacanță: <b>Edenred, Pluxee, Up</b></p>
+        <div class="paycards"><span>VISA</span><span>Mastercard</span><span>Maestro</span><span>Apple Pay</span><span>Google Pay</span></div>
+      </div>
+      <div class="pol">
+        <h4><span class="ic"><svg width="19" height="19"><use href="#i-paw"/></svg></span> Animale de companie</h4>
+        <p>Câini și pisici acceptate până la <b>10 kg</b></p>
+        <p>45 Lei / noapte / animal</p>
+      </div>
+      <div class="pol">
+        <h4><span class="ic"><svg width="19" height="19"><use href="#i-globe"/></svg></span> Limbi vorbite</h4>
+        <p>Română, engleză, franceză</p>
+        <p>Pentru orice problemă, echipa noastră de suport din Constanța îți stă la dispoziție.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="sec-head">
+      <h2 class="sec-title">Recenziile oaspeților</h2>
+      <a class="link-more" href="#">Vezi toate cele 157</a>
+    </div>
+    <div class="rev-grid">
+      <div class="rev-score">
+        <div class="big">9.2</div>
+        <div class="w">Excelent</div>
+        <div class="c">pe baza a 157 de recenzii</div>
+      </div>
+      <div class="rev-bars">
+        <div class="rbar"><span>Curățenie</span><span class="track"><span class="fill" style="width:94%"></span></span><span class="val">9.4</span></div>
+        <div class="rbar"><span>Locație</span><span class="track"><span class="fill" style="width:98%"></span></span><span class="val">9.8</span></div>
+        <div class="rbar"><span>Personal</span><span class="track"><span class="fill" style="width:91%"></span></span><span class="val">9.1</span></div>
+        <div class="rbar"><span>Raport calitate / preț</span><span class="track"><span class="fill" style="width:89%"></span></span><span class="val">8.9</span></div>
+        <div class="rbar"><span>Confort</span><span class="track"><span class="fill" style="width:90%"></span></span><span class="val">9.0</span></div>
+        <div class="rbar"><span>Facilități</span><span class="track"><span class="fill" style="width:88%"></span></span><span class="val">8.8</span></div>
+      </div>
+    </div>
+    <div class="rev-cards">
+      <div class="rev-card">
+        <div class="hd"><span class="av">M</span><div><div class="nm">Maria</div><div class="dt">București · iunie 2026</div></div><span class="sc rate-badge">9.6</span></div>
+        <p>„Plaja e la 2 minute de cameră, micul dejun foarte variat. Șezlongurile incluse au făcut toată diferența — recomand cu drag!”</p>
+      </div>
+      <div class="rev-card">
+        <div class="hd"><span class="av">A</span><div><div class="nm">Andrei</div><div class="dt">Cluj-Napoca · august 2026</div></div><span class="sc rate-badge">9.0</span></div>
+        <p>„Camera curată, vedere superbă la mare. Seara puțină gălăgie dinspre faleză, dar nimic deranjant. Revenim la anul.”</p>
+      </div>
+      <div class="rev-card">
+        <div class="hd"><span class="av">E</span><div><div class="nm">Elena</div><div class="dt">Iași · iulie 2026</div></div><span class="sc rate-badge">9.4</span></div>
+        <p>„Personal foarte amabil, piscina încălzită e un plus mare pentru copii. Raport calitate-preț excelent cu reducerea FRIENDS.”</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="sec-head"><h2 class="sec-title">Locație</h2></div>
+    <div class="loc-grid">
+      <div class="loc-map">
+        <div class="grid-lines" style="position:absolute;inset:0;background-image:linear-gradient(rgba(0,75,151,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(0,75,151,.07) 1px,transparent 1px);background-size:34px 34px"></div>
+        <span class="pin"><svg width="46" height="46" viewBox="0 0 24 24"><path d="M12 21s-7-6.1-7-11a7 7 0 1 1 14 0c0 4.9-7 11-7 11z" fill="#004B97"/><circle cx="12" cy="10" r="2.6" fill="#fff"/></svg></span>
+      </div>
+      <div>
+        <p style="font-weight:700;margin-bottom:6px">Complex Mediteranean</p>
+        <p style="color:#57585A;font-size:14.5px;margin-bottom:14px">Str. Faleza Mării 21, Mamaia 900001, Constanța</p>
+        <div class="dist-list">
+          <div class="dist"><span class="ic"><svg width="16" height="16"><use href="#i-umbrella"/></svg></span> Plaja Mamaia <span class="v">50 m</span></div>
+          <div class="dist"><span class="ic"><svg width="16" height="16"><use href="#i-pin"/></svg></span> Aqua Magic <span class="v">800 m</span></div>
+          <div class="dist"><span class="ic"><svg width="16" height="16"><use href="#i-pin"/></svg></span> Cazino Mamaia <span class="v">1,2 km</span></div>
+          <div class="dist"><span class="ic"><svg width="16" height="16"><use href="#i-pin"/></svg></span> Telegondola Mamaia <span class="v">1,8 km</span></div>
+          <div class="dist"><span class="ic"><svg width="16" height="16"><use href="#i-pin"/></svg></span> Aeroportul Mihail Kogălniceanu <span class="v">26 km</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="section">
+    <div class="sec-head">
+      <h2 class="sec-title">Alternative în apropiere, din inventarul nostru</h2>
+      <a class="link-more" href="#">Toate cazările din Mamaia</a>
+    </div>
+    <div class="hcard-row">
+      <div class="hcard">
+        <div class="ph"><img src="assets/aerial-hotel.jpg" alt=""><span class="heart"><svg width="17" height="17"><use href="#i-heart"/></svg></span></div>
+        <div class="hcard-body">
+          <div class="rating-line"><span class="rate-badge">8.9</span><span class="rate-word">Foarte bine</span><span class="rate-count">312 recenzii</span></div>
+          <div class="hname">Hotel Victoria <span class="stars">★★★</span></div>
+          <div class="hmeta"><svg width="14" height="14"><use href="#i-pin"/></svg> <span class="dist-tag">la 400 m</span> · Mamaia</div>
+          <div class="price-block"><div class="price" style="margin-top:6px">432 <span class="cur">Lei</span></div><div class="price-note">2 adulți, 7 nopți cu mic dejun</div></div>
+        </div>
+      </div>
+      <div class="hcard">
+        <div class="ph"><img src="assets/room-seaview.jpg" alt=""><span class="heart"><svg width="17" height="17"><use href="#i-heart"/></svg></span></div>
+        <div class="hcard-body">
+          <div class="rating-line"><span class="rate-badge">8.0</span><span class="rate-word">Foarte bine</span><span class="rate-count">557 recenzii</span></div>
+          <div class="hname">Sara Boutique Hotel <span class="stars">★★★★</span></div>
+          <div class="hmeta"><svg width="14" height="14"><use href="#i-pin"/></svg> <span class="dist-tag">la 1,1 km</span> · Mamaia Nord</div>
+          <div class="price-block"><div class="price" style="margin-top:6px">1 119 <span class="cur">Lei</span></div><div class="price-note">2 adulți, 7 nopți cu mic dejun</div></div>
+        </div>
+      </div>
+      <div class="hcard">
+        <div class="ph"><img src="assets/pool-sunset.jpg" alt=""><span class="heart"><svg width="17" height="17"><use href="#i-heart"/></svg></span></div>
+        <div class="hcard-body">
+          <div class="rating-line"><span class="rate-badge">8.4</span><span class="rate-word">Foarte bine</span><span class="rate-count">203 recenzii</span></div>
+          <div class="hname">Hotel Aurora <span class="stars">★★★</span></div>
+          <div class="hmeta"><svg width="14" height="14"><use href="#i-pin"/></svg> <span class="dist-tag">la 900 m</span> · Mamaia</div>
+          <div class="price-block"><div class="price" style="margin-top:6px">486 <span class="cur">Lei</span></div><div class="price-note">2 adulți, 7 nopți cu demipensiune</div></div>
+        </div>
+      </div>
+      <div class="hcard">
+        <div class="ph"><img src="assets/jacuzzi-view.jpg" alt=""><span class="heart"><svg width="17" height="17"><use href="#i-heart"/></svg></span></div>
+        <div class="hcard-body">
+          <div class="rating-line"><span class="rate-badge">9.5</span><span class="rate-word">Excepțional</span><span class="rate-count">89 recenzii</span></div>
+          <div class="hname">Aqvatonic Resort &amp; SPA <span class="stars">★★★★</span></div>
+          <div class="hmeta"><svg width="14" height="14"><use href="#i-pin"/></svg> <span class="dist-tag">la 14 km</span> · Eforie Nord</div>
+          <div class="price-block"><div class="price" style="margin-top:6px">780 <span class="cur">Lei</span></div><div class="price-note">2 adulți, 2 nopți cu demipensiune</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<footer class="footer" style="margin-top:40px">
+  <div class="container">
+    <div class="f-bottom" style="margin-top:0;padding-top:0;border-top:0">
+      <div>© 2008–2026 Litoralul Romanesc · Parte din Szallas Group. Toate drepturile rezervate.</div>
+      <div style="font-weight:700;color:#012B55">litoralul<span style="color:#EB802D">romanesc</span>.ro</div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
