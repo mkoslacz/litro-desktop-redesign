@@ -490,3 +490,70 @@ table.rates { width: 100%; border-collapse: collapse; font-size: 14px; }
 .cond-box .h { font-weight: 700; font-size: 13.5px; margin-bottom: 6px; }
 .cond-box .pl { font-size: 13px; }
 .cond-box .ok { color: var(--green-600); font-weight: 700; font-size: 13px; }
+
+/* ============================================================
+   AUDIT FIXES (must-have block, 2026-07-19)
+   ============================================================ */
+
+/* --- "De plătit la hotel" — charges not included in the online total --- */
+.athotel { border-top: 1px dashed var(--gray-400); margin-top: 10px; padding-top: 9px; }
+.athotel .h { font-size: 12.5px; font-weight: 700; color: var(--gray-700); display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
+.athotel .pl { font-size: 13px; }
+.athotel .pl .v { font-weight: 700; }
+.rate-tax { font-size: 12px; color: var(--gray-700); margin-top: 3px; }
+
+/* --- per-rate confirmation type --- */
+.conf { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; border-radius: 7px; padding: 3px 8px; }
+.conf-instant { background: var(--green-100); color: var(--green-600); }
+.conf-request { background: var(--gray-200); color: var(--gray-700); }
+
+/* --- promo code / gift card --- */
+.promo-box { border-top: 1px solid var(--gray-300); margin-top: 10px; padding-top: 12px; }
+.promo-box .lbl { font-size: 13.5px; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 7px; }
+.promo-row { display: flex; gap: 8px; align-items: stretch; }
+.promo-row .inp { flex: 1; height: 42px; padding: 0 12px; font-size: 14px; display: flex; align-items: center; }
+.promo-row .btn { height: 42px; padding: 0 18px; font-size: 14px; flex: none; }
+
+/* --- consent block (unticked by default) --- */
+.consent { display: flex; gap: 10px; align-items: flex-start; font-size: 13.5px; color: var(--gray-700); margin-bottom: 10px; }
+.consent .cb { margin-top: 1px; }
+.consent.optional { color: var(--gray-700); }
+.consent .opt-tag { font-size: 11.5px; font-weight: 700; color: var(--gray-600); background: var(--gray-200); border-radius: 6px; padding: 1px 6px; margin-left: 6px; }
+.btn-disabled { background: var(--gray-400); color: #fff; cursor: not-allowed; }
+.cta-hint { font-size: 12.5px; color: var(--gray-600); text-align: right; margin-top: 6px; }
+
+/* --- house rules --- */
+.rules { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 24px; }
+.rule { display: flex; align-items: flex-start; gap: 8px; font-size: 14px; color: var(--gray-900); }
+.rule .ic { color: var(--gray-600); flex: none; margin-top: 2px; }
+.rule.no .ic { color: var(--red-500); }
+
+/* --- availability filter box (listing) --- */
+.fbox.avail { border-color: #CBDEF2; background: var(--navy-100); }
+.fbox.avail h3 { color: var(--navy-700); }
+.res-types { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+.res-type { font-size: 12.5px; font-weight: 600; color: var(--gray-700); background: #fff; border: 1px solid var(--gray-300); border-radius: 100px; padding: 4px 10px; }
+
+/* --- documents block (thank you) --- */
+.docs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.doc { display: flex; align-items: center; gap: 11px; border: 1px solid var(--gray-300); border-radius: var(--r-m); padding: 12px 14px; background: #fff; }
+.doc .ic { width: 34px; height: 34px; border-radius: 9px; background: var(--navy-100); color: var(--navy-500); display: flex; align-items: center; justify-content: center; flex: none; }
+.doc .t { font-weight: 700; font-size: 14px; }
+.doc .d { font-size: 12.5px; color: var(--gray-700); }
+.doc .go { margin-left: auto; color: var(--navy-500); font-weight: 700; font-size: 13px; }
+
+/* --- cancellation how-to --- */
+.howto { border: 1px solid var(--gray-300); border-radius: var(--r-l); background: #fff; padding: 16px; margin-top: 14px; }
+.howto h4 { font-family: var(--font-title); font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+.howto .steps { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color: var(--gray-900); }
+.howto .steps .s { display: flex; gap: 9px; align-items: flex-start; }
+.howto .steps .s .ic { color: var(--navy-500); flex: none; margin-top: 2px; }
+.howto .sla { font-size: 12.5px; color: var(--gray-700); margin-top: 8px; }
+
+/* --- legal strip / operator identity --- */
+.legal { border-top: 1px solid var(--gray-300); margin-top: 18px; padding-top: 16px; font-size: 12.5px; color: var(--gray-700); line-height: 1.6; }
+.legal .org { font-weight: 700; color: var(--gray-900); }
+.legal .lic { display: inline-flex; align-items: center; gap: 6px; background: var(--navy-100); color: var(--navy-700); border: 1px solid #CBDEF2; border-radius: 7px; padding: 2px 8px; font-weight: 700; margin-right: 8px; }
+.legal a { color: var(--gray-700); text-decoration: underline; }
+.legal .row { margin-bottom: 4px; }
+.legal-compact { display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; }
