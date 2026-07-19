@@ -6,9 +6,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="litro.css">
+<link rel="stylesheet" href="proto.css">
 <style>body { background: #FCFBFA; }</style>
 </head>
-<body>
+<body data-page="checkout">
 
 <svg width="0" height="0" style="position:absolute">
   <defs>
@@ -119,14 +120,14 @@
             <span class="pm hl">Card de vacanță — Edenred · Pluxee · Up</span>
           </div>
         </div>
-        <div class="assist" style="border-style:solid;border-color:#F6D3AF;background:#FFF8F1">
+        <div class="assist" data-voucher style="border-style:solid;border-color:#F6D3AF;background:#FFF8F1">
           <span class="cb on"></span>
           <div style="width:100%">
             <b>Plătesc cu card de vacanță</b>
             <div class="d">Voucherele sunt plafonate, așa că diferența se achită cu cardul — calculăm automat.</div>
             <div class="f2" style="margin-top:9px">
-              <div class="fld" style="margin-bottom:0"><label>Valoarea voucherului</label><div class="inp"><b>800 Lei</b></div></div>
-              <div class="fld" style="margin-bottom:0"><label>Diferență de plată — card online</label><div class="inp"><b>414 Lei</b> <span style="color:#747679;font-size:12.5px">din avansul de 1 214 Lei</span></div></div>
+              <div class="fld" style="margin-bottom:0"><label>Valoarea voucherului</label><div class="inp" data-voucher-amt><b>800 Lei</b></div></div>
+              <div class="fld" style="margin-bottom:0"><label>Diferență de plată — card online</label><div class="inp" data-voucher-diff><b>414 Lei</b> <span style="color:#747679;font-size:12.5px">din avansul de 1 214 Lei</span></div></div>
             </div>
           </div>
         </div>
@@ -210,5 +211,6 @@
   </div>
 </footer>
 
+<script src="proto.js"></script>
 </body>
 </html>

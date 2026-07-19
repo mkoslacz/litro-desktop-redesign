@@ -6,9 +6,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="litro.css">
+<link rel="stylesheet" href="proto.css">
 <style>body { background: #FCFBFA; }</style>
 </head>
-<body>
+<body data-page="listing">
 
 <svg width="0" height="0" style="position:absolute">
   <defs>
@@ -98,7 +99,7 @@
       <div class="fbox avail">
         <h3>Disponibilitate <span class="min">—</span></h3>
         <div class="frow"><span class="cb on"></span> Doar cazări disponibile <span class="cnt">(81)</span></div>
-        <div class="frow"><span class="cb"></span> Doar cu confirmare instantanee <span class="cnt">(63)</span></div>
+        <div class="frow" data-f="instant"><span class="cb"></span> Doar cu confirmare instantanee <span class="cnt">(63)</span></div>
         <div class="frow"><span class="cb"></span> Doar cu tarife afișate <span class="cnt">(74)</span></div>
         <div class="frow"><span class="cb"></span> Plata la recepție <span class="cnt">(7)</span></div>
       </div>
@@ -113,7 +114,7 @@
 
       <div class="fbox">
         <h3>Reduceri <span class="min">—</span></h3>
-        <div class="frow"><span class="cb on"></span> Reducere FRIENDS <span class="cnt">(58)</span></div>
+        <div class="frow" data-f="friends"><span class="cb"></span> Reducere FRIENDS <span class="cnt">(58)</span></div>
         <div class="frow"><span class="cb"></span> Înscrieri Timpurii <span class="cnt">(41)</span></div>
         <div class="frow"><span class="cb"></span> Extra Discount <span class="cnt">(8)</span></div>
       </div>
@@ -133,9 +134,9 @@
       <div class="fbox">
         <h3>Filtre populare <span class="min">—</span></h3>
         <div class="fchips-wrap">
-          <span class="pfilter on">Piscină <span class="cnt">(26)</span></span>
-          <span class="pfilter">Mic dejun inclus <span class="cnt">(58)</span></span>
-          <span class="pfilter on">Pe plajă <span class="cnt">(9)</span></span>
+          <span class="pfilter on" data-f="pool">Piscină <span class="cnt">(26)</span></span>
+          <span class="pfilter" data-f="breakfast">Mic dejun inclus <span class="cnt">(58)</span></span>
+          <span class="pfilter" data-f="beach">Pe plajă <span class="cnt">(9)</span></span>
           <span class="pfilter">Parcare <span class="cnt">(70)</span></span>
           <span class="pfilter">Aer condiționat <span class="cnt">(81)</span></span>
           <span class="pfilter">Animale acceptate <span class="cnt">(18)</span></span>
@@ -195,7 +196,7 @@
     </aside>
 
     <main>
-      <div class="flexi-strip">
+      <div class="flexi-strip" data-base="968">
         <div class="cap"><svg width="15" height="15" style="color:#004B97"><use href="#i-cal"/></svg> Datele tale sunt flexibile? Prețuri pentru 7 nopți în jurul perioadei alese</div>
         <div class="flexi-cells">
           <div class="fx-cell"><div class="d">1 – 8 iun</div><div class="p">532 Lei</div><div class="s">&nbsp;</div></div>
@@ -209,7 +210,7 @@
       </div>
 
       <!-- card 1 -->
-      <div class="lcard">
+      <div class="lcard" data-ppn="968" data-disc="15" data-meal="mic dejun" data-instant="1" data-beach="50" data-fac="pool,beach" data-friends="1" data-score="9.2" data-rank="1">
         <div class="ph">
           <img src="assets/pool-rooftop.jpg" alt="">
           <span class="heart"><svg width="17" height="17"><use href="#i-heart"/></svg></span>
@@ -264,7 +265,7 @@
       </div>
 
       <!-- card 2 -->
-      <div class="lcard">
+      <div class="lcard" data-ppn="419" data-disc="30" data-meal="mic dejun" data-instant="1" data-beach="50" data-fac="beach" data-friends="0" data-score="8.0" data-rank="2">
         <div class="ph">
           <img src="assets/room-seaview.jpg" alt="">
           <span class="heart"><svg width="17" height="17"><use href="#i-heart"/></svg></span>
@@ -309,7 +310,7 @@
       </div>
 
       <!-- card 3 -->
-      <div class="lcard">
+      <div class="lcard" data-ppn="333" data-disc="0" data-meal="mic dejun" data-instant="0" data-beach="300" data-fac="" data-friends="1" data-score="7.1" data-rank="3">
         <div class="ph">
           <img src="assets/lobby.jpg" alt="">
           <span class="heart"><svg width="17" height="17"><use href="#i-heart"/></svg></span>
@@ -350,7 +351,7 @@
       </div>
 
       <!-- card 4 -->
-      <div class="lcard">
+      <div class="lcard" data-ppn="780" data-disc="20" data-meal="mic dejun" data-instant="1" data-beach="150" data-fac="pool" data-friends="0" data-score="8.9" data-rank="4">
         <div class="ph">
           <img src="assets/aerial-hotel.jpg" alt="">
           <span class="heart"><svg width="17" height="17"><use href="#i-heart"/></svg></span>
@@ -389,7 +390,7 @@
       </div>
 
       <!-- card 5 -->
-      <div class="lcard">
+      <div class="lcard" data-ppn="320" data-disc="0" data-meal="demipensiune" data-instant="1" data-beach="90" data-fac="pool" data-friends="0" data-score="8.4" data-rank="5">
         <div class="ph">
           <img src="assets/pool-sunset.jpg" alt="">
           <span class="heart"><svg width="17" height="17"><use href="#i-heart"/></svg></span>
@@ -424,7 +425,7 @@
       </div>
 
       <!-- card 6 -->
-      <div class="lcard">
+      <div class="lcard" data-ppn="311" data-disc="10" data-meal="mic dejun" data-instant="1" data-beach="0" data-fac="beach,pool" data-friends="1" data-score="8.6" data-rank="6">
         <div class="ph">
           <img src="assets/room-double.jpg" alt="">
           <span class="heart"><svg width="17" height="17"><use href="#i-heart"/></svg></span>
@@ -507,5 +508,6 @@
   </div>
 </footer>
 
+<script src="proto.js"></script>
 </body>
 </html>

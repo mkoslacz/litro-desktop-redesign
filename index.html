@@ -33,6 +33,14 @@
   <h1><b>litoralul</b><span>romanesc</span>.ro — desktop redesign</h1>
   <p class="sub">New desktop designs for litoralulromanesc.ro, built on the approved <b>Szallas Group redesign</b> (Redesign sandbox) — the same move as the Hotely.cz re-skin in the sandbox file: identical layout &amp; components, LITRO brand skin, Romanian seaside content. Branding decisions follow the already-refreshed LITRO <i>mobile</i> redesign (navy rating badge, orange stars, red discount pill, navy price, FRIENDS credits).</p>
 
+  <div class="note" style="margin:0 0 22px;background:#EAF7F0;border-color:#BFE5D2;color:#0B5E38">
+    <b>▶ Acesta este un prototip interactiv, nu un mockup.</b> Deschide oricare ecran și clic: caută o stațiune, schimbă datele în calendar
+    (prețurile se recalculează pe zi), filtrează rezultatele, deschide galeria, alege o cameră, aplică codul promo <code>LITORAL10</code>,
+    bifează condițiile și finalizează rezervarea — starea se transmite de la un ecran la altul.
+    <br><b>This is a working prototype, not a mockup.</b> Search, pick dates in the calendar (prices recompute per night), filter,
+    open the gallery, select a room, apply promo code <code>LITORAL10</code>, tick the consent and complete the booking — state carries across screens.
+  </div>
+
   <div class="pages">
     <div class="pg"><img src="preview-home.png" alt=""><div class="b"><h3>Homepage</h3><p>Hero search, inspiration, campaigns, FRIENDS value props, hotel carousels, resort mosaic.</p><a href="home.html">Open page</a></div></div>
     <div class="pg"><img src="preview-listing.png" alt=""><div class="b"><h3>Hotel Listing</h3><p>Filter sidebar (incl. beach distance &amp; Card de vacanță), horizontal result cards, FRIENDS band.</p><a href="listing.html">Open page</a></div></div>
@@ -79,7 +87,7 @@
   <div class="note" style="margin-top:10px">
     <b>To Figma (ready-made):</b> <a href="litro-desktop-redesign.fig" download><b>⬇ litro-desktop-redesign.fig</b></a> — a native Figma file with all five screens as editable frames (layers, texts, photos, exact sizes; single-line texts are auto-width). Drag it onto the Figma home screen / “Import” — done. Fonts used: <b>Outfit</b> + <b>DM Sans</b> (both in Figma’s Google Fonts catalog).<br><br>
     <b>Alternative route:</b> the <b>html.to.design</b> plugin (already used by the team for “LITRO Master Pages”) — capture these live pages: <code>home.html</code>, <code>listing.html</code>, <code>hotel.html</code>, <code>checkout.html</code>, <code>thankyou.html</code> from this site’s URL, or via its Chrome extension.<br><br>
-    <b>To dev:</b> <code>litro.css</code> is the token sheet (colors, radii, shadows, type as CSS variables — all values in px) and <a href="specs.html"><b>specs.html</b></a> is the measurement spec (component-by-component). The HTML files themselves are reference implementations — paddings, gaps and font sizes can be lifted 1:1.
+    <b>To dev:</b> <code>proto.js</code> + <code>proto.css</code> hold all prototype behaviour (state, calendar, filters, gallery, checkout logic) and can be thrown away at implementation time; <code>litro.css</code> is the token sheet (colors, radii, shadows, type as CSS variables — all values in px) and <a href="specs.html"><b>specs.html</b></a> is the measurement spec (component-by-component). The HTML files themselves are reference implementations — paddings, gaps and font sizes can be lifted 1:1.
   </div>
 
   <div class="note"><b>Scope note.</b> All 5 templates of the priority flow are covered: listing → hotel details → checkout → thank you, plus homepage. Checkout follows the LITRO mobile redesign model (single page: details + payment, 30% advance option) skinned with the Szallas DS. Photos are placeholders taken from the sandbox assets; swap for real LITRO property photos in production.</div>
