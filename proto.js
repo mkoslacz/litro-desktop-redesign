@@ -392,6 +392,8 @@
       if (note) note.innerHTML = S.adults + ' adulți, ' + n + ' nopți cu ' + (card.dataset.meal || 'mic dejun') + '<br>TVA inclus · taxa de stațiune la hotel';
       const cr = $('.credits', card);
       if (cr) cr.textContent = 'Primești ' + Math.round(total * 0.02) + ' credite FRIENDS';
+      const sv = $('.save', card);
+      if (sv) { if (gross > total) { sv.style.display = ''; sv.textContent = 'economisești ' + money(gross - total) + ' Lei'; } else sv.style.display = 'none'; }
       card.dataset.total = total;
     });
 
@@ -544,6 +546,8 @@
       });
       const rc = $('.res-count');
       if (rc) rc.innerHTML = shown + (shown === 1 ? ' cazare disponibilă' : ' cazări disponibile') + ' · 8.7/10 din 11 395 recenzii';
+      const rcn = $('.res-count-n');
+      if (rcn) rcn.textContent = document.body.dataset.variant === 'b' ? money(shown * 206) : shown;
       const band = $('.loyal-band'); if (band) band.style.display = shown > 1 ? '' : 'none';
       if (!shown) showEmptyState(); else hideEmptyState();
     }
@@ -1090,6 +1094,50 @@
 
     /* breadcrumbs */
     $$('.crumbs a').forEach((a, i) => a.onclick = e => { e.preventDefault(); goto(i === 0 ? 'home.html' + qs() : 'listing.html' + qs()); });
+
+    /* --- variant B: see-also tabs, pager, newsletter, theme tiles --- */
+    const tabs = $$('.seealso .tab');
+    if (tabs.length) {
+      const SETS = {
+        0: RESORTS.map(r => ['Cazare ' + r[0], r[1] + '']),
+        1: [['Înscrieri Timpurii 2026', '263'], ['Oferte Last Minute', '159'], ['Oferta Verii', '123'], ['Oferta Speciala', '89'],
+            ['Oferta Sfânta Maria', '59'], ['Litoralul Pentru Toți', '55'], ['Oferta Nibiru', '48'], ['Zile Gratuite de Vacanță', '30'],
+            ['Oferta Extrasezon', '25'], ['Extra Discount', '8'], ['Oferta cu tratament', '6'], ['Oferta Seniori', '5'],
+            ['Mare pentru cei mici', '2'], ['Festival Beach Please', '1']],
+        2: [['Hoteluri all inclusive', '112'], ['Direct pe plajă', '126'], ['Cu piscină', '384'], ['Pentru familii cu copii', '441'],
+            ['Doar pentru adulți', '18'], ['Cu bază de tratament', '36'], ['Wellness & SPA', '97'], ['Cu animale acceptate', '214'],
+            ['Cu parcare gratuită', '1 021'], ['Self check-in', '12']]
+      };
+      const cols = $('.seealso .cols');
+      const paintTab = i => {
+        cols.innerHTML = SETS[i].map(([t, c]) => '<a href="#">' + t + ' <span class="c">· ' + c + '</span></a>').join('');
+        $$('a', cols).forEach(a => a.onclick = e => { e.preventDefault(); save(); goto('listing.html' + qs()); });
+      };
+      tabs.forEach((t, i) => t.onclick = () => { tabs.forEach(x => x.classList.remove('on')); t.classList.add('on'); paintTab(i); });
+    }
+    $$('.pager a').forEach(a => a.onclick = e => {
+      e.preventDefault();
+      if (a.classList.contains('on')) return;
+      $$('.pager a').forEach(x => x.classList.remove('on'));
+      if (!/›/.test(a.textContent)) a.classList.add('on');
+      window.scrollTo({ top: $('.listing-grid').offsetTop - 90, behavior: 'smooth' });
+      toast('Pagina ' + a.textContent.trim() + ' — în prototip lista rămâne aceeași');
+    });
+    $$('.theme').forEach(t => t.onclick = () => { save(); goto('listing.html' + qs()); });
+    const nlBtn = $('.nl .btn');
+    if (nlBtn) nlBtn.onclick = () => {
+      const box = $('.nl .form');
+      box.innerHTML = '<div class="trust-note" style="color:#9BE8C2;font-size:15px"><svg width="16" height="16"><use href="#i-check-g"/></svg> Gata! Ți-am trimis un e-mail de confirmare.</div>';
+      toast('Te-ai abonat la ofertele de pe litoral', 'ok');
+    };
+    const nlIn = $('.nl .inp');
+    if (nlIn) { nlIn.contentEditable = 'true'; nlIn.onfocus = () => { if (!nlIn.dataset.t) { nlIn.textContent = ''; nlIn.dataset.t = '1'; nlIn.style.color = '#1E1E1E'; } }; }
+    const howLink = $('.resbar .how');
+    if (howLink) howLink.onclick = () => openModal('Cum stabilim ordinea ofertelor', 
+      '<p>Ordinea implicită („Recomandate de noi”) combină: disponibilitatea reală în inventarul nostru pentru datele alese, ' +
+      'nota din recenziile clienților noștri, raportul preț–calitate față de restul stațiunii și dacă hotelul are confirmare instantă.</p>' +
+      '<p>Hotelurile nu pot plăti pentru o poziție mai bună în listă. Ofertele marcate „Doar la noi” sunt contractate exclusiv de agenția noastră.</p>' +
+      '<p>Poți schimba oricând criteriul din meniul de sortare: preț, notă sau distanță față de plajă.</p>');
 
     /* hint bar */
     if (!sessionStorage.getItem('litroHint') && !navigator.webdriver) {

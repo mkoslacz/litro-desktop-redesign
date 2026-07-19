@@ -114,6 +114,7 @@ const pages = [
   { file: 'dump-hotel.json', name: 'Hotel Details / Desktop', ox: 3280 },
   { file: 'dump-checkout.json', name: 'Checkout / Desktop', ox: 4920 },
   { file: 'dump-thankyou.json', name: 'Thank you / Desktop', ox: 6560 },
+  { file: 'dump-home-b.json', name: 'Home B — listing direct / Desktop', ox: 8200 },
 ];
 
 const assetCache = new Map();
@@ -296,7 +297,7 @@ const meta = {
   client_meta: {
     background_color: { r: 0.949, g: 0.945, b: 0.941, a: 1 },
     thumbnail_size: { width: 400, height: 225 },
-    render_coordinates: { x: 0, y: 0, width: 8000, height: 3900 },
+    render_coordinates: { x: 0, y: 0, width: 9700, height: 4800 },
   },
   file_name: 'LITRO Desktop Redesign',
   developer_related_links: [],
