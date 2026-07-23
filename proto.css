@@ -96,6 +96,14 @@
 .rc-arrow.prev { left: 4px; }
 .rc-arrow.next { right: 4px; }
 
+/* --- listing B/C: densificare ca să se vadă și un colț din al doilea card sus --- */
+body[data-listing="b"] .loyal-band, body[data-listing="c"] .loyal-band { display: none !important; }
+body[data-listing="b"] .lcard, body[data-listing="c"] .lcard { margin-bottom: 8px; }
+body[data-listing="b"] .lc-mid, body[data-listing="c"] .lc-mid { padding: 10px 14px; }
+body[data-listing="b"] .lc-room, body[data-listing="c"] .lc-room { margin-top: 6px; }
+body[data-listing="b"] .quote, body[data-listing="c"] .quote { display: none; }
+body[data-listing="b"] .lcard .ph img, body[data-listing="c"] .lcard .ph img { min-height: 204px; }
+
 /* --- hotel: flexi-strip pliabil + „Ce include" colapsat --- */
 .flexi-strip.collapsed .flexi-cells { display: none; }
 .flexi-strip .cap .flexi-toggle { margin-left: 6px; color: var(--navy-500); font-weight: 700; }

@@ -979,9 +979,13 @@
       };
     });
 
-    /* --- book now --- */
+    /* --- book now: derulează la selecția camerelor (nu direct la checkout) --- */
     const bkCta = $('.bk-cta');
-    if (bkCta) bkCta.onclick = () => { save(); goto('checkout.html' + qs()); };
+    if (bkCta) bkCta.onclick = () => {
+      const target = $('.room-card') || $('.meal-chips') || $('.stay-bar');
+      if (target) window.scrollTo({ top: target.getBoundingClientRect().top + window.pageYOffset - 80, behavior: 'smooth' });
+      toast('Alege camera și tariful dorit', 'ok');
+    };
 
     /* --- modals: campaigns, cancellation, room details --- */
     $$('.camp-strip .go').forEach(g => g.onclick = () => {
