@@ -31,6 +31,9 @@
   .hc-tile:hover .cta { background: #fff; color: var(--navy-700); border-color: #fff; }
   .hc-badge { position: absolute; right: 15px; top: 13px; z-index: 3; font-family: var(--font-title); font-weight: 800; font-size: 33px;
     transform: rotate(-6deg); text-shadow: 0 3px 14px rgba(0,0,0,.32); }
+  /* un singur kafelek care duce direct la hotel — compact, fără să se lățească */
+  .hc-rate { position: absolute; left: 15px; top: 13px; z-index: 3; background: var(--navy-500); color: #fff; font-weight: 800; font-size: 14px; border-radius: 8px; padding: 3px 9px; box-shadow: 0 2px 8px rgba(0,0,0,.28); }
+  .hc-loc { font-family: var(--font-body); font-size: 12.5px; font-weight: 600; opacity: .92; }
 
   .hc-arrow { position: absolute; top: 50%; transform: translateY(-50%); z-index: 5; width: 40px; height: 40px;
     border-radius: 50%; background: rgba(255,255,255,.95); border: none; box-shadow: 0 4px 14px rgba(1,43,85,.22);
@@ -174,12 +177,14 @@
           <span class="cta">Vezi cele 123 de oferte →</span>
         </div>
       </a>
-      <a class="hc-tile t-teal" href="listing-b.html">
+      <!-- exemplu: un singur kafelek care duce DIRECT la un hotel (nu la listing), compact -->
+      <a class="hc-tile hc-hotel" href="hotel.html">
         <img src="assets/jacuzzi-view.jpg" alt="">
+        <span class="hc-rate">9.5</span>
         <div class="hc-tile-body">
-          <div class="k">Zile Gratuite de Vacanță</div>
-          <div class="t">O noapte gratuită<br>la sejururile mai lungi</div>
-          <span class="cta">Vezi cele 30 de oferte →</span>
+          <div class="k">Hotelul săptămânii</div>
+          <div class="t">Aqvatonic Resort &amp; SPA<br><span class="hc-loc">Eforie Nord · pe plajă</span></div>
+          <span class="cta">Vezi hotelul →</span>
         </div>
       </a>
     </div>

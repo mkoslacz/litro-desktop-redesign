@@ -371,7 +371,7 @@
       if (cheap) cheap.classList.add('cheap');
     }
     function render() {
-      if (document.body.dataset.listing === 'b') return renderB();
+      if (document.body.dataset.listing === 'b' || document.body.dataset.listing === 'c') return renderB();
       const cells = $$('.fx-cell', strip);
       const n = nights();
       const startOffset = -4;
@@ -567,27 +567,63 @@
       c.addEventListener('click', e => { if (!e.target.closest('.heart, .more-rooms, a')) go(); });
     });
 
-    /* --- room-type expander --- */
+    /* --- fiecare card primește linkul „Vezi toate tipurile de cameră" (nu doar primul) --- */
+    const ROOM_CNT = [7, 5, 6, 4, 8, 5, 6, 4];
+    $$('.lcard').forEach((card, i) => {
+      const mid = $('.lc-mid', card);
+      if (mid && !$('.more-rooms', card)) {
+        mid.appendChild(el('span', 'more-rooms',
+          'Vezi toate tipurile de cameră <span class="cnt">(' + ROOM_CNT[i % ROOM_CNT.length] + ')</span> ↓'));
+      }
+    });
+
+    /* --- room-type expander — listă (A/B) sau carusel de camere cu poză+descriere (C) --- */
+    const ROOM_IMG = ['room-seaview', 'room-double', 'apartment-family', 'jacuzzi-view', 'pool-rooftop', 'lobby', 'spa-indoor'];
+    const isCarousel = document.body.dataset.listing === 'c';
     $$('.more-rooms').forEach(m => {
       const card = m.closest('.lcard');
       const n = +(m.textContent.match(/\((\d+)\)/) || [0, 4])[1];
-      const box = el('div', 'extra-rooms');
       const base = +(card.dataset.ppn || 80);
       const types = [
-        ['Cameră dublă economy', 'fără balcon', -0.18],
-        ['Cameră dublă standard', '1 pat dublu', -0.08],
-        ['Cameră dublă vedere mare', '+ 2 șezlonguri incluse', 0],
-        ['Cameră triplă', '3 adulți', 0.22],
-        ['Cameră family', '2 adulți + 2 copii', 0.34],
-        ['Studio 4*', 'terasă proprie', 0.52],
+        ['Cameră dublă economy', 'fără balcon · 18 m²', -0.18],
+        ['Cameră dublă standard', '1 pat dublu · 22 m²', -0.08],
+        ['Cameră dublă vedere mare', '+ 2 șezlonguri incluse · 24 m²', 0],
+        ['Cameră triplă', '3 adulți · 28 m²', 0.22],
+        ['Cameră family', '2 adulți + 2 copii · 34 m²', 0.34],
+        ['Studio 4*', 'terasă proprie · 40 m²', 0.52],
         ['Apartament 4*', '55 m², living separat', 0.78]
       ].slice(0, Math.max(3, Math.min(n, 7)));
-      box.innerHTML = types.map(([nm, meta, f]) => {
-        const total = Math.round(stayTotal(base, S.from, S.to) * (1 + f));
-        return '<div class="xroom"><div><div class="n">' + nm + '</div><div class="m">' + meta + '</div></div>' +
-          '<div class="p">' + money(total) + ' Lei' + (f !== 0 ? ' <span class="d">(' + (f > 0 ? '+' : '') + money(total - stayTotal(base, S.from, S.to)) + ')</span>' : '') + '</div></div>';
-      }).join('');
-      m.after(box);
+      let box;
+      if (isCarousel) {
+        box = el('div', 'rcarousel');
+        box.innerHTML = '<div class="rc-track">' + types.map(([nm, meta, f], i) => {
+          const total = Math.round(stayTotal(base, S.from, S.to) * (1 + f));
+          return '<div class="rc-room"><img src="assets/' + ROOM_IMG[i % ROOM_IMG.length] + '.jpg" alt="">' +
+            '<div class="rc-body"><div class="rc-name">' + nm + '</div><div class="rc-meta">' + meta + '</div>' +
+            '<div class="rc-perks"><svg width="13" height="13"><use href="#i-check-g"/></svg> Mic dejun inclus</div>' +
+            '<div class="rc-foot"><div class="rc-price">' + money(total) + ' <span class="cur">Lei</span>' +
+            '<span class="rc-note">' + nights() + ' nopți</span></div>' +
+            '<button class="btn btn-primary rc-sel">Alege</button></div></div></div>';
+        }).join('') + '</div><button class="rc-arrow prev" aria-label="Înapoi">‹</button><button class="rc-arrow next" aria-label="Înainte">›</button>';
+        m.after(box);
+        const track = $('.rc-track', box);
+        const step = () => { const r = $('.rc-room', track); return r ? r.getBoundingClientRect().width + 12 : 232; };
+        $('.rc-arrow.prev', box).onclick = e => { e.stopPropagation(); track.scrollBy({ left: -step() }); };
+        $('.rc-arrow.next', box).onclick = e => { e.stopPropagation(); track.scrollBy({ left: step() }); };
+        $$('.rc-sel', box).forEach(b => b.onclick = e => {
+          e.stopPropagation();
+          S.hotel = $('.hname', card).childNodes[0].textContent.trim(); save();
+          goto('hotel.html' + qs());
+        });
+      } else {
+        box = el('div', 'extra-rooms');
+        box.innerHTML = types.map(([nm, meta, f]) => {
+          const total = Math.round(stayTotal(base, S.from, S.to) * (1 + f));
+          return '<div class="xroom"><div><div class="n">' + nm + '</div><div class="m">' + meta + '</div></div>' +
+            '<div class="p">' + money(total) + ' Lei' + (f !== 0 ? ' <span class="d">(' + (f > 0 ? '+' : '') + money(total - stayTotal(base, S.from, S.to)) + ')</span>' : '') + '</div></div>';
+        }).join('');
+        m.after(box);
+      }
       m.onclick = e => {
         e.stopPropagation();
         box.classList.toggle('open');
@@ -598,6 +634,7 @@
     });
 
     /* --- filters --- */
+    let demoCap = Infinity, demoCount = null;   // comutator demo de inventar (listing B)
     function applyFilters() {
       const active = {
         instant: $('[data-f="instant"]')?.classList.contains('on'),
@@ -606,6 +643,7 @@
         breakfast: $('[data-f="breakfast"]')?.classList.contains('on'),
         friends: $('[data-f="friends"]')?.classList.contains('on')
       };
+      const anyFilter = Object.values(active).some(Boolean);
       let shown = 0;
       cards.forEach(c => {
         const f = (c.dataset.fac || '').split(',');
@@ -615,17 +653,19 @@
         if (active.pool && !f.includes('pool')) ok = false;
         if (active.breakfast && !/mic dejun/i.test(c.dataset.meal || '')) ok = false;
         if (active.friends && c.dataset.friends !== '1') ok = false;
+        if (ok && shown >= demoCap) ok = false;   // demo: plafon de inventar
         c.classList.toggle('card-hidden', !ok);
         if (ok) shown++;
       });
+      const displayN = (demoCount != null && !anyFilter) ? demoCount : shown;
       const rc = $('.res-count');
-      if (rc) rc.innerHTML = shown + (shown === 1 ? ' cazare disponibilă' : ' cazări disponibile') + ' · 8.7/10 din 11 395 recenzii';
+      if (rc) rc.innerHTML = displayN + (displayN === 1 ? ' cazare disponibilă' : ' cazări disponibile') + ' · 8.7/10 din 11 395 recenzii';
       const rcn = $('.res-count-n');
       if (rcn) rcn.textContent = document.body.dataset.variant === 'b' ? money(shown * 206) : shown;
       const band = $('.loyal-band'); if (band) band.style.display = shown > 1 ? '' : 'none';
       // listing B: banner de date flexibile doar când sunt puține rezultate
       const fstrip = $('.flexi-strip');
-      if (fstrip && document.body.dataset.listing === 'b') fstrip.style.display = (shown <= 5) ? '' : 'none';
+      if (fstrip && (document.body.dataset.listing === 'b' || document.body.dataset.listing === 'c')) fstrip.style.display = (shown <= 5) ? '' : 'none';
       if (!shown) showEmptyState(); else hideEmptyState();
     }
     let emptyBox = null;
@@ -763,6 +803,17 @@
       goto(listingHref() + qs());
     });
 
+    /* --- demo: comutator de inventar (mult / puțin) — arată starea „multe" vs „puține" rezultate --- */
+    $$('.invdemo [data-cap]').forEach(b => b.onclick = () => {
+      $$('.invdemo [data-cap]').forEach(x => x.classList.remove('on'));
+      b.classList.add('on');
+      demoCap = +b.dataset.cap; demoCount = +b.dataset.count;
+      $$('.pfilter.on').forEach(p => p.classList.remove('on'));       // curăță filtrele pt. o demonstrație curată
+      $$('.fbox:not(.avail) .cb.on').forEach(c => c.classList.remove('on'));
+      applyFilters(); syncChips();
+      toast('Inventar demo: ' + b.textContent.trim(), 'ok');
+    });
+
     applyFilters(); syncChips();
   }
 
@@ -836,22 +887,81 @@
       toast(shown ? shown + ' tarife cu „' + ch.textContent.trim() + '”' : 'Niciun tarif pentru această opțiune', shown ? 'ok' : 'err');
     });
 
-    /* --- rate selection --- */
-    $$('tr[data-ppn]').forEach(tr => {
-      const btn = $('.btn-select', tr);
-      if (!btn) return;
-      btn.onclick = () => {
-        $$('tr[data-ppn]').forEach(x => x.classList.remove('sel'));
-        tr.classList.add('sel');
-        S.rate = tr.closest('.room-card').querySelector('h3').textContent.trim();
-        S.ratePrice = +(tr.dataset.total || 4046);
-        S.meal = tr.dataset.meal || 'mic dejun';
-        save(); repriceEverything();
-        const bk = $('.book-card');
-        const rn = $('.bk-room .rn', bk);
-        if (rn) rn.textContent = '1 × ' + S.rate;
-        toast('Cameră selectată: ' + S.rate, 'ok');
-        bk.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    /* --- rate selection: „Alege" → stepper (± nr. camere) → belă de rezervare care urcă (model Szallas) --- */
+    const bookBar = $('.booking-bar');
+    if (bookBar) {
+      const sel = {}; // rid -> qty
+      const onlineRows = () => $$('tr[data-ppn]:not(.rate-request)');
+      onlineRows().forEach((tr, i) => { tr.dataset.rid = 'rr' + i; });
+      const rowOf = rid => $('tr[data-rid="' + rid + '"]');
+      const info = tr => ({
+        name: tr.closest('.room-card').querySelector('h3').textContent.trim(),
+        board: tr.dataset.meal || 'mic dejun',
+        price: +(tr.dataset.total || (+tr.dataset.ppn || 578) * 7)
+      });
+      const totalRooms = () => Object.values(sel).reduce((a, q) => a + q, 0);
+      const totalPrice = () => Object.entries(sel).reduce((a, [rid, q]) => a + q * info(rowOf(rid)).price, 0);
+
+      function renderRates() {
+        const any = totalRooms() > 0;
+        onlineRows().forEach(tr => {
+          const rid = tr.dataset.rid, q = sel[rid] || 0, cell = tr.lastElementChild;
+          tr.classList.toggle('sel', q > 0);
+          if (any) {
+            cell.innerHTML = '<div class="rate-stepper"><button class="mn" aria-label="Scade"' + (q <= 0 ? ' disabled' : '') +
+              '>−</button><span class="n">' + q + '</span><button class="pl" aria-label="Adaugă"' + (q >= 4 ? ' disabled' : '') + '>+</button></div>';
+            $('.mn', cell).onclick = () => { if (q > 0) { sel[rid] = q - 1; if (!sel[rid]) delete sel[rid]; sync(); } };
+            $('.pl', cell).onclick = () => { if (q < 4) { sel[rid] = q + 1; sync(); } };
+          } else {
+            cell.innerHTML = '<button class="btn btn-primary btn-select">Alege</button>';
+            $('.btn-select', cell).onclick = () => { sel[rid] = 1; sync(); toast('Cameră adăugată în rezervare', 'ok'); };
+          }
+        });
+      }
+      function renderBar() {
+        const rooms = totalRooms();
+        bookBar.classList.toggle('show', rooms > 0);
+        const summ = $('.bb-summary', bookBar);
+        if (summ) summ.innerHTML = rooms
+          ? Object.entries(sel).map(([rid, q]) => { const it = info(rowOf(rid));
+              return '<div class="row"><span class="q">' + q + '×</span> <span class="nm">' + it.name + '</span> <span class="bd">(' + it.board + ')</span></div>'; }).join('')
+          : '<div class="empty">Nicio cameră selectată</div>';
+        const bp = $('.bb-price', bookBar); if (bp) bp.textContent = money(totalPrice());
+        const br = $('.bb-rooms', bookBar); if (br) br.textContent = rooms;
+      }
+      function sync() { renderRates(); renderBar(); }   // selecția din belă e efemeră, nu suprascrie camerele din căutare
+      renderRates(); renderBar();
+      const bbCta = $('.bb-cta', bookBar);
+      if (bbCta) bbCta.onclick = () => {
+        if (!totalRooms()) return;
+        const first = rowOf(Object.keys(sel)[0]);
+        S.rate = info(first).name; S.meal = info(first).board; S.ratePrice = totalPrice();
+        save(); goto('checkout.html' + qs());
+      };
+    }
+
+    /* --- rate „la cerere" (indisponibil online) → consultant / callback (phone-as-a-scalpel) --- */
+    $$('.btn-request').forEach(b => b.onclick = () => {
+      const tr = b.closest('tr');
+      const rtitle = (($('.ch b', tr) || {}).textContent || tr.closest('.room-card').querySelector('h3').textContent).trim();
+      openModal('La cerere · ' + rtitle,
+        '<p>Această cameră nu se poate rezerva instant online pentru <b>' + fmtRange(S.from, S.to) + '</b>. ' +
+        'Un consultant îți verifică disponibilitatea în inventarul nostru propriu și îți confirmă în cel mai scurt timp.</p>' +
+        '<p style="margin-top:6px"><b>Sună acum:</b> <span style="font-family:var(--font-title);font-weight:800;color:#004B97;font-size:19px">0241 999</span> · zilnic 10:00–18:00</p>' +
+        '<div class="assist" style="border-color:#8FB0D2;align-items:flex-start"><span class="cb"></span>' +
+        '<div style="flex:1"><b>Sau lasă-ne numărul și te sunăm noi</b>' +
+        '<div class="d">Verificăm disponibilitatea pentru datele tale și îți trimitem link de plată dacă e liber.</div>' +
+        '<div class="callback" style="margin-top:9px"><span class="inp req-inp" style="width:170px;display:inline-flex"></span>' +
+        '<button class="btn btn-primary req-send" style="height:42px;padding:0 16px">Cere să fii sunat</button></div></div></div>');
+      const inp = $('.req-inp', modal), send = $('.req-send', modal);
+      if (inp) { inp.contentEditable = 'true'; inp.textContent = 'Numărul tău'; inp.classList.add('ph');
+        inp.onfocus = () => { if (inp.classList.contains('ph')) { inp.textContent = ''; inp.classList.remove('ph'); } inp.classList.add('focus'); };
+        inp.onblur = () => inp.classList.remove('focus'); }
+      if (send) send.onclick = () => {
+        const v = (inp.textContent || '').replace(/\D/g, '');
+        if (v.length < 9) { inp.classList.add('err'); return toast('Introdu un număr de telefon valid', 'err'); }
+        closeModal();
+        toast('Te sunăm în maximum 15 minute pentru „' + rtitle + '”', 'ok');
       };
     });
 

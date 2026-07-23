@@ -34,6 +34,65 @@
 .ph-nav.prev { left: 8px; }
 .ph-nav.next { right: 8px; }
 
+/* --- hotel: rate stepper + sticky booking bar (model Szallas) --- */
+.rate-stepper { display: inline-flex; align-items: center; border: 1.5px solid var(--navy-500); border-radius: 100px; background: #fff; overflow: hidden; }
+.rate-stepper button { width: 38px; height: 40px; border: 0; background: #fff; color: var(--navy-500); font-size: 21px; line-height: 1; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+.rate-stepper button:hover:not(:disabled) { background: var(--navy-100); }
+.rate-stepper button:disabled { opacity: .3; cursor: not-allowed; }
+.rate-stepper .n { min-width: 30px; text-align: center; font-weight: 800; color: var(--navy-900); font-size: 15px; }
+.rates tr.sel { background: var(--navy-100); }
+.rates tr.sel td { border-color: #CBDEF2; }
+
+/* on-request (greyed) rates — steer to online, support low-inventory */
+.rates tr.rate-request { background: #F5F6F7; }
+.rates tr.rate-request .ch b, .rates tr.rate-request .price { color: var(--gray-600); }
+.rates tr.rate-request .price { font-weight: 700; }
+.req-tag { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .3px; color: var(--gray-700); background: #E5E7E9; border-radius: 6px; padding: 3px 8px; margin-bottom: 5px; }
+.btn-request { border: 1.5px dashed #8FB0D2; color: var(--navy-500); background: #fff; border-radius: var(--r-m); padding: 9px 13px; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 7px; line-height: 1.15; text-align: left; cursor: pointer; }
+.btn-request:hover { background: var(--navy-100); border-style: solid; }
+
+.booking-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; background: #fff; border-top: 1px solid var(--gray-300);
+  box-shadow: 0 -6px 24px rgba(1,43,85,.14); transform: translateY(120%); transition: transform .3s cubic-bezier(.4,0,.2,1); }
+.booking-bar.show { transform: translateY(0); }
+.bb-inner { display: flex; align-items: center; gap: 22px; padding: 11px 0; min-height: 76px; }
+.bb-stay { flex: none; }
+.bb-stay .lbl, .bb-total .lbl { font-size: 12px; color: var(--gray-600); font-weight: 600; }
+.bb-stay .dates { font-weight: 700; font-size: 15px; color: var(--gray-900); }
+.bb-stay .sub { font-size: 12.5px; color: var(--gray-700); }
+.bb-summary { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 3px;
+  max-height: 62px; overflow: auto; padding: 0 18px; border-left: 1px solid var(--gray-300); border-right: 1px solid var(--gray-300); }
+.bb-summary .row { font-size: 14.5px; font-weight: 700; color: var(--gray-900); display: flex; align-items: baseline; gap: 8px; white-space: nowrap; }
+.bb-summary .row .q { color: var(--navy-500); font-weight: 800; flex: none; }
+.bb-summary .row .nm { overflow: hidden; text-overflow: ellipsis; }
+.bb-summary .row .bd { color: var(--gray-600); font-weight: 500; font-size: 13px; flex: none; }
+.bb-summary .empty { color: var(--gray-600); font-weight: 500; font-size: 13.5px; }
+.bb-total { flex: none; text-align: right; }
+.bb-total .p { font-family: var(--font-title); font-size: 24px; font-weight: 800; color: var(--navy-900); line-height: 1; }
+.bb-total .bb-note { font-size: 11px; color: var(--gray-600); margin-top: 3px; }
+.bb-cta { flex: none; padding: 13px 24px; font-size: 15.5px; }
+
+/* --- listing C: expandare camere ca un carusel cu poză + descriere --- */
+.rcarousel { position: relative; margin-top: 10px; display: none; }
+.rcarousel.open { display: block; }
+.rc-track { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; scrollbar-width: none; padding: 4px 2px; }
+.rc-track::-webkit-scrollbar { display: none; }
+.rc-room { flex: 0 0 224px; scroll-snap-align: start; border: 1px solid var(--gray-300); border-radius: var(--r-m); overflow: hidden; background: #fff; display: flex; flex-direction: column; }
+.rc-room img { width: 100%; height: 112px; object-fit: cover; }
+.rc-body { padding: 9px 11px 11px; display: flex; flex-direction: column; gap: 3px; flex: 1; }
+.rc-name { font-weight: 700; font-size: 13.5px; color: var(--gray-900); }
+.rc-meta { font-size: 12px; color: var(--gray-700); }
+.rc-perks { font-size: 12px; color: var(--green-600); font-weight: 600; display: flex; align-items: center; gap: 5px; margin-top: 1px; }
+.rc-foot { margin-top: auto; padding-top: 8px; display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.rc-price { font-family: var(--font-title); font-weight: 800; font-size: 15.5px; color: var(--navy-900); line-height: 1.05; }
+.rc-price .cur { font-size: 11px; font-weight: 700; }
+.rc-price .rc-note { display: block; font-family: var(--font-body); font-size: 10.5px; color: var(--gray-600); font-weight: 500; }
+.rc-sel { padding: 7px 14px; font-size: 12.5px; }
+.rc-arrow { position: absolute; top: 44%; transform: translateY(-50%); z-index: 4; width: 34px; height: 34px; border-radius: 50%;
+  background: rgba(255,255,255,.97); border: 1px solid var(--gray-300); box-shadow: 0 3px 10px rgba(1,43,85,.18); color: var(--navy-700); font-size: 18px; line-height: 1; cursor: pointer; }
+.rc-arrow:hover { background: #fff; }
+.rc-arrow.prev { left: -8px; }
+.rc-arrow.next { right: -8px; }
+
 /* --- popovers (destination / calendar / guests) --- */
 .pop { position: absolute; z-index: 800; background: #fff; border: 1px solid var(--gray-300); border-radius: var(--r-l);
   box-shadow: var(--shadow-pop); padding: 14px; display: none; }
