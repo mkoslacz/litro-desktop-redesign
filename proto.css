@@ -96,6 +96,12 @@
 .rc-arrow.prev { left: 4px; }
 .rc-arrow.next { right: 4px; }
 
+/* --- hotel: flexi-strip pliabil + „Ce include" colapsat --- */
+.flexi-strip.collapsed .flexi-cells { display: none; }
+.flexi-strip .cap .flexi-toggle { margin-left: 6px; color: var(--navy-500); font-weight: 700; }
+.meal-def { display: none; }
+.meal-def.open { display: block; }
+
 /* --- popovers (destination / calendar / guests) --- */
 .pop { position: absolute; z-index: 800; background: #fff; border: 1px solid var(--gray-300); border-radius: var(--r-l);
   box-shadow: var(--shadow-pop); padding: 14px; display: none; }

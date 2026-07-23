@@ -113,9 +113,10 @@
   document.addEventListener('click', e => {
     if (openPop && !openPop.contains(e.target) && !e.target.closest('[data-pop-anchor]')) closeAllPops();
   });
-  function placePop(pop, anchor, opts) {
+  let searchOpenCal = null, searchOpenGuests = null;   // exposed so the hotel stay-bar can open the same editors inline
+  function placePop(pop, anchor, opts, host) {
     const r = anchor.getBoundingClientRect();
-    const host = anchor.closest('.search-card') || document.body;
+    host = host || anchor.closest('.search-card') || document.body;
     const hr = host.getBoundingClientRect();
     pop.style.top = (r.bottom - hr.top + 10) + 'px';
     if (opts && opts.right) pop.style.right = (hr.right - r.right) + 'px', pop.style.left = 'auto';
@@ -149,6 +150,7 @@
       $$('[data-bind="guests"]').forEach(n => {
         n.textContent = S.adults + ' adulți' + (S.kids ? ' + ' + S.kids + ' copii' : '');
       });
+      $$('[data-bind="rooms"]').forEach(n => n.textContent = S.rooms + ' ' + (S.rooms === 1 ? 'cameră' : 'camere'));
       $$('[data-bind="dest"]').forEach(n => n.textContent = S.dest);
     }
 
@@ -262,17 +264,18 @@
         toast('Datele actualizate: ' + fmtRange(S.from, S.to) + ' · ' + nights() + ' nopți', 'ok');
       };
     }
-    if (fDate) {
-      fDate.setAttribute('data-pop-anchor', '');
-      fDate.onclick = () => {
-        const wasOpen = popC.classList.contains('open');
-        closeAllPops(); if (wasOpen) return;
-        pick = { from: S.from, to: S.to, half: false, flex: S.flex && S.flex !== 'exact' ? S.flex : 'Date exacte' };
-        calAnchorMonth = new Date(parse(S.from).getFullYear(), parse(S.from).getMonth(), 1);
-        renderCal(); placePop(popC, fDate); popC.classList.add('open'); fDate.classList.add('active');
-        openPop = popC;
-      };
+    function openCal(anchor, host) {
+      const wasOpen = popC.classList.contains('open');
+      closeAllPops(); if (wasOpen) return;
+      pick = { from: S.from, to: S.to, half: false, flex: S.flex && S.flex !== 'exact' ? S.flex : 'Date exacte' };
+      calAnchorMonth = new Date(parse(S.from).getFullYear(), parse(S.from).getMonth(), 1);
+      host = host || card;
+      if (popC.parentElement !== host) host.appendChild(popC);
+      renderCal(); placePop(popC, anchor, null, host); popC.classList.add('open'); anchor.classList.add('active');
+      openPop = popC;
     }
+    searchOpenCal = openCal;
+    if (fDate) { fDate.setAttribute('data-pop-anchor', ''); fDate.onclick = () => openCal(fDate, card); }
 
     /* --- guests popover --- */
     const popG = el('div', 'pop pop-guests'); card.appendChild(popG);
@@ -300,15 +303,16 @@
       $$('[data-age]', popG).forEach(sel => sel.onchange = () => { S.ages[+sel.dataset.age] = +sel.value; save(); });
       $('[data-g-ok]', popG).onclick = () => { closeAllPops(); repriceEverything(); };
     }
-    if (fGuest) {
-      fGuest.setAttribute('data-pop-anchor', '');
-      fGuest.onclick = () => {
-        const wasOpen = popG.classList.contains('open');
-        closeAllPops(); if (wasOpen) return;
-        renderGuests(); placePop(popG, fGuest, { right: true }); popG.classList.add('open'); fGuest.classList.add('active');
-        openPop = popG;
-      };
+    function openGuests(anchor, host) {
+      const wasOpen = popG.classList.contains('open');
+      closeAllPops(); if (wasOpen) return;
+      host = host || card;
+      if (popG.parentElement !== host) host.appendChild(popG);
+      renderGuests(); placePop(popG, anchor, { right: true }, host); popG.classList.add('open'); anchor.classList.add('active');
+      openPop = popG;
     }
+    searchOpenGuests = openGuests;
+    if (fGuest) { fGuest.setAttribute('data-pop-anchor', ''); fGuest.onclick = () => openGuests(fGuest, card); }
 
     /* --- clear destination --- */
     const clr = $('.s-clear', card);
@@ -421,6 +425,7 @@
     $$('[data-bind="dates"]').forEach(x => x.textContent = fmtRange(S.from, S.to));
     $$('[data-bind="nights"]').forEach(x => x.textContent = n);
     $$('[data-bind="guests"]').forEach(x => x.textContent = S.adults + ' adulți' + (S.kids ? ' + ' + S.kids + ' copii' : ''));
+    $$('[data-bind="rooms"]').forEach(x => x.textContent = S.rooms + ' ' + (S.rooms === 1 ? 'cameră' : 'camere'));
     $$('[data-bind="stayline"]').forEach(x => x.textContent = S.adults + ' adulți, ' + n + ' nopți cu mic dejun');
 
     // listing cards
@@ -884,8 +889,18 @@
         const any = $$('tr[data-meal]:not(.rate-hidden)', rc).length;
         rc.style.display = any ? '' : 'none';
       });
+      autoFlexi();
       toast(shown ? shown + ' tarife cu „' + ch.textContent.trim() + '”' : 'Niciun tarif pentru această opțiune', shown ? 'ok' : 'err');
     });
+
+    /* flexi-strip: extins când sunt puține camere disponibile, altfel colapsat (doar text de rozklik) */
+    function autoFlexi() {
+      const fstrip = $('.flexi-strip'); if (!fstrip) return;
+      const avail = $$('.room-card tr[data-ppn]:not(.rate-request):not(.rate-hidden)').length;
+      fstrip.classList.toggle('collapsed', avail > 3);
+      const t = $('.flexi-toggle', fstrip);
+      if (t) t.textContent = fstrip.classList.contains('collapsed') ? 'vezi prețurile ▾' : 'ascunde ▴';
+    }
 
     /* --- rate selection: „Alege" → stepper (± nr. camere) → belă de rezervare care urcă (model Szallas) --- */
     const bookBar = $('.booking-bar');
@@ -1001,8 +1016,43 @@
       toast('Date schimbate pe 6–12 septembrie · Litoralul Pentru Toți', 'ok');
       window.scrollTo({ top: $('.flexi-strip').offsetTop - 120, behavior: 'smooth' });
     };
-    const modif = $$('.stay-bar .btn')[0];
-    if (modif) modif.onclick = () => { window.scrollTo({ top: 0, behavior: 'smooth' }); setTimeout(() => $('.s-field:nth-child(2)')?.click(), 420); };
+    /* --- stay-bar: editare inline a datelor/oaspeților CHIAR AICI (fără redirect la search-ul de sus → listing) --- */
+    const stayBar = $('.stay-bar');
+    if (stayBar) {
+      stayBar.style.position = 'relative';
+      const sf = $$('.f', stayBar);
+      const fdate = sf[0], fguests = sf[1], frooms = sf[2], modif = $('.btn', stayBar);
+      const openD = e => { if (e) e.stopPropagation(); if (searchOpenCal) searchOpenCal(fdate || stayBar, stayBar); };
+      const openG = e => { if (e) e.stopPropagation(); if (searchOpenGuests) searchOpenGuests(fguests || stayBar, stayBar); };
+      [fdate, fguests, frooms].forEach(f => { if (f) { f.setAttribute('data-pop-anchor', ''); f.style.cursor = 'pointer'; } });
+      if (fdate) fdate.onclick = openD;
+      if (fguests) fguests.onclick = openG;
+      if (frooms) frooms.onclick = openG;
+      if (modif) { modif.setAttribute('data-pop-anchor', ''); modif.onclick = openD; }
+    }
+
+    /* --- flexi-strip pliabil: caption ca toggle + auto pe baza disponibilității --- */
+    const fstrip = $('.flexi-strip');
+    if (fstrip) {
+      const cap = $('.cap', fstrip);
+      if (cap && !$('.flexi-toggle', cap)) {
+        cap.appendChild(el('span', 'flexi-toggle'));
+        cap.style.cursor = 'pointer';
+        cap.onclick = () => {
+          fstrip.classList.toggle('collapsed');
+          const t = $('.flexi-toggle', fstrip);
+          if (t) t.textContent = fstrip.classList.contains('collapsed') ? 'vezi prețurile ▾' : 'ascunde ▴';
+        };
+      }
+      autoFlexi();
+    }
+
+    /* --- info despre mese: „Ce include…" colapsat, apare la click pe link --- */
+    const mealInfoLink = $('.meal-info-link'), mealDef = $('.meal-def');
+    if (mealInfoLink && mealDef) mealInfoLink.onclick = () => {
+      mealDef.classList.toggle('open');
+      mealInfoLink.textContent = mealDef.classList.contains('open') ? 'Ascunde info despre mese ▴' : 'Vezi ce include fiecare masă ▾';
+    };
 
     /* --- nearby hotels --- */
     $$('.hcard').forEach(c => c.onclick = () => {
@@ -1032,10 +1082,11 @@
      ============================================================ */
   function paintCheckout() {
     const total = S.ratePrice || 4046;
-    const adv = Math.round(total * 0.3);
-    const rest = total - adv;
     const tax = Math.round(total / 1.19 * 0.01);
     const discounted = S.promo ? Math.round(total * 0.9) : total;
+    const advMin = Math.round(discounted * 0.3);   // avans minim acceptat = 30%
+    let adv = advMin;
+    if (S.payMode === 'advance' && S.advance != null) adv = Math.min(discounted, Math.max(advMin, S.advance));
 
     const set = (sel, html) => { const n = $(sel); if (n) n.innerHTML = html; };
     set('.pl.total .v', money(discounted) + ' <span style="font-size:15px">Lei</span>');
@@ -1045,12 +1096,17 @@
     if (lines[1]) $('.v', lines[1]).textContent = '−' + money(gross - total) + ' Lei';
     const taxV = $('.athotel .pl .v'); if (taxV) taxV.textContent = '≈ ' + tax + ' Lei';
     const sp = $$('.split-box .pl');
-    if (sp[0]) $('.v', sp[0]).textContent = money(S.payMode === 'full' ? discounted : Math.round(discounted * 0.3)) + ' Lei';
-    if (sp[1]) $('.v', sp[1]).textContent = money(S.payMode === 'full' ? 0 : discounted - Math.round(discounted * 0.3)) + ' Lei';
+    if (sp[0]) $('.v', sp[0]).textContent = money(S.payMode === 'full' ? discounted : adv) + ' Lei';
+    if (sp[1]) $('.v', sp[1]).textContent = money(S.payMode === 'full' ? 0 : discounted - adv) + ' Lei';
     const cr = $('.sum-body .credits'); if (cr) cr.textContent = '+ câștigi ' + Math.round(discounted * 0.02) + ' credite FRIENDS după sejur';
 
     const boxes = $$('.pay-box');
-    if (boxes[0]) { $('.p', boxes[0]).innerHTML = money(Math.round(discounted * 0.3)) + ' Lei <span style="font-size:13px;font-weight:700;color:#57585A">azi</span>'; $('.d', boxes[0]).textContent = 'Restul de ' + money(discounted - Math.round(discounted * 0.3)) + ' Lei — online până la 22 mai sau la hotel'; }
+    if (boxes[0]) { $('.p', boxes[0]).innerHTML = money(adv) + ' Lei <span style="font-size:13px;font-weight:700;color:#57585A">azi</span>'; $('.d', boxes[0]).textContent = 'Restul de ' + money(discounted - adv) + ' Lei — online până la 22 mai sau la hotel'; }
+    // avans editabil: actualizează inputul (dacă nu e în editare) + min/max
+    const advAmt = $('.adv-amt'), advMinN = $('.adv-min'), advMaxN = $('.adv-max');
+    if (advMinN) advMinN.textContent = money(advMin) + ' Lei';
+    if (advMaxN) advMaxN.textContent = money(discounted) + ' Lei';
+    if (advAmt && document.activeElement !== advAmt) advAmt.textContent = money(adv);
     if (boxes[1]) $('.p', boxes[1]).textContent = money(discounted) + ' Lei';
     if (boxes[2]) $('.p', boxes[2]).innerHTML = '6 × ' + money(Math.round(discounted / 6)) + ' Lei <span style="font-size:13px;font-weight:700;color:#57585A">0% dobândă</span>';
 
@@ -1065,7 +1121,7 @@
     // voucher split
     const vBox = $('[data-voucher]');
     if (vBox) {
-      const payNow = S.payMode === 'full' ? discounted : Math.round(discounted * 0.3);
+      const payNow = S.payMode === 'full' ? discounted : adv;
       const v = Math.min(S.voucher, payNow);
       const diffN = $('[data-voucher-diff]');
       if (diffN) diffN.innerHTML = '<b>' + money(payNow - v) + ' Lei</b> <span style="color:#747679;font-size:12.5px">din suma de ' + money(payNow) + ' Lei</span>';
@@ -1089,6 +1145,19 @@
       if (cta) cta.childNodes[0].textContent = S.payMode === 'instalments' ? 'Trimite cererea de rezervare ' :
         S.payMode === 'full' ? 'Rezervă și plătește tot ' : 'Rezervă și plătește avansul ';
     });
+
+    /* --- avans editabil (min. 30%, max total) --- */
+    const advAmt = $('.adv-amt');
+    if (advAmt) {
+      advAmt.setAttribute('contenteditable', 'true');
+      const stop = e => e.stopPropagation();
+      advAmt.onmousedown = stop; advAmt.onclick = stop;
+      advAmt.onfocus = () => {
+        if (S.payMode !== 'advance') { S.payMode = 'advance'; save(); $$('.pay-box').forEach((x, i) => x.classList.toggle('on', i === 0)); paintCheckout(); }
+      };
+      advAmt.oninput = () => { S.advance = +((advAmt.textContent || '').replace(/\D/g, '') || 0); save(); paintCheckout(); };
+      advAmt.onblur = () => { paintCheckout(); };   // rescrie inputul la valoarea clampată (min/max)
+    }
 
     /* --- assist checkboxes --- */
     $$('.assist .cb').forEach(cb => cb.onclick = e => {
