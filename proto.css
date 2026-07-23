@@ -97,7 +97,7 @@
 .rc-arrow.next { right: 4px; }
 
 /* --- listing B/C: densificare ca să se vadă și un colț din al doilea card sus --- */
-body[data-listing="b"] .loyal-band, body[data-listing="c"] .loyal-band { display: none !important; }
+/* banda „FRIENDS" a fost mutată după al doilea card (în HTML), deci nu mai împinge cardul 2 sub fold */
 body[data-listing="b"] .lcard, body[data-listing="c"] .lcard { margin-bottom: 8px; }
 body[data-listing="b"] .lc-mid, body[data-listing="c"] .lc-mid { padding: 10px 14px; }
 body[data-listing="b"] .lc-room, body[data-listing="c"] .lc-room { margin-top: 6px; }

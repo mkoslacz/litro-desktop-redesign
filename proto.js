@@ -11,8 +11,8 @@
   const $ = (s, r) => (r || document).querySelector(s);
   const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
   const el = (tag, cls, html) => { const n = document.createElement(tag); if (cls) n.className = cls; if (html != null) n.innerHTML = html; return n; };
-  /* homepage varianta C își trimite fluxul către listing-b (varianta de listing de atelier) */
-  const listingHref = () => (document.body.dataset.variant === 'c' ? 'listing-b.html' : 'listing.html');
+  /* fluxul principal (varianta C) merge la listing-c; restul (arhivate) la listing.html */
+  const listingHref = () => (document.body.dataset.variant === 'c' || document.body.dataset.listing === 'c' ? 'listing-c.html' : 'listing.html');
   const MON = ['ian', 'feb', 'mar', 'apr', 'mai', 'iun', 'iul', 'aug', 'sep', 'oct', 'noi', 'dec'];
   const MONL = ['ianuarie', 'februarie', 'martie', 'aprilie', 'mai', 'iunie', 'iulie', 'august', 'septembrie', 'octombrie', 'noiembrie', 'decembrie'];
   const DOW = ['L', 'Ma', 'Mi', 'J', 'V', 'S', 'D'];
@@ -667,7 +667,12 @@
       if (rc) rc.innerHTML = displayN + (displayN === 1 ? ' cazare disponibilă' : ' cazări disponibile') + ' · 8.7/10 din 11 395 recenzii';
       const rcn = $('.res-count-n');
       if (rcn) rcn.textContent = document.body.dataset.variant === 'b' ? money(shown * 206) : shown;
-      const band = $('.loyal-band'); if (band) band.style.display = shown > 1 ? '' : 'none';
+      // banda „FRIENDS" apare după al DOILEA card vizibil (repoziționată la fiecare filtrare)
+      const band = $('.loyal-band');
+      if (band) {
+        const vis = cards.filter(c => !c.classList.contains('card-hidden'));
+        if (vis.length > 1) { vis[1].after(band); band.style.display = ''; } else band.style.display = 'none';
+      }
       // listing B: banner de date flexibile doar când sunt puține rezultate
       const fstrip = $('.flexi-strip');
       if (fstrip && (document.body.dataset.listing === 'b' || document.body.dataset.listing === 'c')) fstrip.style.display = (shown <= 5) ? '' : 'none';

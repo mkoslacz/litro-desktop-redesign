@@ -1,2 +1,9 @@
 node_modules/
 .DS_Store
+package.json
+package-lock.json
+_figtmp/
+_*.png
+tools/litro/
+tools/figout/
+tools/dump-*.json
