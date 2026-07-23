@@ -468,7 +468,7 @@
         if (p) p.innerHTML = money(S.ratePrice) + ' <span class="cur">Lei</span>';
         const op = $('.bk-price .old-price', bk);
         if (op) op.textContent = money(Math.round(S.ratePrice / 0.85)) + ' Lei';
-        const cr = $('.bk-price .credits', bk);
+        const cr = $('.credits', bk);
         if (cr) cr.textContent = '+ câștigi ' + Math.round(S.ratePrice * 0.02) + ' credite FRIENDS (1 credit = 1 Leu)';
         const tax = $('.athotel .pl .v', bk);
         if (tax) tax.textContent = '≈ ' + Math.round(S.ratePrice / 1.19 * 0.01) + ' Lei';
