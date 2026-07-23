@@ -11,6 +11,8 @@
   const $ = (s, r) => (r || document).querySelector(s);
   const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
   const el = (tag, cls, html) => { const n = document.createElement(tag); if (cls) n.className = cls; if (html != null) n.innerHTML = html; return n; };
+  /* homepage varianta C își trimite fluxul către listing-b (varianta de listing de atelier) */
+  const listingHref = () => (document.body.dataset.variant === 'c' ? 'listing-b.html' : 'listing.html');
   const MON = ['ian', 'feb', 'mar', 'apr', 'mai', 'iun', 'iul', 'aug', 'sep', 'oct', 'noi', 'dec'];
   const MONL = ['ianuarie', 'februarie', 'martie', 'aprilie', 'mai', 'iunie', 'iulie', 'august', 'septembrie', 'octombrie', 'noiembrie', 'decembrie'];
   const DOW = ['L', 'Ma', 'Mi', 'J', 'V', 'S', 'D'];
@@ -182,7 +184,8 @@
     /* --- calendar popover --- */
     const popC = el('div', 'pop pop-cal'); card.appendChild(popC);
     let calAnchorMonth = new Date(2026, 5, 1);
-    let pick = { from: S.from, to: S.to, half: false };
+    let pick = { from: S.from, to: S.to, half: false, flex: S.flex && S.flex !== 'exact' ? S.flex : 'Date exacte' };
+    const CAL_FLEX = ['Date exacte', '± 1 zi', '± 3 zile', 'Un weekend', 'O săptămână'];
     function renderCal() {
       const mk = (base) => {
         const y = base.getFullYear(), m = base.getMonth();
@@ -209,9 +212,16 @@
       };
       const next = new Date(calAnchorMonth.getFullYear(), calAnchorMonth.getMonth() + 1, 1);
       const n = pick.from && pick.to ? nightsBetween(pick.from, pick.to) : 0;
+      const flexInCal = document.body.hasAttribute('data-flex-in-cal');
+      const flexHtml = flexInCal
+        ? '<div class="cal-flex"><span class="lbl">Date flexibile:</span>' +
+          CAL_FLEX.map(f => '<span class="fx-chip' + ((pick.flex || 'Date exacte') === f ? ' on' : '') +
+            '" data-flex="' + f + '">' + f + '</span>').join('') + '</div>'
+        : '';
       popC.innerHTML =
         '<div class="cal-head"><div class="t">Alege datele sejurului</div>' +
         '<div class="cal-nav"><span data-nav="-1">‹</span><span data-nav="1">›</span></div></div>' +
+        flexHtml +
         '<div class="cal-months">' + mk(calAnchorMonth) + mk(next) + '</div>' +
         '<div class="cal-foot"><div class="info">' +
         (n ? '<b>' + fmtRange(pick.from, pick.to) + '</b> · ' + n + (n === 1 ? ' noapte' : ' nopți') +
@@ -220,6 +230,19 @@
         '</div><button class="btn btn-primary" style="padding:10px 22px;font-size:14.5px" data-cal-ok>Aplică datele</button></div>';
       $$('[data-nav]', popC).forEach(b => b.onclick = () => {
         calAnchorMonth = new Date(calAnchorMonth.getFullYear(), calAnchorMonth.getMonth() + (+b.dataset.nav), 1);
+        renderCal();
+      });
+      $$('.cal-flex .fx-chip', popC).forEach(chip => chip.onclick = () => {
+        const label = chip.dataset.flex;
+        pick.flex = label; S.flex = label; save();
+        if (/weekend/i.test(label)) {
+          let d = parse(pick.from || S.from); while (d.getDay() !== 5) d = addDays(d, 1);
+          pick.from = iso(d); pick.to = iso(addDays(d, 2)); pick.half = false;
+          calAnchorMonth = new Date(d.getFullYear(), d.getMonth(), 1);
+        } else if (/săptămână/i.test(label)) {
+          pick.from = '2026-06-05'; pick.to = '2026-06-12'; pick.half = false;
+          calAnchorMonth = new Date(2026, 5, 1);
+        }
         renderCal();
       });
       $$('.cal-d[data-d]:not(.past)', popC).forEach(c => c.onclick = () => {
@@ -244,7 +267,7 @@
       fDate.onclick = () => {
         const wasOpen = popC.classList.contains('open');
         closeAllPops(); if (wasOpen) return;
-        pick = { from: S.from, to: S.to, half: false };
+        pick = { from: S.from, to: S.to, half: false, flex: S.flex && S.flex !== 'exact' ? S.flex : 'Date exacte' };
         calAnchorMonth = new Date(parse(S.from).getFullYear(), parse(S.from).getMonth(), 1);
         renderCal(); placePop(popC, fDate); popC.classList.add('open'); fDate.classList.add('active');
         openPop = popC;
@@ -297,7 +320,7 @@
       if (!S.dest) return toast('Alege mai întâi o stațiune', 'err');
       save();
       if (document.body.dataset.page === 'listing') rerunSearch();
-      else goto('listing.html' + qs());
+      else goto(listingHref() + qs());
     };
 
     /* --- flexible date chips --- */
@@ -326,7 +349,29 @@
     const strip = $('.flexi-strip');
     if (!strip) return;
     const base = +(strip.dataset.base || 560);
+    /* varianta B de listing: banner slim cu „de la {preț}" + nr. de hoteluri disponibile pe fiecare interval */
+    function renderB() {
+      const low = +(strip.dataset.low || 311);
+      const cells = $$('.fx-cell', strip);
+      const n = nights();
+      let cheap = null, cheapVal = Infinity;
+      cells.forEach((c, i) => {
+        const from = addDays(parse(S.from), -3 + i);
+        const to = addDays(from, n);
+        c.dataset.from = iso(from); c.dataset.to = iso(to);
+        const total = stayTotal(low, iso(from), iso(to));
+        c.classList.toggle('sel', iso(from) === S.from);
+        c.classList.remove('cheap');
+        const d = $('.d', c), p = $('.p', c), s = $('.s', c);
+        if (d) d.textContent = from.getDate() + ' – ' + to.getDate() + ' ' + MON[to.getMonth()];
+        if (p) p.innerHTML = 'de la <b>' + money(total) + '</b> Lei';
+        if (s) s.textContent = (c.dataset.hotels || '—') + ' hoteluri';
+        if (total < cheapVal) { cheapVal = total; cheap = c; }
+      });
+      if (cheap) cheap.classList.add('cheap');
+    }
     function render() {
+      if (document.body.dataset.listing === 'b') return renderB();
       const cells = $$('.fx-cell', strip);
       const n = nights();
       const startOffset = -4;
@@ -480,6 +525,35 @@
       toast(h.classList.contains('on') ? 'Adăugat la favorite' : 'Eliminat din favorite', h.classList.contains('on') ? 'ok' : null);
     });
 
+    /* --- card photo galleries (arrows + dots on each listing card photo) --- */
+    const PHOTO_POOL = ['pool-rooftop', 'room-seaview', 'lobby', 'aerial-hotel', 'pool-sunset', 'room-double', 'jacuzzi-view', 'spa-indoor', 'apartment-family', 'coastline']
+      .map(n => 'assets/' + n + '.jpg');
+    $$('.lcard .ph').forEach(ph => {
+      const img = $('img', ph);
+      if (!img || ph.dataset.gallery) return;
+      ph.dataset.gallery = '1';
+      const dots = $$('.dots i', ph);
+      const count = dots.length || 5;
+      const first = img.getAttribute('src');
+      const start = Math.max(0, PHOTO_POOL.indexOf(first));
+      const gallery = [first];
+      for (let k = 1; k < count; k++) gallery.push(PHOTO_POOL[(start + k) % PHOTO_POOL.length]);
+      gallery.forEach(src => { const im = new Image(); im.src = src; });
+      let idx = 0;
+      const show = i => {
+        idx = (i + gallery.length) % gallery.length;
+        img.src = gallery[idx];
+        dots.forEach((d, di) => d.classList.toggle('on', di === idx));
+      };
+      const jump = to => e => { e.stopPropagation(); e.preventDefault(); show(to()); };
+      const prev = el('button', 'ph-nav prev'); prev.type = 'button'; prev.setAttribute('aria-label', 'Poza anterioară'); prev.textContent = '‹';
+      const next = el('button', 'ph-nav next'); next.type = 'button'; next.setAttribute('aria-label', 'Poza următoare'); next.textContent = '›';
+      prev.onclick = jump(() => idx - 1); next.onclick = jump(() => idx + 1);
+      dots.forEach((d, di) => { d.style.cursor = 'pointer'; d.onclick = jump(() => di); });
+      ph.appendChild(prev); ph.appendChild(next);
+      show(0);
+    });
+
     /* --- open hotel --- */
     cards.forEach(c => {
       const go = () => {
@@ -549,6 +623,9 @@
       const rcn = $('.res-count-n');
       if (rcn) rcn.textContent = document.body.dataset.variant === 'b' ? money(shown * 206) : shown;
       const band = $('.loyal-band'); if (band) band.style.display = shown > 1 ? '' : 'none';
+      // listing B: banner de date flexibile doar când sunt puține rezultate
+      const fstrip = $('.flexi-strip');
+      if (fstrip && document.body.dataset.listing === 'b') fstrip.style.display = (shown <= 5) ? '' : 'none';
       if (!shown) showEmptyState(); else hideEmptyState();
     }
     let emptyBox = null;
@@ -683,7 +760,7 @@
     /* --- nearby resorts --- */
     $$('.near-card').forEach(c => c.onclick = () => {
       S.dest = $('.t', c).textContent.trim(); save();
-      goto('listing.html' + qs());
+      goto(listingHref() + qs());
     });
 
     applyFilters(); syncChips();
@@ -1067,13 +1144,13 @@
       const txt = cap ? cap.textContent.trim() : '';
       const match = RESORTS.find(r => txt.startsWith(r[0]));
       if (match) S.dest = match[0];
-      save(); goto('listing.html' + qs());
+      save(); goto(listingHref() + qs());
     });
     $$('.offer-card, .camp .btn, .link-more').forEach(c => {
       if (c.closest('.sec-head') || c.classList.contains('offer-card') || c.closest('.camp')) {
         c.onclick = e => {
           if (c.tagName === 'A' && /toate facilitățile/i.test(c.textContent)) return;
-          e.preventDefault(); save(); goto('listing.html' + qs());
+          e.preventDefault(); save(); goto(listingHref() + qs());
         };
       }
     });
@@ -1093,7 +1170,7 @@
     const logo = $('.logo'); if (logo) { logo.style.cursor = 'pointer'; logo.onclick = () => goto('home.html' + qs()); }
 
     /* breadcrumbs */
-    $$('.crumbs a').forEach((a, i) => a.onclick = e => { e.preventDefault(); goto(i === 0 ? 'home.html' + qs() : 'listing.html' + qs()); });
+    $$('.crumbs a').forEach((a, i) => a.onclick = e => { e.preventDefault(); goto(i === 0 ? 'home.html' + qs() : listingHref() + qs()); });
 
     /* --- variant B: see-also tabs, pager, newsletter, theme tiles --- */
     const tabs = $$('.seealso .tab');
@@ -1111,7 +1188,7 @@
       const cols = $('.seealso .cols');
       const paintTab = i => {
         cols.innerHTML = SETS[i].map(([t, c]) => '<a href="#">' + t + ' <span class="c">· ' + c + '</span></a>').join('');
-        $$('a', cols).forEach(a => a.onclick = e => { e.preventDefault(); save(); goto('listing.html' + qs()); });
+        $$('a', cols).forEach(a => a.onclick = e => { e.preventDefault(); save(); goto(listingHref() + qs()); });
       };
       tabs.forEach((t, i) => t.onclick = () => { tabs.forEach(x => x.classList.remove('on')); t.classList.add('on'); paintTab(i); });
     }
@@ -1123,7 +1200,7 @@
       window.scrollTo({ top: $('.listing-grid').offsetTop - 90, behavior: 'smooth' });
       toast('Pagina ' + a.textContent.trim() + ' — în prototip lista rămâne aceeași');
     });
-    $$('.theme').forEach(t => t.onclick = () => { save(); goto('listing.html' + qs()); });
+    $$('.theme').forEach(t => t.onclick = () => { save(); goto(listingHref() + qs()); });
     const nlBtn = $('.nl .btn');
     if (nlBtn) nlBtn.onclick = () => {
       const box = $('.nl .form');

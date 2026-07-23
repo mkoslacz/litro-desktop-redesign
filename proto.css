@@ -23,6 +23,17 @@
 .card-hidden { display: none !important; }
 .dim { opacity: .45; }
 
+/* --- listing card photo gallery arrows --- */
+.lcard .ph { overflow: hidden; }
+.ph-nav { position: absolute; top: 50%; transform: translateY(-50%); z-index: 4; width: 30px; height: 30px;
+  border-radius: 50%; background: rgba(255,255,255,.86); border: none; box-shadow: 0 2px 8px rgba(1,43,85,.26);
+  color: var(--navy-700); font-size: 18px; line-height: 1; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; opacity: .55; transition: opacity .15s, background .15s; }
+.lcard:hover .ph-nav { opacity: 1; }
+.ph-nav:hover { background: #fff; }
+.ph-nav.prev { left: 8px; }
+.ph-nav.next { right: 8px; }
+
 /* --- popovers (destination / calendar / guests) --- */
 .pop { position: absolute; z-index: 800; background: #fff; border: 1px solid var(--gray-300); border-radius: var(--r-l);
   box-shadow: var(--shadow-pop); padding: 14px; display: none; }
