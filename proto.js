@@ -605,7 +605,7 @@
             '<span class="rc-note">' + nights() + ' nopți</span></div>' +
             '<button class="btn btn-primary rc-sel">Alege</button></div></div></div>';
         }).join('') + '</div><button class="rc-arrow prev" aria-label="Înapoi">‹</button><button class="rc-arrow next" aria-label="Înainte">›</button>';
-        m.after(box);
+        card.appendChild(box);   // pe toată lățimea cardului (rând nou în grid), nu doar coloana din mijloc
         const track = $('.rc-track', box);
         const step = () => { const r = $('.rc-room', track); return r ? r.getBoundingClientRect().width + 12 : 232; };
         $('.rc-arrow.prev', box).onclick = e => { e.stopPropagation(); track.scrollBy({ left: -step() }); };
@@ -903,17 +903,16 @@
       const totalPrice = () => Object.entries(sel).reduce((a, [rid, q]) => a + q * info(rowOf(rid)).price, 0);
 
       function renderRates() {
-        const any = totalRooms() > 0;
         onlineRows().forEach(tr => {
           const rid = tr.dataset.rid, q = sel[rid] || 0, cell = tr.lastElementChild;
           tr.classList.toggle('sel', q > 0);
-          if (any) {
-            cell.innerHTML = '<div class="rate-stepper"><button class="mn" aria-label="Scade"' + (q <= 0 ? ' disabled' : '') +
-              '>−</button><span class="n">' + q + '</span><button class="pl" aria-label="Adaugă"' + (q >= 4 ? ' disabled' : '') + '>+</button></div>';
-            $('.mn', cell).onclick = () => { if (q > 0) { sel[rid] = q - 1; if (!sel[rid]) delete sel[rid]; sync(); } };
+          if (q > 0) {   // doar camerele deja alese arată stepperul ± ; restul rămân buton „Adaugă cameră"
+            cell.innerHTML = '<div class="rate-stepper"><button class="mn" aria-label="Scade">−</button>' +
+              '<span class="n">' + q + '</span><button class="pl" aria-label="Adaugă"' + (q >= 4 ? ' disabled' : '') + '>+</button></div>';
+            $('.mn', cell).onclick = () => { sel[rid] = q - 1; if (!sel[rid]) delete sel[rid]; sync(); };
             $('.pl', cell).onclick = () => { if (q < 4) { sel[rid] = q + 1; sync(); } };
           } else {
-            cell.innerHTML = '<button class="btn btn-primary btn-select">Alege</button>';
+            cell.innerHTML = '<button class="btn btn-primary btn-select">Adaugă cameră</button>';
             $('.btn-select', cell).onclick = () => { sel[rid] = 1; sync(); toast('Cameră adăugată în rezervare', 'ok'); };
           }
         });

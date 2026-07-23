@@ -269,8 +269,9 @@ h2.sec-title { font-family: var(--font-title); font-size: 30px; font-weight: 700
 .review-cap .w .b { color: var(--gray-700); font-size: 13px; }
 .review-cap .rate-badge { font-size: 18px; padding: 9px 11px; border-radius: 12px; }
 
-.hp-grid { display: grid; grid-template-columns: 1fr 368px; gap: 20px; align-items: start; }
-.gallery .hero { position: relative; border-radius: var(--r-l); overflow: hidden; height: 396px; }
+.hp-grid { display: grid; grid-template-columns: 1fr 368px; gap: 20px; align-items: stretch; }
+.gallery { display: flex; flex-direction: column; }
+.gallery .hero { position: relative; border-radius: var(--r-l); overflow: hidden; flex: 1 1 auto; min-height: 396px; }
 .gallery .hero img { width: 100%; height: 100%; object-fit: cover; }
 .g-actions { position: absolute; top: 12px; right: 12px; display: flex; gap: 8px; }
 .g-actions span { width: 38px; height: 38px; border-radius: var(--r-m); background: rgba(255,255,255,.94); display: flex; align-items: center; justify-content: center; color: var(--gray-900); }
