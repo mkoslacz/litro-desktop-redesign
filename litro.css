@@ -586,13 +586,14 @@ table.rates { width: 100%; border-collapse: collapse; font-size: 14px; }
 .pill-cond { background: transparent; color: var(--gray-700); font-weight: 600; padding-left: 0; }
 
 /* --- offer chips row (hotel head) --- */
-.offer-chips { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0 2px; }
-.offer-chip { border: 1.5px solid var(--orange-500); color: var(--orange-600); background: var(--orange-100); border-radius: 100px; padding: 6px 13px; font-size: 13px; font-weight: 700; }
+.offer-chips { display: flex; gap: 7px; flex-wrap: nowrap; overflow-x: auto; margin: 8px 0 2px; scrollbar-width: none; }
+.offer-chips::-webkit-scrollbar { display: none; }
+.offer-chip { border: 1.5px solid var(--orange-500); color: var(--orange-600); background: var(--orange-100); border-radius: 100px; padding: 4px 11px; font-size: 12px; font-weight: 700; white-space: nowrap; flex: none; }
 .offer-chip.plain { border-color: var(--gray-400); color: var(--gray-900); background: #fff; }
 
 /* --- above-the-fold programme badges --- */
-.prog-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
-.prog { display: inline-flex; align-items: center; gap: 8px; border-radius: var(--r-m); padding: 8px 12px; font-size: 13px; font-weight: 700; }
+.prog-badges { display: flex; gap: 7px; flex-wrap: wrap; margin-top: 9px; }
+.prog { display: inline-flex; align-items: center; gap: 7px; border-radius: var(--r-m); padding: 6px 11px; font-size: 12.5px; font-weight: 700; }
 .prog-green { background: var(--green-100); color: var(--green-600); border: 1px solid #BFE5D2; }
 .prog-orange { background: var(--orange-100); color: var(--orange-600); border: 1px solid #F6D3AF; }
 
