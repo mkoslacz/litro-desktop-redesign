@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Litoralul Romanesc — Checkout (English)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="litro.css">
+<link rel="stylesheet" href="proto.css">
+<style>body { background: #FCFBFA; }</style>
+</head>
+<body data-page="checkout">
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-7-6.1-7-11a7 7 0 1 1 14 0c0 4.9-7 11-7 11z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="10" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="16" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3.5 10h17M8 2.8V7M16 2.8V7" stroke="currentColor" stroke-width="2" fill="none"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 20c.5-3.4 3-5.4 6-5.4s5.5 2 6 5.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 5.4a3.2 3.2 0 0 1 0 5.9M18.2 14.9c1.7.8 2.6 2.3 2.9 4.6" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5.5 3.5h3l1.7 4.3-2 1.6a13 13 0 0 0 6.4 6.4l1.6-2 4.3 1.7v3a1.8 1.8 0 0 1-2 1.8C10.3 19.7 4.3 13.7 3.7 5.5a1.8 1.8 0 0 1 1.8-2z" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6.5h16M4 12h16M4 17.5h16" stroke="currentColor" stroke-width="2.2"/></symbol>
+    <symbol id="i-chev-d" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2"/></symbol>
+    <symbol id="i-check-g" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.6"/></symbol>
+    <symbol id="i-bed" viewBox="0 0 24 24"><path d="M3 18.5V6M3 14h18v4.5M3 11h18v-1a3 3 0 0 0-3-3H9" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="6.5" cy="8.5" r="1.6" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+    <symbol id="i-food" viewBox="0 0 24 24"><path d="M7 3v7M4.5 3v4.5a2.5 2.5 0 0 0 5 0V3M7 12v9M16.5 3c-1.8 1.5-2.5 4-2.5 6.5 0 1.5 1 2.5 2.5 2.5V21M16.5 3V12" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-pct" viewBox="0 0 24 24"><path d="M19 5 5 19" stroke="currentColor" stroke-width="2.2"/><circle cx="7.5" cy="7.5" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="16.5" cy="16.5" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+  </defs>
+</svg>
+
+<header class="header" style="border-bottom:1px solid #EFEDED">
+  <div class="container header-in" style="padding:14px 0">
+    <div class="logo">
+      <svg width="38" height="38" viewBox="0 0 42 42"><circle cx="19" cy="23" r="13" fill="none" stroke="#004B97" stroke-width="7"/><circle cx="33" cy="8.5" r="5.5" fill="#EB802D"/></svg>
+      <div class="logo-text"><div class="l1" style="font-size:20px">litoralul</div><div class="l2" style="font-size:13.5px">romanesc<b>.ro</b></div></div>
+    </div>
+    <div class="header-right">
+      <div class="h-phone">
+        <svg width="20" height="20" style="color:#004B97"><use href="#i-phone"/></svg>
+        <div><div class="num">0241 999 · 0241 837 777</div><div class="hrs">● Daily 10:00–18:00</div></div>
+      </div>
+      <div class="h-user"><span class="avatar">A</span> Ana <svg width="16" height="16"><use href="#i-chev-d"/></svg></div>
+      <span class="langswitch"><a href="checkout.html">RO</a><a href="checkout-en.html" class="on">EN</a></span>
+      <span class="h-burger"><svg width="24" height="24"><use href="#i-menu"/></svg></span>
+    </div>
+  </div>
+</header>
+
+<div class="stepper-band">
+  <div class="container stepper">
+    <div class="step done"><span class="dot">✓</span> Choose stay</div>
+    <span class="step-line"></span>
+    <div class="step active"><span class="dot">2</span> Your details</div>
+    <span class="step-line"></span>
+    <div class="step todo"><span class="dot">3</span> Confirmation</div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="co-grid">
+    <main>
+      <div class="form-card">
+        <h2>Your details</h2>
+        <div class="f2">
+          <div class="fld"><label>First name</label><div class="inp"><b>Ana</b></div></div>
+          <div class="fld"><label>Last name</label><div class="inp"><b>Ionescu</b></div></div>
+        </div>
+        <div class="f2">
+          <div class="fld"><label>Email</label><div class="inp"><b>ana.ionescu@gmail.com</b></div><div class="f-note">We'll send the booking confirmation to this email.</div></div>
+          <div class="fld"><label>Phone</label><div style="display:flex;gap:8px"><div class="inp" style="width:86px;flex:none">+40 ▾</div><div class="inp"><b>722 000 000</b></div></div></div>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <h2>Billing details</h2>
+        <div class="seg"><span class="on">Individual</span><span>Company</span></div>
+        <div class="f2">
+          <div class="fld"><label>Country</label><div class="inp"><b>Romania</b> <span style="float:right;color:#747679">▾</span></div></div>
+          <div class="fld"><label>County</label><div class="inp"><b>Bucharest</b> <span style="float:right;color:#747679">▾</span></div></div>
+        </div>
+        <div class="f2">
+          <div class="fld"><label>City</label><div class="inp"><b>Bucharest</b></div></div>
+          <div class="fld"><label>Address (optional)</label><div class="inp ph">Street, number</div></div>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <h2>How would you like to pay?</h2>
+        <div class="payopt">
+          <div class="pay-box on">
+            <span class="radio"></span>
+            <div class="t">Deposit now, the rest later</div>
+            <div class="p">1 214 Lei <span style="font-size:13px;font-weight:700;color:#57585A">today</span></div>
+            <div class="d">The remaining 2 832 Lei — online by 22 May or at the hotel</div>
+            <div class="adv-edit">
+              <label>Deposit amount — you can change it</label>
+              <div class="adv-row"><span class="inp adv-amt">1 214</span> <span class="adv-cur">Lei</span></div>
+              <div class="adv-hint">Minimum <b class="adv-min">1 214 Lei</b> (30%) · maximum <b class="adv-max">4 046 Lei</b></div>
+            </div>
+          </div>
+          <div class="pay-box">
+            <span class="radio"></span>
+            <div class="t">Pay it all now</div>
+            <div class="p">4 046 Lei</div>
+            <div class="d">One payment, no worries at check-in</div>
+          </div>
+          <div class="pay-box" style="grid-column:1 / -1">
+            <span class="radio"></span>
+            <div class="t">Pay in instalments — up to 6 interest-free instalments</div>
+            <div class="p">6 × 674 Lei <span style="font-size:13px;font-weight:700;color:#57585A">0% interest</span></div>
+            <div class="d">Banca Transilvania credit card (StarCARD) 6 instalments · Card Avantaj 5 instalments</div>
+            <div class="assist">
+              <span class="cb"></span>
+              <div>
+                Send me the instalment payment link via a consultant
+                <div class="d">For now, instalments are set up with a consultant: we'll call within 2 hours between 10:00–18:00 and send you a secure payment link.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="fld"><label>Payment method</label>
+          <div class="pm-row">
+            <span class="pm hl">💳 Online card</span>
+            <span class="pm">VISA</span><span class="pm">Mastercard</span>
+            <span class="pm"> Pay</span><span class="pm">G Pay</span>
+            <span class="pm">Bank transfer</span>
+            <span class="pm hl">Holiday card — Edenred · Pluxee · Up</span>
+          </div>
+        </div>
+        <div class="assist" data-voucher style="border-style:solid;border-color:#F6D3AF;background:#FFF8F1">
+          <span class="cb on"></span>
+          <div style="width:100%">
+            <b>I'll pay with a holiday card</b>
+            <div class="d">Vouchers are capped, so the difference is paid by card — we calculate it automatically.</div>
+            <div class="f2" style="margin-top:9px">
+              <div class="fld" style="margin-bottom:0"><label>Voucher value</label><div class="inp" data-voucher-amt><b>800 Lei</b></div></div>
+              <div class="fld" style="margin-bottom:0"><label>Amount due — online card</label><div class="inp" data-voucher-diff><b>414 Lei</b> <span style="color:#747679;font-size:12.5px">of the 1 214 Lei deposit</span></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="trust-note" style="margin-top:8px"><svg width="14" height="14"><use href="#i-lock"/></svg> Secure payment · this offer has instant confirmation</div>
+      </div>
+
+      <div class="form-card">
+        <h2>Special requests <span style="color:#747679;font-size:13px;font-weight:500">(optional)</span></h2>
+        <div class="textarea">E.g. higher-floor room, late check-in, baby cot…</div>
+        <div class="cnt-note">0 / 250</div>
+      </div>
+
+      <div class="consent"><span class="cb"></span><span>I have read and accept the <a href="#">Booking Terms &amp; Conditions</a>, the <a href="#">Traveller Contract</a> and the <a href="#">Privacy Policy</a>. I confirm the details above are correct.</span></div>
+      <div class="consent optional"><span class="cb"></span><span>I'd like to receive early-booking and last-minute seaside offers by email. I can withdraw my consent at any time.<span class="opt-tag">optional</span></span></div>
+      <div class="cta-row">
+        <span class="trust-note"><svg width="15" height="15"><use href="#i-check-g"/></svg> Free cancellation if you cancel at least 10 days before check-in</span>
+        <div style="text-align:right">
+          <button class="btn btn-disabled btn-big">Book and pay the deposit →</button>
+          <div class="cta-hint">Tick to accept the terms to continue</div>
+        </div>
+      </div>
+    </main>
+
+    <aside>
+      <div class="sum-card">
+        <div class="ph"><img src="assets/pool-rooftop.jpg" alt=""></div>
+        <div class="sum-body">
+          <div class="rating-line" style="margin-bottom:6px"><span class="rate-badge">9.2</span><span class="rate-word">Excellent</span><span class="rate-count">157 reviews</span></div>
+          <div class="hname">Complex Mediteranean <span class="stars">★★★★</span></div>
+          <div class="hmeta" style="margin:4px 0 0"><svg width="13" height="13"><use href="#i-pin"/></svg> Mamaia · 50 m from the beach</div>
+          <div class="sum-meta">
+            <div class="row"><span class="ic"><svg width="16" height="16"><use href="#i-cal"/></svg></span> 5–12 Jun · 7 nights</div>
+            <div class="row"><span class="ic"><svg width="16" height="16"><use href="#i-users"/></svg></span> 2 adults + 2 children (aged 7 and 11) <a href="#" style="margin-left:auto;font-size:12.5px;font-weight:700">Edit</a></div>
+            <div class="row"><span class="ic"><svg width="16" height="16"><use href="#i-bed"/></svg></span> 1 × Double room with sea view</div>
+            <div class="row"><span class="ic"><svg width="16" height="16"><use href="#i-food"/></svg></span> Breakfast included</div>
+          </div>
+          <div class="green-band">✓ Free cancellation until 20 May (10 days before check-in) · <a href="#" style="color:inherit;text-decoration:underline">see terms</a></div>
+          <div class="price-lines">
+            <div class="pl"><span>Accommodation · 7 nights</span><span class="v">4 760 Lei</span></div>
+            <div class="pl disc"><span>Early Booking −15%</span><span class="v">−714 Lei</span></div>
+            <div class="pl total"><span class="l">Total online</span><span class="v">4 046 <span style="font-size:15px">Lei</span></span></div>
+            <div class="pl small"><span>VAT included · breakfast included</span></div>
+            <div class="athotel">
+              <div class="h"><svg width="14" height="14"><use href="#i-pin"/></svg> To pay at the hotel</div>
+              <div class="pl"><span>Resort tax (1% of the rate, excl. VAT)</span><span class="v">≈ 34 Lei</span></div>
+              <div class="pl small"><span>Paid at reception on the day of arrival.</span></div>
+            </div>
+          </div>
+          <div class="promo-box">
+            <div class="lbl"><svg width="15" height="15" style="color:#004B97"><use href="#i-pct"/></svg> Have a promo code or gift card?</div>
+            <div class="promo-row">
+              <div class="inp ph">Enter your code</div>
+              <button class="btn btn-outline-navy">Apply</button>
+            </div>
+          </div>
+          <div class="split-box">
+            <div class="pl"><span>To pay today (deposit)</span><span class="v">1 214 Lei</span></div>
+            <div class="pl"><span>By 22 May / at the hotel</span><span class="v">2 832 Lei</span></div>
+          </div>
+          <div class="credits" style="margin-top:10px">+ earn 28 FRIENDS credits after your stay</div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<footer class="footer" style="margin-top:30px">
+  <div class="container">
+      <div class="legal">
+        <div class="legal-compact">
+          <span class="lic">Tourism Licence no. 536</span>
+          <span><span class="org">S.C. Creative Eye S.R.L.</span> · J13/2215/2003 · CUI RO15613488 · Constanța</span>
+          <span>ANPC 021 9551 · Ministry of Tourism 0800 868 282</span>
+          <span><a href="#">Terms &amp; conditions</a> · <a href="#">Traveller contract</a> · <a href="#">Privacy policy</a></span>
+        </div>
+      </div>
+    <div class="f-bottom" style="margin-top:0;padding-top:0;border-top:0">
+      <div>© 2008–2026 Litoralul Romanesc · Part of Szallas Group. All rights reserved.</div>
+      <div style="font-weight:700;color:#012B55">litoralul<span style="color:#EB802D">romanesc</span>.ro</div>
+    </div>
+  </div>
+</footer>
+
+<script src="proto.js"></script>
+</body>
+</html>

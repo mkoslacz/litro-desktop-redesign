@@ -12,9 +12,17 @@
   const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
   const el = (tag, cls, html) => { const n = document.createElement(tag); if (cls) n.className = cls; if (html != null) n.innerHTML = html; return n; };
   /* fluxul principal (varianta C) merge la listing-c; restul (arhivate) la listing.html */
-  const listingHref = () => (document.body.dataset.variant === 'c' || document.body.dataset.listing === 'c' ? 'listing-c.html' : 'listing.html');
+  /* limbă: pe paginile EN (<html lang="en">) navigarea merge la variantele „-en" */
+  const EN = () => document.documentElement.lang === 'en';
+  const en = (n) => EN() ? n.replace('.html', '-en.html') : n;
+  const listingHref = () => en(document.body.dataset.variant === 'c' || document.body.dataset.listing === 'c' ? 'listing-c.html' : 'listing.html');
   const MON = ['ian', 'feb', 'mar', 'apr', 'mai', 'iun', 'iul', 'aug', 'sep', 'oct', 'noi', 'dec'];
+  const MON_EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const MONL = ['ianuarie', 'februarie', 'martie', 'aprilie', 'mai', 'iunie', 'iulie', 'august', 'septembrie', 'octombrie', 'noiembrie', 'decembrie'];
+  const monN = i => EN() ? MON_EN[i] : MON[i];   // lună scurtă, în funcție de limbă
+  const guestsTxt = () => EN()
+    ? S.adults + ' adult' + (S.adults === 1 ? '' : 's') + (S.kids ? ' + ' + S.kids + ' child' + (S.kids === 1 ? '' : 'ren') : '')
+    : guestsTxt();
   const DOW = ['L', 'Ma', 'Mi', 'J', 'V', 'S', 'D'];
   const money = n => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0');
   const pad = n => (n < 10 ? '0' : '') + n;
@@ -23,7 +31,7 @@
   const parse = s => { const [y, m, dd] = s.split('-').map(Number); return new Date(y, m - 1, dd); };
   const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
   const nightsBetween = (a, b) => Math.max(1, Math.round((parse(b) - parse(a)) / 864e5));
-  const fmtShort = s => { const d = parse(s); return d.getDate() + ' ' + MON[d.getMonth()]; };
+  const fmtShort = s => { const d = parse(s); return d.getDate() + ' ' + monN(d.getMonth()); };
   const fmtRange = (a, b) => fmtShort(a) + ' – ' + fmtShort(b);
 
   const RESORTS = [
@@ -140,17 +148,17 @@
       if (fDest) setVal(fDest, S.dest);
       if (fDate) setVal(fDate, fmtRange(S.from, S.to));
       if (fGuest) {
-        const parts = [S.adults + ' ' + (S.adults === 1 ? 'adult' : 'adulți')];
-        if (S.kids) parts.push(S.kids + ' ' + (S.kids === 1 ? 'copil' : 'copii'));
-        parts.push(S.rooms + ' ' + (S.rooms === 1 ? 'cameră' : 'camere'));
+        const parts = [S.adults + (EN() ? ' adult' + (S.adults === 1 ? '' : 's') : ' ' + (S.adults === 1 ? 'adult' : 'adulți'))];
+        if (S.kids) parts.push(S.kids + (EN() ? ' child' + (S.kids === 1 ? '' : 'ren') : ' ' + (S.kids === 1 ? 'copil' : 'copii')));
+        parts.push(S.rooms + (EN() ? (S.rooms===1?' room':' rooms') : (S.rooms===1?' cameră':' camere')));
         setVal(fGuest, parts.join(', '));
       }
       $$('[data-bind="dates"]').forEach(n => n.textContent = fmtRange(S.from, S.to));
       $$('[data-bind="nights"]').forEach(n => n.textContent = nights());
       $$('[data-bind="guests"]').forEach(n => {
-        n.textContent = S.adults + ' adulți' + (S.kids ? ' + ' + S.kids + ' copii' : '');
+        n.textContent = guestsTxt();
       });
-      $$('[data-bind="rooms"]').forEach(n => n.textContent = S.rooms + ' ' + (S.rooms === 1 ? 'cameră' : 'camere'));
+      $$('[data-bind="rooms"]').forEach(n => n.textContent = S.rooms + (EN() ? (S.rooms===1?' room':' rooms') : (S.rooms===1?' cameră':' camere')));
       $$('[data-bind="dest"]').forEach(n => n.textContent = S.dest);
     }
 
@@ -368,8 +376,8 @@
         c.classList.remove('cheap');
         const d = $('.d', c), p = $('.p', c), s = $('.s', c);
         if (d) d.textContent = from.getDate() + ' – ' + to.getDate() + ' ' + MON[to.getMonth()];
-        if (p) p.innerHTML = 'de la <b>' + money(total) + '</b> Lei';
-        if (s) s.textContent = (c.dataset.hotels || '—') + ' hoteluri';
+        if (p) p.innerHTML = (EN()?'from <b>':'de la <b>') + money(total) + '</b> Lei';
+        if (s) s.textContent = (c.dataset.hotels || '—') + (EN()?' hotels':' hoteluri');
         if (total < cheapVal) { cheapVal = total; cheap = c; }
       });
       if (cheap) cheap.classList.add('cheap');
@@ -424,8 +432,8 @@
     const n = nights();
     $$('[data-bind="dates"]').forEach(x => x.textContent = fmtRange(S.from, S.to));
     $$('[data-bind="nights"]').forEach(x => x.textContent = n);
-    $$('[data-bind="guests"]').forEach(x => x.textContent = S.adults + ' adulți' + (S.kids ? ' + ' + S.kids + ' copii' : ''));
-    $$('[data-bind="rooms"]').forEach(x => x.textContent = S.rooms + ' ' + (S.rooms === 1 ? 'cameră' : 'camere'));
+    $$('[data-bind="guests"]').forEach(x => x.textContent = guestsTxt());
+    $$('[data-bind="rooms"]').forEach(x => x.textContent = S.rooms + (EN() ? (S.rooms===1?' room':' rooms') : (S.rooms===1?' cameră':' camere')));
     $$('[data-bind="stayline"]').forEach(x => x.textContent = S.adults + ' adulți, ' + n + ' nopți cu mic dejun');
 
     // listing cards
@@ -439,9 +447,15 @@
       const op = $('.old-price', card);
       if (op) op.textContent = money(gross) + ' Lei';
       const note = $('.price-note', card);
-      if (note) note.innerHTML = S.adults + ' adulți, ' + n + ' nopți cu ' + (card.dataset.meal || 'mic dejun') + '<br>TVA inclus · taxa de stațiune la hotel';
+      if (note) {
+        const mealRo = card.dataset.meal || 'mic dejun';
+        const mealEn = { 'mic dejun': 'breakfast', 'demipensiune': 'half board', 'all inclusive': 'all-inclusive', 'fără masă': 'no board', 'pensiune completă': 'full board' }[mealRo] || mealRo;
+        note.innerHTML = EN()
+          ? S.adults + ' adults, ' + n + ' nights with ' + mealEn + '<br>VAT included · resort tax at the hotel'
+          : S.adults + ' adulți, ' + n + ' nopți cu ' + mealRo + '<br>TVA inclus · taxa de stațiune la hotel';
+      }
       const cr = $('.credits', card);
-      if (cr) cr.textContent = 'Primești ' + Math.round(total * 0.02) + ' credite FRIENDS';
+      if (cr) cr.textContent = (EN()?'Earn ':'Primești ') + Math.round(total * 0.02) + (EN()?' FRIENDS credits':' credite FRIENDS');
       const sv = $('.save', card);
       if (sv) { if (gross > total) { sv.style.display = ''; sv.textContent = 'economisești ' + money(gross - total) + ' Lei'; } else sv.style.display = 'none'; }
       card.dataset.total = total;
@@ -469,7 +483,7 @@
         const op = $('.bk-price .old-price', bk);
         if (op) op.textContent = money(Math.round(S.ratePrice / 0.85)) + ' Lei';
         const cr = $('.credits', bk);
-        if (cr) cr.textContent = '+ câștigi ' + Math.round(S.ratePrice * 0.02) + ' credite FRIENDS (1 credit = 1 Leu)';
+        if (cr) cr.textContent = (EN()?'+ earn ':'+ câștigi ') + Math.round(S.ratePrice * 0.02) + (EN()?' FRIENDS credits (1 credit = 1 Leu)':' credite FRIENDS (1 credit = 1 Leu)');
         const tax = $('.athotel .pl .v', bk);
         if (tax) tax.textContent = '≈ ' + Math.round(S.ratePrice / 1.19 * 0.01) + ' Lei';
         save();
@@ -522,7 +536,7 @@
 
     /* --- headline binding --- */
     const h1 = $('.listing-head h1');
-    if (h1) h1.textContent = 'Cazare ' + (S.dest || 'litoral');
+    if (h1) h1.textContent = (EN()?'Stays in ':'Cazare ') + (S.dest || (EN()?'the seaside':'litoral'));
 
     /* --- hearts --- */
     $$('.heart').forEach(h => h.onclick = e => {
@@ -565,7 +579,7 @@
         S.hotel = $('.hname', c).childNodes[0].textContent.trim();
         S.ratePrice = +(c.dataset.total || 4046);
         save();
-        goto('hotel.html' + qs());
+        goto(en('hotel.html') + qs());
       };
       const cta = $('.lc-cta .btn', c);
       if (cta) cta.onclick = e => { e.stopPropagation(); go(); };
@@ -618,7 +632,7 @@
         $$('.rc-sel', box).forEach(b => b.onclick = e => {
           e.stopPropagation();
           S.hotel = $('.hname', card).childNodes[0].textContent.trim(); save();
-          goto('hotel.html' + qs());
+          goto(en('hotel.html') + qs());
         });
       } else {
         box = el('div', 'extra-rooms');
@@ -664,7 +678,7 @@
       });
       const displayN = (demoCount != null && !anyFilter) ? demoCount : shown;
       const rc = $('.res-count');
-      if (rc) rc.innerHTML = displayN + (displayN === 1 ? ' cazare disponibilă' : ' cazări disponibile') + ' · 8.7/10 din 11 395 recenzii';
+      if (rc) rc.innerHTML = displayN + (EN() ? (displayN === 1 ? ' available stay' : ' available stays') + ' · 8.7/10 from 11,395 reviews' : (displayN === 1 ? ' cazare disponibilă' : ' cazări disponibile') + ' · 8.7/10 din 11 395 recenzii');
       const rcn = $('.res-count-n');
       if (rcn) rcn.textContent = document.body.dataset.variant === 'b' ? money(shown * 206) : shown;
       // banda „FRIENDS" apare după al DOILEA card vizibil (repoziționată la fiecare filtrare)
@@ -932,7 +946,7 @@
             $('.mn', cell).onclick = () => { sel[rid] = q - 1; if (!sel[rid]) delete sel[rid]; sync(); };
             $('.pl', cell).onclick = () => { if (q < 4) { sel[rid] = q + 1; sync(); } };
           } else {
-            cell.innerHTML = '<button class="btn btn-primary btn-select">Adaugă cameră</button>';
+            cell.innerHTML = (EN()?'<button class="btn btn-primary btn-select">Add room</button>':'<button class="btn btn-primary btn-select">Adaugă cameră</button>');
             $('.btn-select', cell).onclick = () => { sel[rid] = 1; sync(); toast('Cameră adăugată în rezervare', 'ok'); };
           }
         });
@@ -944,7 +958,7 @@
         if (summ) summ.innerHTML = rooms
           ? Object.entries(sel).map(([rid, q]) => { const it = info(rowOf(rid));
               return '<div class="row"><span class="q">' + q + '×</span> <span class="nm">' + it.name + '</span> <span class="bd">(' + it.board + ')</span></div>'; }).join('')
-          : '<div class="empty">Nicio cameră selectată</div>';
+          : (EN()?'<div class="empty">No room selected</div>':'<div class="empty">Nicio cameră selectată</div>');
         const bp = $('.bb-price', bookBar); if (bp) bp.textContent = money(totalPrice());
         const br = $('.bb-rooms', bookBar); if (br) br.textContent = rooms;
       }
@@ -955,7 +969,7 @@
         if (!totalRooms()) return;
         const first = rowOf(Object.keys(sel)[0]);
         S.rate = info(first).name; S.meal = info(first).board; S.ratePrice = totalPrice();
-        save(); goto('checkout.html' + qs());
+        save(); goto(en('checkout.html') + qs());
       };
     }
 
@@ -1066,7 +1080,7 @@
     /* --- nearby hotels --- */
     $$('.hcard').forEach(c => c.onclick = () => {
       S.hotel = $('.hname', c).childNodes[0].textContent.trim(); save();
-      goto('hotel.html' + qs());
+      goto(en('hotel.html') + qs());
     });
 
     /* --- sticky bar --- */
@@ -1076,7 +1090,7 @@
       '<div class="sc"><span class="pr"></span><button class="btn btn-primary">Rezervă acum</button></div></div>';
     document.body.appendChild(bar);
     $('.nm', bar).textContent = S.hotel || 'Complex Mediteranean';
-    $('.btn', bar).onclick = () => { save(); goto('checkout.html' + qs()); };
+    $('.btn', bar).onclick = () => { save(); goto(en('checkout.html') + qs()); };
     const bkCard = $('.book-card');
     window.addEventListener('scroll', () => {
       if (!bkCard) return;
@@ -1107,7 +1121,7 @@
     const sp = $$('.split-box .pl');
     if (sp[0]) $('.v', sp[0]).textContent = money(S.payMode === 'full' ? discounted : adv) + ' Lei';
     if (sp[1]) $('.v', sp[1]).textContent = money(S.payMode === 'full' ? 0 : discounted - adv) + ' Lei';
-    const cr = $('.sum-body .credits'); if (cr) cr.textContent = '+ câștigi ' + Math.round(discounted * 0.02) + ' credite FRIENDS după sejur';
+    const cr = $('.sum-body .credits'); if (cr) cr.textContent = (EN()?'+ earn ':'+ câștigi ') + Math.round(discounted * 0.02) + (EN()?' FRIENDS credits after your stay':' credite FRIENDS după sejur');
 
     const boxes = $$('.pay-box');
     if (boxes[0]) { $('.p', boxes[0]).innerHTML = money(adv) + ' Lei <span style="font-size:13px;font-weight:700;color:#57585A">azi</span>'; $('.d', boxes[0]).textContent = 'Restul de ' + money(discounted - adv) + ' Lei — online până la 22 mai sau la hotel'; }
@@ -1247,7 +1261,7 @@
         return toast('Bifează acceptarea condițiilor pentru a continua', 'err');
       }
       if (S.promo) { S.ratePrice = Math.round((S.ratePrice || 4046) * 0.9); S.promo = null; }
-      save(); goto('thankyou.html' + qs(), 900);
+      save(); goto(en('thankyou.html') + qs(), 900);
     };
 
     /* --- editable form fields --- */
@@ -1271,7 +1285,7 @@
       if (/reguli|condiții/i.test(a.textContent)) {
         openModal('Condiții de anulare', '<p>Anulare gratuită dacă trimiți solicitarea cu <b>cel puțin 10 zile înainte de check-in</b> (până la 26 mai).</p>' +
           '<p>Se aplică ofertelor standard, cu rezervarea achitată integral. Fiecare solicitare este analizată individual.</p><p>După acest termen se reține avansul.</p>');
-      } else goto('hotel.html' + qs());
+      } else goto(en('hotel.html') + qs());
     });
   }
 
@@ -1354,10 +1368,10 @@
     });
 
     /* logo → home */
-    const logo = $('.logo'); if (logo) { logo.style.cursor = 'pointer'; logo.onclick = () => goto('home.html' + qs()); }
+    const logo = $('.logo'); if (logo) { logo.style.cursor = 'pointer'; logo.onclick = () => goto(en('home-c.html') + qs()); }
 
     /* breadcrumbs */
-    $$('.crumbs a').forEach((a, i) => a.onclick = e => { e.preventDefault(); goto(i === 0 ? 'home.html' + qs() : listingHref() + qs()); });
+    $$('.crumbs a').forEach((a, i) => a.onclick = e => { e.preventDefault(); goto(i === 0 ? en('home-c.html') + qs() : listingHref() + qs()); });
 
     /* --- variant B: see-also tabs, pager, newsletter, theme tiles --- */
     const tabs = $$('.seealso .tab');

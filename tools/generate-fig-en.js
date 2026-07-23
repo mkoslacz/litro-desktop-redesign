@@ -110,6 +110,10 @@ nodeChanges.push({
 
 const pages = [
   { file: 'dump-home-c-en.json', name: 'Home C (English) / Desktop', ox: 0 },
+  { file: 'dump-listing-c-en.json', name: 'Listing C (English) / Desktop', ox: 1640 },
+  { file: 'dump-hotel-en.json', name: 'Hotel Details (English) / Desktop', ox: 3280 },
+  { file: 'dump-checkout-en.json', name: 'Checkout (English) / Desktop', ox: 4920 },
+  { file: 'dump-thankyou-en.json', name: 'Thank you (English) / Desktop', ox: 6560 },
 ];
 
 const assetCache = new Map();
@@ -294,7 +298,7 @@ const meta = {
     thumbnail_size: { width: 400, height: 225 },
     render_coordinates: { x: 0, y: 0, width: 9700, height: 4800 },
   },
-  file_name: 'LITRO Home C — English',
+  file_name: 'LITRO Desktop — English (C flow)',
   developer_related_links: [],
   exported_at: new Date().toISOString(),
 };
