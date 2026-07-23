@@ -72,7 +72,9 @@
 .bb-cta { flex: none; padding: 13px 24px; font-size: 15.5px; }
 
 /* --- listing C: expandare camere ca un carusel cu poză + descriere --- */
-.rcarousel { position: relative; margin-top: 10px; display: none; }
+/* min-width:0 pe coloana grid, altfel caruselul lat împinge cardul + pagina pe orizontală */
+.lcard .lc-mid { min-width: 0; }
+.rcarousel { position: relative; margin-top: 10px; display: none; max-width: 100%; }
 .rcarousel.open { display: block; }
 .rc-track { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; scrollbar-width: none; padding: 4px 2px; }
 .rc-track::-webkit-scrollbar { display: none; }
@@ -90,8 +92,8 @@
 .rc-arrow { position: absolute; top: 44%; transform: translateY(-50%); z-index: 4; width: 34px; height: 34px; border-radius: 50%;
   background: rgba(255,255,255,.97); border: 1px solid var(--gray-300); box-shadow: 0 3px 10px rgba(1,43,85,.18); color: var(--navy-700); font-size: 18px; line-height: 1; cursor: pointer; }
 .rc-arrow:hover { background: #fff; }
-.rc-arrow.prev { left: -8px; }
-.rc-arrow.next { right: -8px; }
+.rc-arrow.prev { left: 4px; }
+.rc-arrow.next { right: 4px; }
 
 /* --- popovers (destination / calendar / guests) --- */
 .pop { position: absolute; z-index: 800; background: #fff; border: 1px solid var(--gray-300); border-radius: var(--r-l);
