@@ -22,7 +22,7 @@
   const monN = i => EN() ? MON_EN[i] : MON[i];   // lună scurtă, în funcție de limbă
   const guestsTxt = () => EN()
     ? S.adults + ' adult' + (S.adults === 1 ? '' : 's') + (S.kids ? ' + ' + S.kids + ' child' + (S.kids === 1 ? '' : 'ren') : '')
-    : guestsTxt();
+    : S.adults + (S.adults === 1 ? ' adult' : ' adulți') + (S.kids ? ' + ' + S.kids + (S.kids === 1 ? ' copil' : ' copii') : '');
   const DOW = ['L', 'Ma', 'Mi', 'J', 'V', 'S', 'D'];
   const money = n => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0');
   const pad = n => (n < 10 ? '0' : '') + n;
@@ -293,14 +293,14 @@
         '<div class="stepper"><span class="b' + (S[key] <= min ? ' off' : '') + '" data-step="' + key + '" data-dir="-1">−</span>' +
         '<span class="v">' + S[key] + '</span>' +
         '<span class="b' + (S[key] >= max ? ' off' : '') + '" data-step="' + key + '" data-dir="1">+</span></div></div>';
-      popG.innerHTML = row('Adulți', 'de la 18 ani', 'adults', 1, 10) +
-        row('Copii', '0–17 ani', 'kids', 0, 4) +
+      popG.innerHTML = row(EN() ? 'Adults' : 'Adulți', EN() ? 'from 18 years' : 'de la 18 ani', 'adults', 1, 10) +
+        row(EN() ? 'Children' : 'Copii', EN() ? '0–17 years' : '0–17 ani', 'kids', 0, 4) +
         (S.kids ? '<div class="ages">' + Array.from({ length: S.kids }).map((_, i) =>
-          '<div class="age">Copil ' + (i + 1) + ': <select data-age="' + i + '">' +
+          '<div class="age">' + (EN() ? 'Child ' : 'Copil ') + (i + 1) + ': <select data-age="' + i + '">' +
           Array.from({ length: 18 }).map((__, a) => '<option' + ((S.ages[i] || 7) === a ? ' selected' : '') + '>' + a + '</option>').join('') +
-          '</select> ani</div>').join('') + '</div>' : '') +
-        row('Camere', 'repartizare la recepție', 'rooms', 1, 5) +
-        '<div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="btn btn-primary" style="padding:10px 20px;font-size:14px" data-g-ok>Gata</button></div>';
+          '</select> ' + (EN() ? 'yrs' : 'ani') + '</div>').join('') + '</div>' : '') +
+        row(EN() ? 'Rooms' : 'Camere', EN() ? 'assigned at reception' : 'repartizare la recepție', 'rooms', 1, 5) +
+        '<div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="btn btn-primary" style="padding:10px 20px;font-size:14px" data-g-ok>' + (EN() ? 'Done' : 'Gata') + '</button></div>';
       $$('[data-step]', popG).forEach(b => b.onclick = () => {
         if (b.classList.contains('off')) return;
         const k = b.dataset.step, dir = +b.dataset.dir;
@@ -1083,21 +1083,7 @@
       goto(en('hotel.html') + qs());
     });
 
-    /* --- sticky bar --- */
-    const bar = el('div', 'stickybar');
-    bar.innerHTML = '<div class="container in"><span class="nm"></span>' +
-      '<span class="conf conf-instant"><svg width="12" height="12"><use href="#i-check-g"/></svg> Confirmare instantă</span>' +
-      '<div class="sc"><span class="pr"></span><button class="btn btn-primary">Rezervă acum</button></div></div>';
-    document.body.appendChild(bar);
-    $('.nm', bar).textContent = S.hotel || 'Complex Mediteranean';
-    $('.btn', bar).onclick = () => { save(); goto(en('checkout.html') + qs()); };
-    const bkCard = $('.book-card');
-    window.addEventListener('scroll', () => {
-      if (!bkCard) return;
-      const past = window.scrollY > bkCard.offsetTop + bkCard.offsetHeight;
-      bar.classList.toggle('on', past);
-      $('.pr', bar).textContent = money(S.ratePrice) + ' Lei';
-    });
+    /* --- bara sticky de sus a fost eliminată: bara de rezervare de jos (.booking-bar) o dublează --- */
   }
 
   /* ============================================================
@@ -1137,7 +1123,7 @@
     const rn = $('.sum-body .hname'); if (rn && S.hotel) rn.childNodes[0].textContent = S.hotel + ' ';
     const rows = $$('.sum-meta .row');
     if (rows[0]) rows[0].innerHTML = rows[0].innerHTML.replace(/(<\/span>).*/, '$1 ' + fmtRange(S.from, S.to) + ' · ' + nights() + ' nopți');
-    if (rows[1]) rows[1].innerHTML = rows[1].innerHTML.replace(/(<\/span>)[^<]*/, '$1 ' + S.adults + ' adulți + ' + S.kids + ' copii' + (S.kids ? ' (' + S.ages.slice(0, S.kids).join(' și ') + ' ani)' : '') + ' ');
+    if (rows[1]) rows[1].innerHTML = rows[1].innerHTML.replace(/(<\/span>)[^<]*/, '$1 ' + guestsTxt() + (S.kids ? ' (' + S.ages.slice(0, S.kids).join(EN() ? ' & ' : ' și ') + (EN() ? ' yrs' : ' ani') + ')' : '') + ' ');
     if (rows[2]) rows[2].innerHTML = rows[2].innerHTML.replace(/(<\/span>).*/, '$1 ' + S.rooms + ' × ' + (S.rate || 'Cameră dublă vedere mare'));
     if (rows[3]) rows[3].innerHTML = rows[3].innerHTML.replace(/(<\/span>).*/, '$1 ' + (S.meal ? S.meal.charAt(0).toUpperCase() + S.meal.slice(1) + ' inclus' : 'Mic dejun inclus'));
 
