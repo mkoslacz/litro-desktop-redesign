@@ -246,3 +246,6 @@ body[data-listing="b"] .lcard .ph img, body[data-listing="c"] .lcard .ph img { m
 .rates tr.sel { background: var(--navy-100); }
 .rates tr.sel td { border-color: #CBDEF2; }
 .rate-hidden { display: none; }
+
+/* Bara de navigare mutată în meniul din burger — apare doar pe homepage, deci o ascundem peste tot */
+.mainnav { display: none; }

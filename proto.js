@@ -516,11 +516,16 @@
       $$('.it', m).forEach(i => i.onclick = () => { closeAllPops(); toast('În prototip: ' + i.textContent.trim()); });
     }
     const burger = $('.h-burger');
-    if (burger) burger.onclick = () => openModal('Meniu', [
-      ['Litoral România', 'home.html'], ['Cazare Mamaia', 'listing.html'], ['Ofertele noastre', null],
-      ['Program FRIENDS', null], ['Vacanțe în rate', null], ['Vouchere de vacanță', null],
-      ['Asigurare storno', null], ['Contact', null]
-    ].map(([t, href]) => '<p style="font-size:16px"><a href="' + (href || '#') + '" style="font-weight:700">' + t + '</a></p>').join(''));
+    if (burger) {
+      // meniul din burger preia linkurile din bara de navigare (ascunsă pe homepage), deci urmează limba paginii
+      const navLinks = $$('.mainnav a').map(a => [a.textContent.trim(), a.getAttribute('href')]).filter(x => x[0]);
+      const fallback = EN()
+        ? [['Romanian Seaside', 'home-c-en.html'], ['Danube Delta', null], ['Seaside deals', null], ['Resorts', null], ['All-inclusive hotels', null], ['Last minute', null], ['Seaside for Everyone', null], ['FRIENDS programme', null], ['Contact', null]]
+        : [['Litoral România', 'home-c.html'], ['Delta Dunării', null], ['Oferte litoral', null], ['Stațiuni', null], ['Hoteluri all inclusive', null], ['Last minute', null], ['Litoralul Pentru Toți', null], ['Program FRIENDS', null], ['Contact', null]];
+      const items = navLinks.length ? navLinks : fallback;
+      burger.onclick = () => openModal(EN() ? 'Menu' : 'Meniu',
+        items.map(([t, href]) => '<p style="font-size:16px"><a href="' + (href && href !== '#' ? href : '#') + '" style="font-weight:700">' + t + '</a></p>').join(''));
+    }
 
     $$('.mainnav a').forEach(a => {
       if (a.getAttribute('href') === '#') a.onclick = e => { e.preventDefault(); toast('În prototip: ' + a.textContent.trim()); };
@@ -536,7 +541,7 @@
 
     /* --- headline binding --- */
     const h1 = $('.listing-head h1');
-    if (h1) h1.textContent = (EN()?'Stays in ':'Cazare ') + (S.dest || (EN()?'the seaside':'litoral'));
+    if (h1 && !h1.hasAttribute('data-fixed')) h1.textContent = (EN()?'Stays in ':'Cazare ') + (S.dest || (EN()?'the seaside':'litoral'));
 
     /* --- hearts --- */
     $$('.heart').forEach(h => h.onclick = e => {
@@ -678,7 +683,7 @@
       });
       const displayN = (demoCount != null && !anyFilter) ? demoCount : shown;
       const rc = $('.res-count');
-      if (rc) rc.innerHTML = displayN + (EN() ? (displayN === 1 ? ' available stay' : ' available stays') + ' · 8.7/10 from 11,395 reviews' : (displayN === 1 ? ' cazare disponibilă' : ' cazări disponibile') + ' · 8.7/10 din 11 395 recenzii');
+      if (rc && !rc.hasAttribute('data-fixed')) rc.innerHTML = displayN + (EN() ? (displayN === 1 ? ' available stay' : ' available stays') + ' · 8.7/10 from 11,395 reviews' : (displayN === 1 ? ' cazare disponibilă' : ' cazări disponibile') + ' · 8.7/10 din 11 395 recenzii');
       const rcn = $('.res-count-n');
       if (rcn) rcn.textContent = document.body.dataset.variant === 'b' ? money(shown * 206) : shown;
       // banda „FRIENDS" apare după al DOILEA card vizibil (repoziționată la fiecare filtrare)
