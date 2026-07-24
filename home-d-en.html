@@ -1,0 +1,831 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Litoralul Romanesc — Home D (English)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="litro.css">
+<link rel="stylesheet" href="proto.css">
+<style>
+  /* ===== Varianta C (atelier) — stiluri proprii, nu ating home.html / home-b.html ===== */
+
+  /* Carusel de campanii — stil "tiles": mai multe carduri vizibile simultan, compact pe verticală */
+  .hero-carousel { position: relative; margin: 18px 0 6px; }
+  .hc-track { display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth;
+    scrollbar-width: none; padding: 2px; margin: -2px; }
+  .hc-track::-webkit-scrollbar { display: none; }
+  .hc-tile { flex: 0 0 31.5%; scroll-snap-align: start; position: relative; height: 210px; display: block;
+    border-radius: var(--r-l); overflow: hidden; box-shadow: var(--shadow-card); color: #fff; text-decoration: none; }
+  .hc-tile img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
+  .hc-tile::after { content: ""; position: absolute; inset: 0; z-index: 1;
+    background: linear-gradient(158deg, rgba(1,43,85,.72) 0%, rgba(1,43,85,.30) 42%, rgba(1,43,85,.80) 100%); }
+  .hc-tile.t-orange::after { background: linear-gradient(158deg, rgba(150,74,12,.80) 0%, rgba(184,94,14,.34) 42%, rgba(110,55,8,.82) 100%); }
+  .hc-tile.t-teal::after   { background: linear-gradient(158deg, rgba(11,85,99,.80) 0%, rgba(14,124,140,.34) 42%, rgba(8,58,68,.82) 100%); }
+  .hc-tile.t-plum::after   { background: linear-gradient(158deg, rgba(74,35,80,.80) 0%, rgba(122,59,132,.34) 42%, rgba(52,22,60,.82) 100%); }
+  .hc-tile-body { position: relative; z-index: 2; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; padding: 18px 20px; }
+  .hc-tile .k { font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; opacity: .92; margin-bottom: 6px; }
+  .hc-tile .t { font-family: var(--font-title); font-size: 20.5px; font-weight: 700; line-height: 1.12; margin-bottom: 11px; }
+  .hc-tile .cta { align-self: flex-start; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.42); border-radius: 100px; padding: 6px 13px; transition: background .15s, color .15s; }
+  .hc-tile:hover .cta { background: #fff; color: var(--navy-700); border-color: #fff; }
+  .hc-badge { position: absolute; right: 15px; top: 13px; z-index: 3; font-family: var(--font-title); font-weight: 800; font-size: 33px;
+    transform: rotate(-6deg); text-shadow: 0 3px 14px rgba(0,0,0,.32); }
+  /* un singur kafelek care duce direct la hotel — compact, fără să se lățească */
+  .hc-rate { position: absolute; left: 15px; top: 13px; z-index: 3; background: var(--navy-500); color: #fff; font-weight: 800; font-size: 14px; border-radius: 8px; padding: 3px 9px; box-shadow: 0 2px 8px rgba(0,0,0,.28); }
+  .hc-loc { font-family: var(--font-body); font-size: 12.5px; font-weight: 600; opacity: .92; }
+
+  .hc-arrow { position: absolute; top: 50%; transform: translateY(-50%); z-index: 5; width: 40px; height: 40px;
+    border-radius: 50%; background: rgba(255,255,255,.95); border: none; box-shadow: 0 4px 14px rgba(1,43,85,.22);
+    display: flex; align-items: center; justify-content: center; color: var(--navy-700); font-size: 21px; line-height: 1; cursor: pointer; transition: opacity .2s; }
+  .hc-arrow:hover { background: #fff; }
+  .hc-arrow.prev { left: 8px; } .hc-arrow.next { right: 8px; }
+  .hc-arrow[disabled] { opacity: 0; pointer-events: none; }
+
+  /* Hero cu căutarea integrată — „nu ai găsit? caută" pe imaginea hero */
+  .search-hero { position: relative; margin-top: 20px; border-radius: var(--r-l); overflow: hidden; box-shadow: var(--shadow-card); }
+  .search-hero .sh-bg { position: absolute; inset: 0; }
+  .search-hero .sh-bg img { width: 100%; height: 100%; object-fit: cover; }
+  .search-hero .sh-bg::after { content: ""; position: absolute; inset: 0;
+    background: linear-gradient(100deg, rgba(1,43,85,.92) 0%, rgba(1,43,85,.74) 44%, rgba(1,43,85,.42) 100%); }
+  .search-hero .sh-in { position: relative; z-index: 2; padding: 30px 34px 26px; }
+  .search-hero .sh-title { font-family: var(--font-title); font-size: 29px; font-weight: 700; color: #fff; letter-spacing: -.3px; margin: 0; line-height: 1.1; }
+  .search-hero .sh-sub { color: rgba(255,255,255,.9); font-size: 15px; margin: 8px 0 18px; max-width: 640px; }
+  .search-hero .search-card { box-shadow: 0 14px 40px rgba(1,43,85,.34); }
+  .search-hero .sh-note { margin-top: 12px; }
+  .search-hero .sh-note .trust-note { color: #9BE8C2; }
+
+  /* Chips de date flexibile — acum în interiorul calendarului */
+  .cal-flex { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 2px 0 14px;
+    padding-bottom: 14px; border-bottom: 1px solid var(--gray-200); }
+  .cal-flex .lbl { font-size: 13px; font-weight: 700; color: var(--gray-700); margin-right: 2px; }
+
+  /* language switch RO / EN in header */
+  .langswitch { display: inline-flex; border: 1.5px solid var(--gray-400); border-radius: 100px; overflow: hidden; }
+  .langswitch a { padding: 5px 11px; font-size: 12.5px; font-weight: 700; color: var(--gray-700); }
+  .langswitch a.on { background: var(--navy-500); color: #fff; }
+
+  /* ===== Embedded listing (variant C) — listing bits only, no header compaction ===== */
+  body[data-listing="c"] .res-count { font-size: 13px; margin-left: 10px; }
+  body[data-listing="c"] .res-types { margin-top: 0; }
+  body[data-listing="c"] .res-type { padding: 3px 9px; font-size: 12px; }
+  body[data-listing="c"] .fchips { margin: 6px 0 8px; }
+  body[data-listing="c"] .fchip { padding: 5px 11px; font-size: 12.5px; }
+  body[data-listing="c"] .listing-head { margin: 22px 0 4px; }
+  body[data-listing="c"] .listing-head h1 { font-size: 24px; }
+  body[data-listing="c"] .flexi-strip { padding: 6px 12px 7px; margin-bottom: 10px; }
+  body[data-listing="c"] .flexi-strip .cap { font-size: 12px; margin: 0 2px 5px; }
+  body[data-listing="c"] .fx-cell { padding: 4px 4px; }
+  body[data-listing="c"] .fx-cell .d { font-size: 11px; }
+  body[data-listing="c"] .fx-cell .p { font-size: 12.5px; font-weight: 700; }
+  body[data-listing="c"] .fx-cell .p b { font-weight: 800; }
+  body[data-listing="c"] .fx-cell .s { font-size: 10px; font-weight: 600; color: var(--gray-600); }
+  body[data-listing="c"] .fx-cell.cheap .p b { color: var(--green-600); }
+
+  /* inventory demo switch */
+  .invdemo { position: fixed; left: 18px; top: 50%; transform: translateY(-50%); z-index: 890; width: 162px;
+    background: #fff; border: 1px solid var(--gray-300); border-radius: var(--r-l); box-shadow: var(--shadow-pop); padding: 11px; }
+  .invdemo .h { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--gray-600); margin-bottom: 4px; }
+  .invdemo .sub { font-size: 11px; color: var(--gray-600); margin-bottom: 9px; line-height: 1.35; }
+  .invdemo a { display: block; border-radius: var(--r-m); padding: 8px 11px; font-size: 13px; font-weight: 700; color: var(--gray-900); cursor: pointer; }
+  .invdemo a + a { margin-top: 4px; }
+  .invdemo a:hover { background: var(--gray-200); }
+  .invdemo a.on { background: var(--navy-500); color: #fff; }
+</style>
+</head>
+<body data-page="listing" data-variant="c" data-listing="c" data-flex-in-cal>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-7-6.1-7-11a7 7 0 1 1 14 0c0 4.9-7 11-7 11z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="10" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="16" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3.5 10h17M8 2.8V7M16 2.8V7" stroke="currentColor" stroke-width="2" fill="none"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 20c.5-3.4 3-5.4 6-5.4s5.5 2 6 5.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 5.4a3.2 3.2 0 0 1 0 5.9M18.2 14.9c1.7.8 2.6 2.3 2.9 4.6" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15.6 15.6 21 21" stroke="currentColor" stroke-width="2.4"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5.5 3.5h3l1.7 4.3-2 1.6a13 13 0 0 0 6.4 6.4l1.6-2 4.3 1.7v3a1.8 1.8 0 0 1-2 1.8C10.3 19.7 4.3 13.7 3.7 5.5a1.8 1.8 0 0 1 1.8-2z" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6.5h16M4 12h16M4 17.5h16" stroke="currentColor" stroke-width="2.2"/></symbol>
+    <symbol id="i-chev-d" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2"/></symbol>
+    <symbol id="i-chev-l" viewBox="0 0 24 24"><path d="m14.5 6-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2"/></symbol>
+    <symbol id="i-chev-r" viewBox="0 0 24 24"><path d="m9.5 6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2"/></symbol>
+    <symbol id="i-arrow-r" viewBox="0 0 24 24"><path d="M4 12h15M13.5 6 19.5 12l-6 6" fill="none" stroke="currentColor" stroke-width="2.2"/></symbol>
+    <symbol id="i-sort" viewBox="0 0 24 24"><path d="M7 4v13M7 20l-3.5-3.5M7 20l3.5-3.5M17 20V7M17 4l-3.5 3.5M17 4l3.5 3.5" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20.3S4 15 4 9.6A4.4 4.4 0 0 1 12 7a4.4 4.4 0 0 1 8 2.6c0 5.4-8 10.7-8 10.7z" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-pct" viewBox="0 0 24 24"><path d="M19 5 5 19" stroke="currentColor" stroke-width="2.2"/><circle cx="7.5" cy="7.5" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="16.5" cy="16.5" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-card" viewBox="0 0 24 24"><rect x="3" y="5.5" width="18" height="13" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 10h18M7 14.5h4" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-head" viewBox="0 0 24 24"><path d="M4.5 13a7.5 7.5 0 0 1 15 0" fill="none" stroke="currentColor" stroke-width="2"/><rect x="3" y="12.5" width="4" height="6.5" rx="1.8" fill="none" stroke="currentColor" stroke-width="2"/><rect x="17" y="12.5" width="4" height="6.5" rx="1.8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M19 19.5c0 1.6-1.6 2.2-4 2.3" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.5V12l3 2.4" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.2"/></symbol>
+    <symbol id="i-check-g" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.6"/></symbol>
+  </defs>
+</svg>
+
+
+<div class="invdemo">
+  <div class="h">Inventory · demo</div>
+  <div class="sub">Simulate how many hotels are free — the date banner appears only when few results.</div>
+  <a data-cap="99" data-count="81">Many · 81</a>
+  <a data-cap="6" data-count="12">Medium · 12</a>
+  <a data-cap="3" data-count="3">Few · 3</a>
+</div>
+
+<div class="promobar">Seaside 2026 — up to <b>45%</b> off with Early Booking! <a href="#">See the deals →</a></div>
+
+<header class="header">
+  <div class="container header-in">
+    <div class="logo">
+      <svg width="42" height="42" viewBox="0 0 42 42"><circle cx="19" cy="23" r="13" fill="none" stroke="#004B97" stroke-width="7"/><circle cx="33" cy="8.5" r="5.5" fill="#EB802D"/></svg>
+      <div class="logo-text"><div class="l1">litoralul</div><div class="l2">romanesc<b>.ro</b></div></div>
+    </div>
+    <div class="header-right">
+      <div class="h-phone">
+        <svg width="20" height="20" style="color:#004B97"><use href="#i-phone"/></svg>
+        <div><div class="num">0241 999 · 0241 837 777</div><div class="hrs">● Daily 10:00–18:00</div></div>
+      </div>
+      <div class="h-user"><span class="avatar">A</span> Ana <svg width="16" height="16"><use href="#i-chev-d"/></svg></div>
+      <span class="langswitch"><a href="home-d.html">RO</a><a href="home-d-en.html" class="on">EN</a></span>
+      <span class="h-burger"><svg width="24" height="24"><use href="#i-menu"/></svg></span>
+    </div>
+  </div>
+</header>
+
+<div class="mainnav">
+  <div class="container in">
+    <a href="#" class="on">Romanian Seaside</a>
+    <a href="#">Danube Delta</a>
+    <span class="sep"></span>
+    <a href="#">Seaside deals <svg width="13" height="13"><use href="#i-chev-d"/></svg></a>
+    <a href="#">Resorts <svg width="13" height="13"><use href="#i-chev-d"/></svg></a>
+    <a href="#">All-inclusive hotels</a>
+    <a href="#">Last minute</a>
+    <a href="#">Seaside for Everyone</a>
+    <div class="right">
+      <a href="#">FRIENDS programme</a>
+      <a href="#">Contact</a>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- 1. Carusel de campanii importante — stil tiles, sus, compact pe verticală -->
+  <section class="hero-carousel" aria-label="Featured campaigns">
+    <div class="hc-track">
+      <a class="hc-tile" href="listing-c-en.html">
+        <img src="assets/aerial-hotel.jpg" alt="">
+        <div class="hc-tile-body">
+          <div class="k">Early Booking 2026</div>
+          <div class="t">Book early,<br>pay less</div>
+          <span class="cta">See all 263 deals →</span>
+        </div>
+        <div class="hc-badge">−45%</div>
+      </a>
+      <a class="hc-tile t-orange" href="listing-c-en.html">
+        <img src="assets/coastline.jpg" alt="">
+        <div class="hc-tile-body">
+          <div class="k">Last-Minute Deals</div>
+          <div class="t">Grab a last-minute<br>holiday</div>
+          <span class="cta">See all 159 deals →</span>
+        </div>
+      </a>
+      <a class="hc-tile t-teal" href="listing-c-en.html">
+        <img src="assets/pool-sunset.jpg" alt="">
+        <div class="hc-tile-body">
+          <div class="k">Easter &amp; May Day at the seaside</div>
+          <div class="t">Open the season<br>by the sea</div>
+          <span class="cta">See all 104 deals →</span>
+        </div>
+      </a>
+      <a class="hc-tile t-plum" href="listing-c-en.html">
+        <img src="assets/aerial-portrait.jpg" alt="">
+        <div class="hc-tile-body">
+          <div class="k">Seaside for Everyone</div>
+          <div class="t">A quiet off-season,<br>significant savings</div>
+          <span class="cta">See all 55 deals →</span>
+        </div>
+      </a>
+      <a class="hc-tile" href="listing-c-en.html">
+        <img src="assets/pool-rooftop.jpg" alt="">
+        <div class="hc-tile-body">
+          <div class="k">Summer Deal</div>
+          <div class="t">Sun, sea and the<br>best prices</div>
+          <span class="cta">See all 123 deals →</span>
+        </div>
+      </a>
+      <!-- exemplu: un singur kafelek care duce DIRECT la un hotel (nu la listing), compact -->
+      <a class="hc-tile hc-hotel" href="hotel-en.html">
+        <img src="assets/jacuzzi-view.jpg" alt="">
+        <span class="hc-rate">9.5</span>
+        <div class="hc-tile-body">
+          <div class="k">Hotel of the week</div>
+          <div class="t">Aqvatonic Resort &amp; SPA<br><span class="hc-loc">Eforie Nord · on the beach</span></div>
+          <span class="cta">View hotel →</span>
+        </div>
+      </a>
+    </div>
+    <button class="hc-arrow prev" aria-label="Previous">‹</button>
+    <button class="hc-arrow next" aria-label="Next">›</button>
+  </section>
+
+  <!-- 2. Hero cu căutarea integrată: „nu ai găsit? caută" pe imaginea hero -->
+  <section class="search-hero">
+    <div class="sh-bg"><img src="assets/coastline.jpg" alt=""></div>
+    <div class="sh-in">
+      <h1 class="sh-title">Didn't find the right holiday above?</h1>
+      <p class="sh-sub">Search directly through all our seaside stays — pick a resort, dates and guests.</p>
+      <div class="search-card">
+        <div class="s-field">
+          <span class="ic"><svg width="22" height="22"><use href="#i-pin"/></svg></span>
+          <div><div class="s-label">Where to?</div><div class="s-value">Mamaia</div></div>
+          <span class="s-clear"><svg width="16" height="16"><use href="#i-x"/></svg></span>
+        </div>
+        <div class="s-field">
+          <span class="ic"><svg width="22" height="22"><use href="#i-cal"/></svg></span>
+          <div><div class="s-label">When?</div><div class="s-value">5–12 Jun</div></div>
+        </div>
+        <div class="s-field">
+          <span class="ic"><svg width="22" height="22"><use href="#i-users"/></svg></span>
+          <div><div class="s-label">Guests &amp; rooms</div><div class="s-value">2 adults, 1 room</div></div>
+        </div>
+        <button class="btn btn-primary btn-search">Search <svg width="19" height="19"><use href="#i-search"/></svg></button>
+      </div>
+      <div class="sh-note">
+        <span class="trust-note"><svg width="15" height="15"><use href="#i-check-g"/></svg> Our own inventory · instant confirmation · pick flexible dates in the calendar</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== Embedded listing (variant C) — right under search, like variant B ====== -->
+  <div class="listing-head">
+    <div style="display:flex;align-items:baseline">
+      <h1>Stays in Mamaia</h1><span class="res-count">81 available stays · 8.7/10 from 11,395 reviews</span>
+    </div>
+    <div class="sort-box"><svg width="17" height="17"><use href="#i-sort"/></svg> Recommended by us <svg width="15" height="15"><use href="#i-chev-d"/></svg></div>
+  </div>
+
+  <div class="res-types">
+    <span class="res-type">Hotels 70</span>
+    <span class="res-type">Apartments 7</span>
+    <span class="res-type">Rooms 4</span>
+    <span class="trust-note" style="margin-left:6px"><svg width="14" height="14"><use href="#i-check-g"/></svg> our own inventory · instant confirmation</span>
+  </div>
+
+  <div class="fchips" style="margin-top:14px">
+    <span class="lbl">Filters:</span>
+    <span class="fchip">On the beach <svg width="13" height="13"><use href="#i-x"/></svg></span>
+    <span class="fchip">Pool <svg width="13" height="13"><use href="#i-x"/></svg></span>
+    <span class="fchip">FRIENDS discount <svg width="13" height="13"><use href="#i-x"/></svg></span>
+    <a class="clear-all" href="#">Clear all</a>
+  </div>
+
+  <div class="listing-grid">
+    <aside>
+      <div class="map-card"><div class="grid-lines"></div><button class="btn">📍 View on map</button></div>
+
+      <div class="fbox avail">
+        <h3>Availability <span class="min">—</span></h3>
+        <div class="frow"><span class="cb on"></span> Only available stays <span class="cnt">(81)</span></div>
+        <div class="frow" data-f="instant"><span class="cb"></span> Only instant confirmation <span class="cnt">(63)</span></div>
+        <div class="frow"><span class="cb"></span> Only with shown rates <span class="cnt">(74)</span></div>
+        <div class="frow"><span class="cb"></span> Pay at reception <span class="cnt">(7)</span></div>
+      </div>
+
+      <div class="fbox">
+        <h3>Your recent filters <span class="min">—</span></h3>
+        <div class="frow"><span class="cb"></span> Hotel <span class="cnt">(70)</span></div>
+        <div class="frow"><span class="cb"></span> 200 – 600 Lei <span class="cnt">(52)</span></div>
+        <div class="frow"><span class="cb"></span> Excellent 9.5+ <span class="cnt">(24)</span></div>
+        <div class="frow"><span class="cb"></span> Online payment <span class="cnt">(74)</span></div>
+      </div>
+
+      <div class="fbox">
+        <h3>Discounts <span class="min">—</span></h3>
+        <div class="frow" data-f="friends"><span class="cb"></span> FRIENDS discount <span class="cnt">(58)</span></div>
+        <div class="frow"><span class="cb"></span> Early Booking <span class="cnt">(41)</span></div>
+        <div class="frow"><span class="cb"></span> Extra Discount <span class="cnt">(8)</span></div>
+      </div>
+
+      <div class="fbox">
+        <h3>Price per night <span class="min">—</span></h3>
+        <div class="histo">
+          <i style="height:18%"></i><i style="height:30%"></i><i style="height:44%" class="hi"></i><i style="height:68%" class="hi"></i><i style="height:92%" class="hi"></i><i style="height:100%" class="hi"></i><i style="height:78%" class="hi"></i><i style="height:60%" class="hi"></i><i style="height:48%" class="hi"></i><i style="height:36%" class="hi"></i><i style="height:26%"></i><i style="height:20%"></i><i style="height:14%"></i><i style="height:10%"></i><i style="height:7%"></i>
+        </div>
+        <div class="range-line"><span class="fill"></span><span class="knob" style="left:12%"></span><span class="knob" style="left:76%"></span></div>
+        <div class="minmax">
+          <div class="inp"><b>Min</b>200 Lei</div>
+          <div class="inp"><b>Max</b>1 200 Lei</div>
+        </div>
+      </div>
+
+      <div class="fbox">
+        <h3>Popular filters <span class="min">—</span></h3>
+        <div class="fchips-wrap">
+          <span class="pfilter on" data-f="pool">Pool <span class="cnt">(26)</span></span>
+          <span class="pfilter" data-f="breakfast">Breakfast included <span class="cnt">(58)</span></span>
+          <span class="pfilter" data-f="beach">On the beach <span class="cnt">(9)</span></span>
+          <span class="pfilter">Parking <span class="cnt">(70)</span></span>
+          <span class="pfilter">Air conditioning <span class="cnt">(81)</span></span>
+          <span class="pfilter">Pets allowed <span class="cnt">(18)</span></span>
+        </div>
+        <a href="#" class="link-more" style="font-size:13.5px;margin-top:10px">See all amenities (48) →</a>
+      </div>
+
+      <div class="fbox">
+        <h3>Distance to the beach <span class="min">—</span></h3>
+        <div class="frow"><span class="cb on"></span> On the beach <span class="cnt">(9)</span></div>
+        <div class="frow"><span class="cb"></span> Under 100 m <span class="cnt">(42)</span></div>
+        <div class="frow"><span class="cb"></span> Under 300 m <span class="cnt">(68)</span></div>
+        <div class="frow"><span class="cb"></span> Under 1 km <span class="cnt">(78)</span></div>
+      </div>
+
+      <div class="fbox">
+        <h3>Holiday card <span class="min">—</span></h3>
+        <div class="frow"><span class="cb"></span> Edenred <span class="cnt">(31)</span></div>
+        <div class="frow"><span class="cb"></span> Pluxee <span class="cnt">(28)</span></div>
+        <div class="frow"><span class="cb"></span> Up România <span class="cnt">(24)</span></div>
+      </div>
+
+      <div class="fbox">
+        <h3>Board <span class="min">—</span></h3>
+        <div class="frow"><span class="cb"></span> No board <span class="cnt">(28)</span></div>
+        <div class="frow"><span class="cb"></span> Breakfast <span class="cnt">(58)</span></div>
+        <div class="frow"><span class="cb"></span> Half board <span class="cnt">(22)</span></div>
+        <div class="frow"><span class="cb"></span> Full board <span class="cnt">(11)</span></div>
+        <div class="frow"><span class="cb"></span> All-inclusive <span class="cnt">(23)</span></div>
+      </div>
+
+      <div class="fbox">
+        <h3>Property type <span class="min">—</span></h3>
+        <div class="frow"><span class="cb on"></span> Hotels <span class="cnt">(70)</span></div>
+        <div class="frow" style="padding-left:26px"><span class="cb on"></span> 5 stars <span class="cnt">(1)</span></div>
+        <div class="frow" style="padding-left:26px"><span class="cb on"></span> 4 stars <span class="cnt">(29)</span></div>
+        <div class="frow" style="padding-left:26px"><span class="cb on"></span> 3 stars <span class="cnt">(45)</span></div>
+        <div class="frow" style="padding-left:26px"><span class="cb"></span> 2 stars <span class="cnt">(6)</span></div>
+        <div class="frow"><span class="cb"></span> Apartments <span class="cnt">(7)</span></div>
+        <div class="frow"><span class="cb"></span> Rooms <span class="cnt">(4)</span></div>
+        <div class="frow"><span class="cb"></span> Villas <span class="cnt">(2)</span></div>
+      </div>
+
+      <div class="fbox">
+        <h3>By review score <span class="min">—</span></h3>
+        <div class="frow"><span class="cb"></span> Excellent 9.5+ <span class="cnt">(24)</span></div>
+        <div class="frow"><span class="cb"></span> Very good 9.0+ <span class="cnt">(28)</span></div>
+        <div class="frow"><span class="cb"></span> Good 8.0+ <span class="cnt">(48)</span></div>
+      </div>
+
+      <div class="fbox">
+        <h3>Payment &amp; cancellation <span class="min">—</span></h3>
+        <div class="frow"><span class="cb"></span> Free cancellation <span class="cnt">(46)</span></div>
+        <div class="frow"><span class="cb"></span> No prepayment <span class="cnt">(21)</span></div>
+        <div class="frow"><span class="cb"></span> Online payment <span class="cnt">(24)</span></div>
+      </div>
+    </aside>
+
+    <main>
+      <!-- banner de date: apare DOAR când sunt puține rezultate (vezi proto.js applyFilters) -->
+      <div class="flexi-strip" data-base="968" data-low="311" style="display:none">
+        <div class="cap"><svg width="15" height="15" style="color:#004B97"><use href="#i-cal"/></svg> Few options for your dates? The lowest prices and how many hotels are free around your chosen dates</div>
+        <div class="flexi-cells">
+          <div class="fx-cell" data-hotels="62"><div class="d">2–9 Jun</div><div class="p">from <b>512</b> Lei</div><div class="s">62 hotels</div></div>
+          <div class="fx-cell" data-hotels="68"><div class="d">3–10 Jun</div><div class="p">from <b>498</b> Lei</div><div class="s">68 hotels</div></div>
+          <div class="fx-cell" data-hotels="74"><div class="d">4–11 Jun</div><div class="p">from <b>486</b> Lei</div><div class="s">74 hotels</div></div>
+          <div class="fx-cell sel" data-hotels="81"><div class="d">5–12 Jun</div><div class="p">from <b>479</b> Lei</div><div class="s">81 hotels</div></div>
+          <div class="fx-cell" data-hotels="77"><div class="d">6–13 Jun</div><div class="p">from <b>489</b> Lei</div><div class="s">77 hotels</div></div>
+          <div class="fx-cell" data-hotels="70"><div class="d">7–14 Jun</div><div class="p">from <b>472</b> Lei</div><div class="s">70 hotels</div></div>
+          <div class="fx-cell" data-hotels="66"><div class="d">8–15 Jun</div><div class="p">from <b>505</b> Lei</div><div class="s">66 hotels</div></div>
+        </div>
+      </div>
+
+      <!-- card 1 -->
+      <div class="lcard" data-ppn="968" data-disc="15" data-meal="mic dejun" data-instant="1" data-beach="50" data-fac="pool,beach" data-friends="1" data-score="9.2" data-rank="1">
+        <div class="ph">
+          <img src="assets/pool-rooftop.jpg" alt="">
+          <span class="heart"><svg width="17" height="17"><use href="#i-heart"/></svg></span>
+          <div class="dots"><i class="on"></i><i></i><i></i><i></i><i></i></div>
+        </div>
+        <div class="lc-mid">
+          <div class="hname">Complex Mediteranean <span class="stars">★★★★</span></div>
+          <div class="hmeta"><svg width="14" height="14"><use href="#i-pin"/></svg> Mamaia, Cazino area · 50 m from the beach · <a href="#" style="font-weight:700">View on map</a></div>
+          <div class="lc-room">
+            <div class="rt">Double room with sea view</div>
+            <div class="rd">1 double bed · 2 sunbeds included on the beach</div>
+          </div>
+          <div class="lc-perks">
+            <span class="perk"><svg width="15" height="15"><use href="#i-check-g"/></svg> Breakfast included</span>
+            <span class="perk"><svg width="15" height="15"><use href="#i-check-g"/></svg> Flexible cancellation</span>
+          </div>
+          <div class="lc-tags">
+            <span class="conf conf-instant"><svg width="12" height="12"><use href="#i-check-g"/></svg> Instant confirmation</span>
+            <span class="pill pill-camp">Summer Deal</span>
+            <span class="pill pill-friends">FRIENDS discount −10%</span>
+          </div>
+          <div class="quote">
+            <div class="h">What guests love · <b>Score 10/10</b></div>
+            <div class="t">“The location, the play areas, the pools. The kids didn't want to leave.”</div>
+          </div>
+          <span class="more-rooms">See all room types <span class="cnt">(7)</span> ↓</span>
+        </div>
+        <div class="lc-right">
+          <div class="rating-top">
+            <div class="rw"><div class="rate-word">Excellent</div><div class="rate-count">157 reviews</div></div>
+            <span class="rate-badge">9.2</span>
+          </div>
+          <div class="lc-price">
+            <div><span class="pill pill-red">−15%</span> <span class="expiry soon">expires in 4 days</span></div>
+            <span class="old-price">680 Lei</span>
+            <div class="price">579 <span class="cur">Lei</span></div>
+            <div class="price-note">2 adults, 7 nights with breakfast<br>VAT included · resort tax at the hotel</div>
+            <div class="credits">Earn 159 FRIENDS credits</div>
+          </div>
+          <div class="lc-cta"><button class="btn btn-primary">View offer</button></div>
+        </div>
+      </div>
+
+      <!-- card 2 -->
+      <div class="lcard" data-ppn="419" data-disc="30" data-meal="mic dejun" data-instant="1" data-beach="50" data-fac="beach" data-friends="0" data-score="8.0" data-rank="2">
+        <div class="ph">
+          <img src="assets/room-seaview.jpg" alt="">
+          <span class="heart"><svg width="17" height="17"><use href="#i-heart"/></svg></span>
+          <div class="dots"><i class="on"></i><i></i><i></i><i></i><i></i></div>
+        </div>
+        <div class="lc-mid">
+          <div class="hname">Sara Boutique Hotel <span class="stars">★★★★</span></div>
+          <div class="hmeta"><svg width="14" height="14"><use href="#i-pin"/></svg> Mamaia Nord · 50 m from the beach · <a href="#" style="font-weight:700">View on map</a></div>
+          <div class="lc-room">
+            <div class="rt">Deluxe double room</div>
+            <div class="rd">1 double bed · balcony with sea view</div>
+          </div>
+          <div class="lc-perks">
+            <span class="perk"><svg width="15" height="15"><use href="#i-check-g"/></svg> Breakfast included</span>
+            <span class="perk"><svg width="15" height="15"><use href="#i-check-g"/></svg> Free cancellation</span>
+          </div>
+          <div class="lc-tags">
+            <span class="conf conf-instant"><svg width="12" height="12"><use href="#i-check-g"/></svg> Instant confirmation</span>
+            <span class="pill pill-camp">Free Holiday Days</span>
+            <span class="pill pill-cond">min. 5 nights</span>
+          </div>
+          <div class="quote">
+            <div class="h">What guests love · <b>Score 10/10</b></div>
+            <div class="t">“The cleanliness, the friendliness. The sea-view balcony is worth every penny.”</div>
+          </div>
+          <span class="more-rooms">See all room types <span class="cnt">(5)</span> ↓</span>
+        </div>
+        <div class="lc-right">
+          <div class="rating-top">
+            <div class="rw"><div class="rate-word">Very good</div><div class="rate-count">557 reviews</div></div>
+            <span class="rate-badge">8.0</span>
+          </div>
+          <div class="lc-price">
+            <div><span class="pill pill-red">−30%</span> <span class="expiry">expires in 21 days</span></div>
+            <span class="old-price">1 590 Lei</span>
+            <div class="price">1 119 <span class="cur">Lei</span></div>
+            <div class="price-note">2 adults, 7 nights with breakfast<br>VAT included · resort tax at the hotel</div>
+            <div class="credits">Earn 224 FRIENDS credits</div>
+          </div>
+          <div class="lc-cta"><button class="btn btn-primary">View offer</button></div>
+        </div>
+      </div>
+
+      <!-- loyalty band — după al doilea element -->
+      <div class="loyal-band">
+        <span class="ic"><svg width="21" height="21"><use href="#i-pct"/></svg></span>
+        <div>
+          <div class="t">Join the FRIENDS programme</div>
+          <div class="d">Sign in and get exclusive discounts and credits on every booking.</div>
+        </div>
+        <button class="btn btn-primary">Join for free</button>
+      </div>
+
+      <!-- card 3 -->
+      <div class="lcard" data-ppn="333" data-disc="0" data-meal="mic dejun" data-instant="0" data-beach="300" data-fac="" data-friends="1" data-score="7.1" data-rank="3">
+        <div class="ph">
+          <img src="assets/lobby.jpg" alt="">
+          <span class="heart"><svg width="17" height="17"><use href="#i-heart"/></svg></span>
+          <div class="dots"><i class="on"></i><i></i><i></i><i></i><i></i></div>
+        </div>
+        <div class="lc-mid">
+          <div class="hname">Sonio Boutique <span class="stars">★★★</span></div>
+          <div class="hmeta"><svg width="14" height="14"><use href="#i-pin"/></svg> Mamaia, Nord area · 300 m from the beach · <a href="#" style="font-weight:700">View on map</a></div>
+          <div class="lc-room">
+            <div class="rt">Standard double room</div>
+            <div class="rd">1 double bed or 2 single beds</div>
+          </div>
+          <div class="lc-perks">
+            <span class="perk"><svg width="15" height="15"><use href="#i-check-g"/></svg> Breakfast included</span>
+          </div>
+          <div class="lc-tags">
+            <span class="conf conf-request">Confirmation within 2 hours</span>
+            <span class="pill pill-new">New on litoralulromanesc.ro</span>
+          </div>
+          <div class="quote empty">
+            <div class="h">No reviews yet</div>
+            <div class="t">New hotel, opened in 2026: modern rooms, restaurant on the ground floor, 300 m from the beach.</div>
+          </div>
+          <span class="more-rooms">See all room types <span class="cnt">(3)</span> ↓</span>
+        </div>
+        <div class="lc-right">
+          <div class="rating-top">
+            <div class="rw"><div class="rate-word">Good</div><div class="rate-count">117 reviews</div></div>
+            <span class="rate-badge">7.1</span>
+          </div>
+          <div class="lc-price">
+            <div class="price">310 <span class="cur">Lei</span></div>
+            <div class="price-note">2 adults, 7 nights with breakfast<br>VAT included · resort tax at the hotel</div>
+            <div class="credits">Earn 62 FRIENDS credits</div>
+          </div>
+          <div class="lc-cta"><button class="btn btn-primary">View offer</button></div>
+        </div>
+      </div>
+
+      <!-- card 4 -->
+      <div class="lcard" data-ppn="780" data-disc="20" data-meal="mic dejun" data-instant="1" data-beach="150" data-fac="pool" data-friends="0" data-score="8.9" data-rank="4">
+        <div class="ph">
+          <img src="assets/aerial-hotel.jpg" alt="">
+          <span class="heart"><svg width="17" height="17"><use href="#i-heart"/></svg></span>
+          <div class="dots"><i class="on"></i><i></i><i></i><i></i><i></i></div>
+        </div>
+        <div class="lc-mid">
+          <div class="hname">Hotel Victoria <span class="stars">★★★</span></div>
+          <div class="hmeta"><svg width="14" height="14"><use href="#i-pin"/></svg> Mamaia, Cazino area · 150 m from the beach · <a href="#" style="font-weight:700">View on map</a></div>
+          <div class="lc-room">
+            <div class="rt">Double room with lake view</div>
+            <div class="rd">1 double bed, 1 sofa bed</div>
+          </div>
+          <div class="lc-perks">
+            <span class="perk"><svg width="15" height="15"><use href="#i-check-g"/></svg> Breakfast included</span>
+            <span class="perk"><svg width="15" height="15"><use href="#i-check-g"/></svg> Flexible cancellation</span>
+          </div>
+          <div class="lc-tags">
+            <span class="pill pill-camp">Early Booking 2026</span>
+            <span class="pill pill-cond">full payment · non-refundable</span>
+          </div>
+        </div>
+        <div class="lc-right">
+          <div class="rating-top">
+            <div class="rw"><div class="rate-word">Very good</div><div class="rate-count">312 reviews</div></div>
+            <span class="rate-badge">8.9</span>
+          </div>
+          <div class="lc-price">
+            <span class="pill pill-red">−20%</span>
+            <span class="old-price">540 Lei</span>
+            <div class="price">432 <span class="cur">Lei</span></div>
+            <div class="price-note">2 adults, 7 nights with breakfast<br>VAT included · resort tax at the hotel</div>
+            <div class="credits">Earn 86 FRIENDS credits</div>
+          </div>
+          <div class="lc-cta"><button class="btn btn-primary">View offer</button></div>
+        </div>
+      </div>
+
+      <!-- card 5 -->
+      <div class="lcard" data-ppn="320" data-disc="0" data-meal="demipensiune" data-instant="1" data-beach="90" data-fac="pool" data-friends="0" data-score="8.4" data-rank="5">
+        <div class="ph">
+          <img src="assets/pool-sunset.jpg" alt="">
+          <span class="heart"><svg width="17" height="17"><use href="#i-heart"/></svg></span>
+          <div class="dots"><i class="on"></i><i></i><i></i><i></i><i></i></div>
+        </div>
+        <div class="lc-mid">
+          <div class="hname">Hotel Aurora <span class="stars">★★★</span></div>
+          <div class="hmeta"><svg width="14" height="14"><use href="#i-pin"/></svg> Mamaia, Perla area · 90 m from the beach · <a href="#" style="font-weight:700">View on map</a></div>
+          <div class="lc-room">
+            <div class="rt">Twin room</div>
+            <div class="rd">2 single beds · partial sea view</div>
+          </div>
+          <div class="lc-perks">
+            <span class="perk"><svg width="15" height="15"><use href="#i-check-g"/></svg> Half board included</span>
+          </div>
+          <div class="lc-tags">
+            <span class="pill pill-green">A special offer available</span>
+          </div>
+        </div>
+        <div class="lc-right">
+          <div class="rating-top">
+            <div class="rw"><div class="rate-word">Very good</div><div class="rate-count">203 reviews</div></div>
+            <span class="rate-badge">8.4</span>
+          </div>
+          <div class="lc-price">
+            <div class="price">486 <span class="cur">Lei</span></div>
+            <div class="price-note">2 adults, 7 nights with half board<br>VAT included · resort tax at the hotel</div>
+            <div class="credits">Earn 97 FRIENDS credits</div>
+          </div>
+          <div class="lc-cta"><button class="btn btn-primary">View offer</button></div>
+        </div>
+      </div>
+
+      <!-- card 6 -->
+      <div class="lcard" data-ppn="311" data-disc="10" data-meal="mic dejun" data-instant="1" data-beach="0" data-fac="beach,pool" data-friends="1" data-score="8.6" data-rank="6">
+        <div class="ph">
+          <img src="assets/room-double.jpg" alt="">
+          <span class="heart"><svg width="17" height="17"><use href="#i-heart"/></svg></span>
+          <div class="dots"><i class="on"></i><i></i><i></i><i></i><i></i></div>
+        </div>
+        <div class="lc-mid">
+          <div class="hname">Hotel Flora <span class="stars">★★★</span></div>
+          <div class="hmeta"><svg width="14" height="14"><use href="#i-pin"/></svg> Mamaia, Flora area · on the beach · <a href="#" style="font-weight:700">View on map</a></div>
+          <div class="lc-room">
+            <div class="rt">Standard double room</div>
+            <div class="rd">1 double bed · air conditioning</div>
+          </div>
+          <div class="lc-perks">
+            <span class="perk"><svg width="15" height="15"><use href="#i-check-g"/></svg> Breakfast included</span>
+            <span class="perk"><svg width="15" height="15"><use href="#i-check-g"/></svg> Free cancellation</span>
+          </div>
+          <div class="lc-tags">
+            <span class="pill pill-friends">FRIENDS discount −10%</span>
+          </div>
+        </div>
+        <div class="lc-right">
+          <div class="rating-top">
+            <div class="rw"><div class="rate-word">Very good</div><div class="rate-count">184 reviews</div></div>
+            <span class="rate-badge">8.6</span>
+          </div>
+          <div class="lc-price">
+            <span class="pill pill-red">−10%</span>
+            <span class="old-price">460 Lei</span>
+            <div class="price">414 <span class="cur">Lei</span></div>
+            <div class="price-note">2 adults, 7 nights with breakfast<br>VAT included · resort tax at the hotel</div>
+            <div class="credits">+ 3 FRIENDS credits / night</div>
+          </div>
+          <div class="lc-cta"><button class="btn btn-primary">View offer</button></div>
+        </div>
+      </div>
+
+      <div class="rescue">
+        <span class="ic"><svg width="22" height="22"><use href="#i-phone"/></svg></span>
+        <div>
+          <div class="t">Can't find what you're looking for for 5–12 June?</div>
+          <div class="d">Our consultants see all our seaside inventory, including rooms freed up today.</div>
+          <div class="help-line" style="margin-top:6px"><span class="dot-on"></span> <b>Open now</b> · 0241 999 · daily 10:00–18:00</div>
+        </div>
+        <div class="acts">
+          <div class="callback">
+            <div class="inp ph">Your number</div>
+            <button class="btn btn-primary">Call me</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="show-more" style="padding:14px 0 24px"><button class="chip-btn" style="padding:13px 30px;font-size:15px">Show more results ↓</button></div>
+
+      <!-- banner „stațiuni din apropiere" — mereu la baza listei, nu între carduri -->
+      <div class="near-band" style="margin-bottom:30px">
+        <div class="hd"><span class="t">Explore nearby resorts too</span><span class="d">our inventory across the whole coast — one booking, the same FRIENDS benefits</span></div>
+        <div class="near-cards">
+          <div class="near-card"><img src="assets/aerial-portrait.jpg" alt=""><div><div class="t">Mamaia Nord</div><div class="m">4 km north · 58 stays · from 310 Lei</div></div><span class="go"><svg width="18" height="18"><use href="#i-chev-r"/></svg></span></div>
+          <div class="near-card"><img src="assets/coastline.jpg" alt=""><div><div class="t">Eforie Nord</div><div class="m">14 km south · 184 stays · from 240 Lei</div></div><span class="go"><svg width="18" height="18"><use href="#i-chev-r"/></svg></span></div>
+          <div class="near-card"><img src="assets/pool-sunset.jpg" alt=""><div><div class="t">Costinești</div><div class="m">31 km south · 97 stays · from 195 Lei</div></div><span class="go"><svg width="18" height="18"><use href="#i-chev-r"/></svg></span></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <section class="section" style="padding-bottom:26px">
+    <div class="trust-band">
+      <div class="cell"><div class="v">500+</div><div class="l">properties across the whole coast, contracted directly</div></div>
+      <div class="cell"><div class="v">270 000</div><div class="l">travellers chose us in the 2024 season</div></div>
+      <div class="cell"><div class="v">9.0 / 10</div><div class="l">average hotel score on litoralulromanesc.ro</div></div>
+      <div class="cell"><div class="v">since 2005</div><div class="l">licensed agency — Tourism Licence no. 536</div></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="sec-head">
+      <h2 class="sec-title">All seaside resorts</h2>
+      <a class="link-more" href="#">Full list of hotels <svg width="17" height="17"><use href="#i-arrow-r"/></svg></a>
+    </div>
+    <div class="resort-index">
+      <a href="#">Mamaia <span class="c">· 319 stays</span></a>
+      <a href="#">Mamaia Nord <span class="c">· 58</span></a>
+      <a href="#">Eforie Nord <span class="c">· 184</span></a>
+      <a href="#">Eforie Sud <span class="c">· 76</span></a>
+      <a href="#">Costinești <span class="c">· 97</span></a>
+      <a href="#">Neptun-Olimp <span class="c">· 112</span></a>
+      <a href="#">Jupiter <span class="c">· 64</span></a>
+      <a href="#">Venus <span class="c">· 71</span></a>
+      <a href="#">Saturn <span class="c">· 49</span></a>
+      <a href="#">Mangalia <span class="c">· 38</span></a>
+      <a href="#">Constanța <span class="c">· 84</span></a>
+      <a href="#">Vama Veche 2 Mai <span class="c">· 64</span></a>
+      <a href="#">Techirghiol <span class="c">· 21</span></a>
+      <a href="#">Năvodari <span class="c">· 18</span></a>
+      <a href="#">Tuzla <span class="c">· 9</span></a>
+      <a href="#">Corbu <span class="c">· 12</span></a>
+      <a href="#">23 August <span class="c">· 14</span></a>
+      <a href="#">Piatra <span class="c">· 7</span></a>
+      <a href="#">Ovidiu <span class="c">· 5</span></a>
+      <a href="#">Danube Delta <span class="c">· separate destination</span></a>
+    </div>
+  </section>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <div class="f-grid">
+      <div class="f-col">
+        <h4>Contact</h4>
+        <a class="f-contact" href="#"><svg width="16" height="16" style="color:#004B97"><use href="#i-phone"/></svg> 0241 999</a>
+        <a class="f-contact" href="#">rezervari@litoralulromanesc.ro</a>
+        <a class="f-contact" href="#">Live chat</a>
+        <a href="#">FAQ</a>
+        <a href="#">Complaints</a>
+        <div class="f-cur">RON <svg width="15" height="15"><use href="#i-chev-d"/></svg></div>
+      </div>
+      <div class="f-col">
+        <h4>About us</h4>
+        <a href="#">About Litoralul Romanesc</a>
+        <a href="#">Team</a>
+        <div class="f-social"><span>f</span><span>in</span><span>ig</span><span>yt</span></div>
+      </div>
+      <div class="f-col">
+        <h4>Terms &amp; settings</h4>
+        <a href="#">Terms &amp; conditions</a>
+        <a href="#">Data protection</a>
+        <a href="#">Cookie settings</a>
+        <a href="#">ANPC · SOL</a>
+        <a href="#">Report abuse</a>
+      </div>
+      <div class="f-col">
+        <h4>For partners</h4>
+        <a href="#">List your property</a>
+        <a href="#">Hotelier extranet</a>
+        <a href="#">Affiliates</a>
+        <a href="#">Media &amp; press</a>
+      </div>
+      <div class="f-col">
+        <h4>Services &amp; programmes</h4>
+        <a href="#">Instalment holidays — 6 interest-free instalments</a>
+        <a href="#">Holiday vouchers</a>
+        <a href="#">Gift voucher</a>
+        <a href="#">Cancellation insurance</a>
+        <a href="#">Free cancellation</a>
+        <a href="#">FRIENDS Club</a>
+      </div>
+      <div class="f-col">
+        <h4>Get inspired</h4>
+        <a href="#">Download the app</a>
+        <a href="#">Subscribe to the newsletter</a>
+        <a href="#">Seaside blog</a>
+        <a href="#">FRIENDS programme</a>
+        <a href="#">Attractions &amp; events</a>
+      </div>
+    </div>
+    <div class="f-brands">
+      <span>szallas.hu</span><span>nocowanie.pl</span><span>travelminit.ro</span><span>hotely.cz</span><span>noclegi.pl</span><span>revngo.com</span><span>maiutazas.hu</span>
+    </div>
+      <div class="legal">
+        <div class="row"><span class="lic">Tourism Licence no. 536</span> Organising agency licensed by the Ministry of Tourism since 2005</div>
+        <div class="row"><span class="org">Organising Agency LitoralulRomanesc.ro — S.C. Creative Eye S.R.L.</span> · Nr. ROC J13/2215/2003 · CUI RO15613488 · Bd. Mamaia nr. 158, et. 6, Constanța</div>
+        <div class="row">ANPC: 021 9551 · Ministry of Tourism, Control Directorate: 0800 868 282 · Personal data operator no. 22071</div>
+        <div class="row"><a href="#">Terms &amp; conditions</a> · <a href="#">Traveller contract</a> · <a href="#">Privacy policy</a> · <a href="#">Cancellation policy</a> · <a href="#">Cookie settings</a></div>
+      </div>
+    <div class="f-bottom">
+      <div>© 2008–2026 Litoralul Romanesc · Part of Szallas Group. All rights reserved.</div>
+      <div style="font-weight:700;color:#012B55">litoralul<span style="color:#EB802D">romanesc</span>.ro</div>
+    </div>
+  </div>
+</footer>
+
+<script src="proto.js"></script>
+<script>
+/* Carusel de campanii — stil tiles, varianta C (self-contained, nu atinge proto.js) */
+(function () {
+  var root = document.querySelector('.hero-carousel');
+  if (!root) return;
+  var track = root.querySelector('.hc-track');
+  var prev = root.querySelector('.hc-arrow.prev');
+  var next = root.querySelector('.hc-arrow.next');
+  var timer = null;
+
+  function step() {
+    var tile = track.querySelector('.hc-tile');
+    return tile ? tile.getBoundingClientRect().width + 16 : 320;
+  }
+  function maxLeft() { return track.scrollWidth - track.clientWidth; }
+  function sync() {
+    prev.toggleAttribute('disabled', track.scrollLeft < 4);
+    next.toggleAttribute('disabled', track.scrollLeft > maxLeft() - 4);
+  }
+  prev.onclick = function () { track.scrollBy({ left: -step() }); rearm(); };
+  next.onclick = function () { track.scrollBy({ left: step() }); rearm(); };
+  track.addEventListener('scroll', sync, { passive: true });
+
+  function auto() {
+    if (track.scrollLeft >= maxLeft() - 4) track.scrollTo({ left: 0 });
+    else track.scrollBy({ left: step() });
+  }
+  function rearm() { if (timer) clearInterval(timer); if (!window.navigator.webdriver) timer = setInterval(auto, 5000); }
+  root.addEventListener('mouseenter', function () { if (timer) clearInterval(timer); });
+  root.addEventListener('mouseleave', rearm);
+
+  sync(); rearm();
+})();
+</script>
+<script>
+/* EN page: proto.js repaints the search-card date/guests in Romanian on load — restore English labels */
+window.addEventListener('load', function () {
+  setTimeout(function () {
+    var v = document.querySelectorAll('.search-hero .search-card .s-value');
+    if (v[1]) v[1].textContent = '5–12 Jun';
+    if (v[2]) v[2].textContent = '2 adults, 1 room';
+  }, 80);
+});
+</script>
+</body>
+</html>

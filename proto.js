@@ -592,7 +592,7 @@
       const mid = $('.lc-mid', card);
       if (mid && !$('.more-rooms', card)) {
         mid.appendChild(el('span', 'more-rooms',
-          'Vezi toate tipurile de cameră <span class="cnt">(' + ROOM_CNT[i % ROOM_CNT.length] + ')</span> ↓'));
+          (EN() ? 'See all room types ' : 'Vezi toate tipurile de cameră ') + '<span class="cnt">(' + ROOM_CNT[i % ROOM_CNT.length] + ')</span> ↓'));
       }
     });
 
@@ -647,8 +647,8 @@
         e.stopPropagation();
         box.classList.toggle('open');
         m.innerHTML = box.classList.contains('open')
-          ? 'Ascunde tipurile de cameră ↑'
-          : 'Vezi toate tipurile de cameră <span class="cnt">(' + n + ')</span> ↓';
+          ? (EN() ? 'Hide room types ↑' : 'Ascunde tipurile de cameră ↑')
+          : (EN() ? 'See all room types ' : 'Vezi toate tipurile de cameră ') + '<span class="cnt">(' + n + ')</span> ↓';
       };
     });
 
