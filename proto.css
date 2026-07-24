@@ -255,7 +255,7 @@ body[data-listing="b"] .lcard .ph img, body[data-listing="c"] .lcard .ph img { m
 .proto-tools { position: fixed; left: 18px; bottom: 18px; z-index: 891; width: 190px;
   background: #fff; border: 1px solid var(--gray-300); border-radius: var(--r-l); box-shadow: var(--shadow-pop); padding: 11px; }
 .proto-tools .pt-h { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--gray-600); margin-bottom: 9px; }
-.proto-tools .pt-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.proto-tools .pt-row { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; }
 .proto-tools .pt-row + .pt-row { margin-top: 9px; }
 .proto-tools .pt-lbl { font-size: 12px; font-weight: 600; color: var(--gray-700); }
 .proto-tools .pt-seg { display: inline-flex; border: 1px solid var(--gray-300); border-radius: 8px; overflow: hidden; }
@@ -271,16 +271,12 @@ body[data-listing="b"] .lcard .ph img, body[data-listing="c"] .lcard .ph img { m
 .lc-icons .lci .t { font-size: 13px; font-weight: 700; color: var(--gray-900); line-height: 1.18; }
 .lc-icons .lci .s { font-size: 12px; color: var(--gray-600); }
 
-body[data-density="b"] .lcard .lc-room,
-body[data-density="b"] .lcard .lc-perks,
-body[data-density="b"] .lcard .lc-tags,
+/* B = compact (ca versiunea anterioară): fără citat + perks + cotația de preț */
 body[data-density="b"] .lcard .quote,
-body[data-density="b"] .lcard .more-rooms,
-body[data-density="b"] .lcard .price-note,
-body[data-density="b"] .lcard .credits,
-body[data-density="b"] .lcard .expiry { display: none; }
-body[data-density="b"] .lcard .lc-icons { display: flex; }
+body[data-density="b"] .lcard .lc-perks,
+body[data-density="b"] .lcard .price-note { display: none; }
 
+/* C = rezumat cu iconițe mari (fostul B) */
 body[data-density="c"] .lcard .lc-room,
 body[data-density="c"] .lcard .lc-perks,
 body[data-density="c"] .lcard .lc-tags,
@@ -288,12 +284,15 @@ body[data-density="c"] .lcard .quote,
 body[data-density="c"] .lcard .more-rooms,
 body[data-density="c"] .lcard .price-note,
 body[data-density="c"] .lcard .credits,
-body[data-density="c"] .lcard .expiry,
-body[data-density="c"] .lcard .lc-icons { display: none; }
-body[data-density="c"] .lcard .ph img { min-height: 150px; }
+body[data-density="c"] .lcard .expiry { display: none; }
+body[data-density="c"] .lcard .lc-icons { display: flex; }
 
 /* filtru „populare" compactat (mutat sus în bara laterală) */
 .fbox.fbox-compact { padding-top: 10px; padding-bottom: 10px; }
 .fbox.fbox-compact .fchips-wrap { gap: 5px; }
 .fbox.fbox-compact .pfilter { padding: 4px 9px; font-size: 12px; }
 .fbox.fbox-compact .link-more { margin-top: 7px !important; font-size: 12.5px; }
+
+/* checkout: sumar mai compact ca CTA-ul din caseta plutitoare să intre în primul viewport */
+body[data-page="checkout"] .sum-card .ph { height: 120px; }
+body[data-page="checkout"] .sum-card .sum-body { padding-top: 12px; }

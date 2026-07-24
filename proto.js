@@ -547,7 +547,7 @@
     }
     if (hasListing) {
       if (!document.body.dataset.density) document.body.dataset.density = 'a';
-      const modes = EN() ? [['a', 'Detailed'], ['b', 'Compact'], ['c', 'Minimal']] : [['a', 'Detaliat'], ['b', 'Compact'], ['c', 'Minimal']];
+      const modes = EN() ? [['a', 'Detailed'], ['b', 'Compact'], ['c', 'Icons']] : [['a', 'Detaliat'], ['b', 'Compact'], ['c', 'Iconițe']];
       html += '<div class="pt-row"><span class="pt-lbl">' + (EN() ? 'Card view' : 'Densitate celule') + '</span><div class="pt-seg pt-den">' +
         modes.map(([k, label]) => '<span class="pt-b' + (document.body.dataset.density === k ? ' on' : '') + '" data-d="' + k + '" title="' + label + '">' + k.toUpperCase() + '</span>').join('') + '</div></div>';
     }
@@ -557,6 +557,12 @@
       document.body.dataset.density = btn.dataset.d;
       $$('.pt-den .pt-b', box).forEach(b => b.classList.toggle('on', b === btn));
     });
+    // așează panoul chiar sub caseta „inventar demo", dacă există
+    const inv = $('.invdemo');
+    if (inv) {
+      const place = () => { const r = inv.getBoundingClientRect(); box.style.top = (r.bottom + 10) + 'px'; box.style.left = r.left + 'px'; box.style.width = r.width + 'px'; box.style.bottom = 'auto'; };
+      place(); window.addEventListener('resize', place);
+    }
   }
 
   /* ============================================================
@@ -1299,28 +1305,36 @@
 
     /* --- consent gating --- */
     const cta = $('.cta-row .btn');
+    const sumCta = $('.sum-cta');   // CTA-ul din caseta plutitoare de sumar (vizibil în primul viewport)
     const consents = $$('.consent .cb');
     function syncCta() {
       const ok = consents[0] && consents[0].classList.contains('on');
-      if (!cta) return;
-      cta.classList.toggle('btn-disabled', !ok);
-      cta.classList.toggle('btn-primary', ok);
+      [cta, sumCta].forEach(btn => { if (btn) { btn.classList.toggle('btn-disabled', !ok); btn.classList.toggle('btn-primary', ok); } });
       const hint = $('.cta-hint');
       if (hint) hint.style.visibility = ok ? 'hidden' : 'visible';
     }
     consents.forEach((cb, i) => cb.onclick = () => {
       cb.classList.toggle('on');
-      if (i === 1) toast(cb.classList.contains('on') ? 'Te-ai abonat la ofertele noastre' : 'Abonare anulată');
+      if (i === 1) toast(cb.classList.contains('on') ? (EN() ? 'You subscribed to our offers' : 'Te-ai abonat la ofertele noastre') : (EN() ? 'Subscription cancelled' : 'Abonare anulată'));
       syncCta();
     });
     syncCta();
-    if (cta) cta.onclick = () => {
-      if (cta.classList.contains('btn-disabled')) {
-        $('.consent .cb')?.classList.add('err');
-        return toast('Bifează acceptarea condițiilor pentru a continua', 'err');
-      }
+    const needConsent = () => toast(EN() ? 'Tick the terms to continue' : 'Bifează acceptarea condițiilor pentru a continua', 'err');
+    const proceed = () => {
       if (S.promo) { S.ratePrice = Math.round((S.ratePrice || 4046) * 0.9); S.promo = null; }
       save(); goto(en('thankyou.html') + qs(), 900);
+    };
+    if (cta) cta.onclick = () => {
+      if (cta.classList.contains('btn-disabled')) { $('.consent .cb')?.classList.add('err'); return needConsent(); }
+      proceed();
+    };
+    if (sumCta) sumCta.onclick = () => {
+      if (sumCta.classList.contains('btn-disabled')) {
+        $('.consent')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        $('.consent .cb')?.classList.add('err');
+        return needConsent();
+      }
+      proceed();
     };
 
     /* --- editable form fields --- */
