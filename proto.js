@@ -532,6 +532,33 @@
     });
   }
 
+  /* Panou plutitor de prototip (stil ca „inventar demo"): comutatorul de limbă RO/EN și
+     densitatea celulelor sunt controale de demo, nu UI de produs — le scoatem din pagină. */
+  function initProtoTools() {
+    const ls = $('.langswitch');
+    const langLinks = ls ? $$('a', ls).map(a => ({ t: a.textContent.trim(), href: a.getAttribute('href'), on: a.classList.contains('on') })) : [];
+    const hasListing = !!$('.listing-grid');
+    if (!langLinks.length && !hasListing) return;
+    const box = el('div', 'proto-tools');
+    let html = '<div class="pt-h">' + (EN() ? 'Prototype · settings' : 'Prototip · setări') + '</div>';
+    if (langLinks.length) {
+      html += '<div class="pt-row"><span class="pt-lbl">' + (EN() ? 'Language' : 'Limbă') + '</span><div class="pt-seg">' +
+        langLinks.map(l => '<a href="' + (l.href || '#') + '" class="pt-b' + (l.on ? ' on' : '') + '">' + l.t + '</a>').join('') + '</div></div>';
+    }
+    if (hasListing) {
+      if (!document.body.dataset.density) document.body.dataset.density = 'a';
+      const modes = EN() ? [['a', 'Detailed'], ['b', 'Compact'], ['c', 'Minimal']] : [['a', 'Detaliat'], ['b', 'Compact'], ['c', 'Minimal']];
+      html += '<div class="pt-row"><span class="pt-lbl">' + (EN() ? 'Card view' : 'Densitate celule') + '</span><div class="pt-seg pt-den">' +
+        modes.map(([k, label]) => '<span class="pt-b' + (document.body.dataset.density === k ? ' on' : '') + '" data-d="' + k + '" title="' + label + '">' + k.toUpperCase() + '</span>').join('') + '</div></div>';
+    }
+    box.innerHTML = html;
+    document.body.appendChild(box);
+    $$('.pt-den .pt-b', box).forEach(btn => btn.onclick = () => {
+      document.body.dataset.density = btn.dataset.d;
+      $$('.pt-den .pt-b', box).forEach(b => b.classList.toggle('on', b === btn));
+    });
+  }
+
   /* ============================================================
      LISTING
      ============================================================ */
@@ -543,20 +570,46 @@
     const h1 = $('.listing-head h1');
     if (h1 && !h1.hasAttribute('data-fixed')) h1.textContent = (EN()?'Stays in ':'Cazare ') + (S.dest || (EN()?'the seaside':'litoral'));
 
-    /* --- comutator densitate celule: A (complet, ca acum) / B (compact) / C (minimal) --- */
-    const lgrid = $('.listing-grid');
-    if (lgrid && !$('.density-bar')) {
-      if (!document.body.dataset.density) document.body.dataset.density = 'a';
-      const dbar = el('div', 'density-bar');
-      const modes = EN() ? [['a', 'Detailed'], ['b', 'Compact'], ['c', 'Minimal']] : [['a', 'Detaliat'], ['b', 'Compact'], ['c', 'Minimal']];
-      dbar.innerHTML = '<span class="lbl">' + (EN() ? 'Card view:' : 'Vizualizare:') + '</span>' +
-        modes.map(([k, label]) => '<span class="dbtn' + (document.body.dataset.density === k ? ' on' : '') + '" data-d="' + k + '">' + k.toUpperCase() + ' · ' + label + '</span>').join('');
-      lgrid.parentNode.insertBefore(dbar, lgrid);
-      $$('.dbtn', dbar).forEach(btn => btn.onclick = () => {
-        document.body.dataset.density = btn.dataset.d;
-        $$('.dbtn', dbar).forEach(b => b.classList.toggle('on', b === btn));
-      });
+    /* --- densitate celule: implicit A; comutatorul e în panoul de prototip (initProtoTools) --- */
+    if (!document.body.dataset.density) document.body.dataset.density = 'a';
+
+    /* --- reordonare bară filtre: sus „recente" apoi „populare" (compact), disponibilitatea mai jos, restul ca înainte --- */
+    const aside = $('.listing-grid aside');
+    if (aside) {
+      const fboxByTitle = ts => $$('.fbox', aside).find(b => { const h = $('h3', b); return h && ts.some(t => h.textContent.trim().startsWith(t)); });
+      const mapCard = $('.map-card', aside);
+      const recent = fboxByTitle(['Filtrele tale recente', 'Your recent filters']);
+      const popular = fboxByTitle(['Filtre populare', 'Popular filters']);
+      const avail = $('.fbox.avail', aside);
+      if (mapCard && recent) mapCard.after(recent);
+      if (recent && popular) recent.after(popular);
+      if (popular && avail) popular.after(avail);
+      if (popular) popular.classList.add('fbox-compact');
     }
+
+    /* --- rând de iconițe mari (rezumat pentru modul compact B): date · masă · cameră --- */
+    const CAL_SVG = '<svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="16" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3.5 10h17M8 2.8V7M16 2.8V7" stroke="currentColor" stroke-width="2" fill="none"/></svg>';
+    const FOOD_SVG = '<svg viewBox="0 0 24 24"><path d="M7 3v7M4.5 3v4.5a2.5 2.5 0 0 0 5 0V3M7 12v9M16.5 3c-1.8 1.5-2.5 4-2.5 6.5 0 1.5 1 2.5 2.5 2.5V21M16.5 3V12" fill="none" stroke="currentColor" stroke-width="2"/></svg>';
+    const BED_SVG = '<svg viewBox="0 0 24 24"><path d="M3 18.5V6M3 14h18v4.5M3 11h18v-1a3 3 0 0 0-3-3H9" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="6.5" cy="8.5" r="1.6" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>';
+    const mealLabel = m => {
+      m = (m || '').toLowerCase();
+      if (EN()) return !m || /fără/.test(m) ? 'No meal' : /mic dejun/.test(m) ? 'Breakfast' : /demipensiune/.test(m) ? 'Half board' : /pensiune completă/.test(m) ? 'Full board' : /all inclusive/.test(m) ? 'All inclusive' : m;
+      return !m || /fără/.test(m) ? 'Fără masă' : m.charAt(0).toUpperCase() + m.slice(1);
+    };
+    cards.forEach(card => {
+      const mid = $('.lc-mid', card);
+      if (!mid || $('.lc-icons', card)) return;
+      const rt = $('.lc-room .rt', card);
+      const roomTxt = rt ? rt.textContent.trim() : (EN() ? 'Standard room' : 'Cameră standard');
+      const nS = nights();
+      const ic = el('div', 'lc-icons');
+      ic.innerHTML =
+        '<div class="lci">' + CAL_SVG + '<div class="t">' + (EN() ? 'from ' : 'din ') + fmtShort(S.from) + '</div><div class="s">' + nS + (EN() ? (nS === 1 ? ' night' : ' nights') : ' nopți') + '</div></div>' +
+        '<div class="lci">' + FOOD_SVG + '<div class="t">' + mealLabel(card.dataset.meal) + '</div></div>' +
+        '<div class="lci">' + BED_SVG + '<div class="t">' + roomTxt + '</div></div>';
+      const anchor = $('.hmeta', mid) || $('.lc-room', mid);
+      if (anchor) anchor.after(ic); else mid.appendChild(ic);
+    });
 
     /* --- hearts --- */
     $$('.heart').forEach(h => h.onclick = e => {
@@ -1436,6 +1489,7 @@
   /* ---------- boot ---------- */
   document.addEventListener('DOMContentLoaded', () => {
     initHeader();
+    initProtoTools();
     initSearch();
     initFlexiStrip();
     initListing();
