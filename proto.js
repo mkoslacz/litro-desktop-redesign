@@ -534,17 +534,32 @@
 
   /* Panou plutitor de prototip (stil ca „inventar demo"): comutatorul de limbă RO/EN și
      densitatea celulelor sunt controale de demo, nu UI de produs — le scoatem din pagină. */
+  function applyAuth(mode) {
+    document.body.dataset.auth = mode;
+    try { localStorage.setItem('litroAuth', mode); } catch (e) { }
+    const hu = $('.h-user');
+    if (hu) {
+      const av = $('.avatar', hu);
+      const nameNode = Array.from(hu.childNodes).find(n => n.nodeType === 3 && n.textContent.trim());
+      if (nameNode) nameNode.textContent = mode === 'in' ? ' Ana ' : (EN() ? ' Sign in ' : ' Autentifică-te ');
+      if (av) av.style.display = mode === 'in' ? '' : 'none';
+    }
+  }
+
   function initProtoTools() {
     const ls = $('.langswitch');
     const langLinks = ls ? $$('a', ls).map(a => ({ t: a.textContent.trim(), href: a.getAttribute('href'), on: a.classList.contains('on') })) : [];
     const hasListing = !!$('.listing-grid');
-    if (!langLinks.length && !hasListing) return;
+    if (!document.body.dataset.auth) { let a; try { a = localStorage.getItem('litroAuth'); } catch (e) { } document.body.dataset.auth = a || 'out'; }   // implicit: nemembru → se văd bannerele „autentifică-te pentru FRIENDS"
     const box = el('div', 'proto-tools');
     let html = '<div class="pt-h">' + (EN() ? 'Prototype · settings' : 'Prototip · setări') + '</div>';
     if (langLinks.length) {
       html += '<div class="pt-row"><span class="pt-lbl">' + (EN() ? 'Language' : 'Limbă') + '</span><div class="pt-seg">' +
         langLinks.map(l => '<a href="' + (l.href || '#') + '" class="pt-b' + (l.on ? ' on' : '') + '">' + l.t + '</a>').join('') + '</div></div>';
     }
+    const authModes = EN() ? [['out', 'Guest'], ['in', 'Member']] : [['out', 'Musafir'], ['in', 'Membru']];
+    html += '<div class="pt-row"><span class="pt-lbl">' + (EN() ? 'Account' : 'Cont') + '</span><div class="pt-seg pt-auth">' +
+      authModes.map(([k, label]) => '<span class="pt-b' + (document.body.dataset.auth === k ? ' on' : '') + '" data-auth="' + k + '">' + label + '</span>').join('') + '</div></div>';
     if (hasListing) {
       if (!document.body.dataset.density) document.body.dataset.density = 'a';
       const modes = EN() ? [['a', 'Detailed'], ['b', 'Compact'], ['c', 'Icons']] : [['a', 'Detaliat'], ['b', 'Compact'], ['c', 'Iconițe']];
@@ -557,6 +572,11 @@
       document.body.dataset.density = btn.dataset.d;
       $$('.pt-den .pt-b', box).forEach(b => b.classList.toggle('on', b === btn));
     });
+    $$('.pt-auth .pt-b', box).forEach(btn => btn.onclick = () => {
+      applyAuth(btn.dataset.auth);
+      $$('.pt-auth .pt-b', box).forEach(b => b.classList.toggle('on', b === btn));
+    });
+    applyAuth(document.body.dataset.auth);
     // așează panoul chiar sub caseta „inventar demo", dacă există
     const inv = $('.invdemo');
     if (inv) {
@@ -1309,7 +1329,7 @@
     const consents = $$('.consent .cb');
     function syncCta() {
       const ok = consents[0] && consents[0].classList.contains('on');
-      [cta, sumCta].forEach(btn => { if (btn) { btn.classList.toggle('btn-disabled', !ok); btn.classList.toggle('btn-primary', ok); } });
+      if (cta) { cta.classList.toggle('btn-disabled', !ok); cta.classList.toggle('btn-primary', ok); }   // sumCta rămâne mereu portocaliu
       const hint = $('.cta-hint');
       if (hint) hint.style.visibility = ok ? 'hidden' : 'visible';
     }
@@ -1328,13 +1348,23 @@
       if (cta.classList.contains('btn-disabled')) { $('.consent .cb')?.classList.add('err'); return needConsent(); }
       proceed();
     };
+    // CTA-ul din sumar rămâne portocaliu și te plimbă pas cu pas prin secțiuni până la confirmare
+    const walkSteps = $$('.form-card').filter(fc => !/opțional|optional/i.test(($('h2', fc) && $('h2', fc).textContent) || ''));
+    const consentEl = $('.consent');
+    if (consentEl) walkSteps.push(consentEl);
+    let walkI = 0;
     if (sumCta) sumCta.onclick = () => {
-      if (sumCta.classList.contains('btn-disabled')) {
-        $('.consent')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        $('.consent .cb')?.classList.add('err');
-        return needConsent();
+      const consentOk = consents[0] && consents[0].classList.contains('on');
+      if (walkI >= walkSteps.length) { if (consentOk) return proceed(); walkI = Math.max(0, walkSteps.length - 1); }
+      const target = walkSteps[walkI];
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        $$('.co-focus').forEach(x => x.classList.remove('co-focus'));
+        target.classList.add('co-focus');
+        setTimeout(() => target.classList.remove('co-focus'), 1600);
+        if (target.classList.contains('consent') && !consentOk) { $('.consent .cb')?.classList.add('err'); needConsent(); }
       }
-      proceed();
+      walkI++;
     };
 
     /* --- editable form fields --- */

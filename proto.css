@@ -286,6 +286,18 @@ body[data-density="c"] .lcard .price-note,
 body[data-density="c"] .lcard .credits,
 body[data-density="c"] .lcard .expiry { display: none; }
 body[data-density="c"] .lcard .lc-icons { display: flex; }
+/* celulă mai joasă în modul C: fără atâta spațiu gol */
+body[data-density="c"] .lcard .ph img { min-height: 104px; }
+body[data-density="c"] .lc-mid { padding-top: 9px; padding-bottom: 9px; }
+body[data-density="c"] .lc-icons { margin-top: 5px; gap: 4px; }
+body[data-density="c"] .lc-icons .lci { padding: 2px; gap: 3px; }
+body[data-density="c"] .lc-icons .lci svg { width: 22px; height: 22px; }
+body[data-density="c"] .lc-right { padding-top: 9px; padding-bottom: 9px; }
+body[data-density="c"] .lc-right .rating-top { margin-bottom: 4px; }
+body[data-density="c"] .lc-price { margin-top: 8px; }   /* anulează margin-top:auto care întindea coloana */
+body[data-density="c"] .lc-price .price { font-size: 23px; }
+body[data-density="c"] .lc-cta { margin-top: 8px; }
+body[data-density="c"] .lc-cta .btn { padding: 8px 0; font-size: 14px; }
 
 /* filtru „populare" compactat (mutat sus în bara laterală) */
 .fbox.fbox-compact { padding-top: 10px; padding-bottom: 10px; }
@@ -296,3 +308,11 @@ body[data-density="c"] .lcard .lc-icons { display: flex; }
 /* checkout: sumar mai compact ca CTA-ul din caseta plutitoare să intre în primul viewport */
 body[data-page="checkout"] .sum-card .ph { height: 120px; }
 body[data-page="checkout"] .sum-card .sum-body { padding-top: 12px; }
+
+/* checkout: evidențiere pas cu pas când CTA-ul portocaliu te plimbă prin câmpuri */
+.co-focus { outline: 2.5px solid var(--orange-500, #EB802D); outline-offset: 4px; border-radius: var(--r-l); transition: outline-color .2s; }
+.consent.co-focus { outline-offset: 8px; }
+
+/* stare de autentificare (comutator de prototip): ascunde bannerele „autentifică-te pentru FRIENDS" când ești membru */
+body[data-auth="in"] .friends-band,
+body[data-auth="in"] .loyal-band { display: none; }
