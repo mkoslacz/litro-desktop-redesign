@@ -249,3 +249,21 @@ body[data-listing="b"] .lcard .ph img, body[data-listing="c"] .lcard .ph img { m
 
 /* Bara de navigare mutată în meniul din burger — apare doar pe homepage, deci o ascundem peste tot */
 .mainnav { display: none; }
+
+/* ===== comutator densitate celule listing (A = complet / B = compact / C = minimal) ===== */
+.density-bar { display: flex; align-items: center; gap: 4px; justify-content: flex-end; margin: 2px 0 12px; font-size: 13px; color: var(--gray-600); }
+.density-bar .lbl { font-weight: 600; margin-right: 4px; }
+.density-bar .dbtn { display: inline-flex; align-items: center; height: 28px; padding: 0 11px; border: 1px solid var(--gray-300); background: #fff; border-radius: 8px; font-weight: 700; font-size: 12.5px; color: var(--gray-700); cursor: pointer; transition: background .12s, color .12s, border-color .12s; }
+.density-bar .dbtn:hover { border-color: var(--navy-500); color: var(--navy-700); }
+.density-bar .dbtn.on { background: var(--navy-500); color: #fff; border-color: var(--navy-500); }
+body[data-density="b"] .lcard .quote,
+body[data-density="b"] .lcard .lc-perks { display: none; }
+body[data-density="c"] .lcard .quote,
+body[data-density="c"] .lcard .lc-perks,
+body[data-density="c"] .lcard .lc-tags,
+body[data-density="c"] .lcard .lc-room,
+body[data-density="c"] .lcard .price-note,
+body[data-density="c"] .lcard .credits,
+body[data-density="c"] .lcard .more-rooms,
+body[data-density="c"] .lcard .expiry { display: none; }
+body[data-density="c"] .lcard .ph img { min-height: 150px; }

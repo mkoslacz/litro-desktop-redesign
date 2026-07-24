@@ -420,6 +420,7 @@ table.rates { width: 100%; border-collapse: collapse; font-size: 14px; }
 .step-line { width: 150px; height: 1.5px; background: var(--gray-400); }
 
 .co-grid { display: grid; grid-template-columns: 1fr 384px; gap: 20px; align-items: start; margin-top: 20px; }
+.co-grid aside { position: sticky; top: 16px; align-self: start; }
 .form-card { border: 1px solid var(--gray-300); border-radius: var(--r-l); background: #fff; box-shadow: var(--shadow-card); padding: 20px; margin-bottom: 14px; }
 .form-card h2 { font-family: var(--font-title); font-size: 21px; font-weight: 700; margin-bottom: 14px; }
 .f2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }

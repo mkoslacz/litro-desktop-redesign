@@ -543,6 +543,21 @@
     const h1 = $('.listing-head h1');
     if (h1 && !h1.hasAttribute('data-fixed')) h1.textContent = (EN()?'Stays in ':'Cazare ') + (S.dest || (EN()?'the seaside':'litoral'));
 
+    /* --- comutator densitate celule: A (complet, ca acum) / B (compact) / C (minimal) --- */
+    const lgrid = $('.listing-grid');
+    if (lgrid && !$('.density-bar')) {
+      if (!document.body.dataset.density) document.body.dataset.density = 'a';
+      const dbar = el('div', 'density-bar');
+      const modes = EN() ? [['a', 'Detailed'], ['b', 'Compact'], ['c', 'Minimal']] : [['a', 'Detaliat'], ['b', 'Compact'], ['c', 'Minimal']];
+      dbar.innerHTML = '<span class="lbl">' + (EN() ? 'Card view:' : 'Vizualizare:') + '</span>' +
+        modes.map(([k, label]) => '<span class="dbtn' + (document.body.dataset.density === k ? ' on' : '') + '" data-d="' + k + '">' + k.toUpperCase() + ' · ' + label + '</span>').join('');
+      lgrid.parentNode.insertBefore(dbar, lgrid);
+      $$('.dbtn', dbar).forEach(btn => btn.onclick = () => {
+        document.body.dataset.density = btn.dataset.d;
+        $$('.dbtn', dbar).forEach(b => b.classList.toggle('on', b === btn));
+      });
+    }
+
     /* --- hearts --- */
     $$('.heart').forEach(h => h.onclick = e => {
       e.stopPropagation(); h.classList.toggle('on');
