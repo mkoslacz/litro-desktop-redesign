@@ -547,8 +547,17 @@
   }
 
   function initProtoTools() {
+    /* Stările de demo se pot fixa și din URL — așa exportăm în Figma fiecare variantă
+       (?auth=in|out, ?density=a|b|c) fără să dăm clic în panou. */
+    if (q.get('auth')) document.body.dataset.auth = q.get('auth');
+    if (q.get('density')) document.body.dataset.density = q.get('density');
     /* ?nopanel=1 — folosit la exportul în Figma, ca panoul de demo să nu ajungă în ramă */
-    if (q.get('nopanel')) return;
+    if (q.get('nopanel')) {
+      document.body.dataset.export = '1';
+      if (!document.body.dataset.auth) document.body.dataset.auth = 'out';
+      applyAuth(document.body.dataset.auth);
+      return;
+    }
     const ls = $('.langswitch');
     const langLinks = ls ? $$('a', ls).map(a => ({ t: a.textContent.trim(), href: a.getAttribute('href'), on: a.classList.contains('on') })) : [];
     const hasListing = !!$('.listing-grid');

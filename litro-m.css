@@ -715,7 +715,11 @@ body[data-export] .pricebar {
   position: static; transform: none; width: auto; box-shadow: none;
   border-top: 1px solid var(--gray-400); padding-bottom: 12px;
 }
-body[data-export] .booking-bar { display: none; }
+body[data-export] .booking-bar:not(.show) { display: none; }
+body[data-export] .booking-bar.show {
+  position: static; transform: none; width: auto; box-shadow: none;
+  border-top: 1px solid var(--gray-400); padding-bottom: 12px;
+}
 body[data-export].has-bar { padding-bottom: 0; }
 
 /* Panou de prototip (demo, nu face parte din produs): limbă, vedere desktop/mobil,

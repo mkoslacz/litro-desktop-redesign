@@ -250,6 +250,15 @@ body[data-listing="b"] .lcard .ph img, body[data-listing="c"] .lcard .ph img { m
 /* Bara de navigare mutată în meniul din burger — apare doar pe homepage, deci o ascundem peste tot */
 .mainnav { display: none; }
 
+/* ===== mod de export (?nopanel=1) — pentru capturile care ajung în Figma =====
+   Comenzile de demo dispar, iar elementele fixate nu mai rămân agățate de
+   marginea ferestrei de captură (1200 px), adică la mijlocul unei rame înalte. */
+body[data-export] .invdemo,
+body[data-export] .vswitch,
+body[data-export] .proto-hint,
+body[data-export] .booking-bar,
+body[data-export] .stickybar { display: none; }
+
 /* ===== controale de prototip: panou plutitor (ca „inventar demo") — limbă + densitate celule ===== */
 .header .langswitch { display: none; }   /* comutatorul RO/EN e un control de prototip, mutat în panoul plutitor (specificitate mai mare ca stilul inline din home-c/home-d) */
 .proto-tools { position: fixed; left: 18px; bottom: 18px; z-index: 891; width: 190px;

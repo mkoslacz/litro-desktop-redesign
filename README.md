@@ -16,7 +16,8 @@ inside that sandbox.
 | `m-home.html` `m-listing.html` `m-hotel.html` `m-checkout.html` `m-thankyou.html` (+ `-en`) | The same flow as **mobile web**, at 390px, in Romanian and English |
 | `litro.css` | The design system: colour/radius/shadow/type tokens + every component |
 | `litro-m.css` `proto-m.js` | Mobile stylesheet + mobile interaction engine (see below) |
-| `litro-mobile-web.fig` | Native Figma file with all ten mobile screens as editable 430px frames (RO row + EN row) |
+| `litro-final.fig` | **The handoff file** — 35 editable frames: desktop + mobile, RO + EN, plus every state variant |
+| `litro-mobile-web.fig` `litro-desktop-redesign.fig` `litro-c-flow-en.fig` | Earlier partial exports, superseded by `litro-final.fig` |
 | `specs.html` | Measurement spec for developers (component by component, all values in px) |
 | `audit.html` | Production gap audit — live funnel vs these screens + call-centre strategy |
 | `preview-*.png` | Full-page renders of each screen |
@@ -62,6 +63,17 @@ mobile, bottom left on desktop:
 | Account | Guest ↔ Member (hides the "sign in for FRIENDS" bands) |
 | Card view *(listing)* | A detailed · B compact with the date/board/room icon row · C horizontal summary |
 | Demo inventory *(listing)* | Many / Some / Few results — drives the count, the empty state and the flexible-date banner |
+
+Every one of these is also settable from the URL, on both desktop and mobile, so any state can be
+linked to directly — and so the Figma export can capture each variant without a click:
+
+| Param | Effect |
+|---|---|
+| `?auth=in` / `?auth=out` | Member vs guest (hides the "sign in for FRIENDS" bands) |
+| `?density=a\|b\|c` | Listing card density |
+| `?inv=many\|some\|few` | Demo inventory (mobile listing) |
+| `?room=2` | Pre-selects rooms so the booking bar is up (mobile hotel) |
+| `?nopanel=1` | Export mode: no demo panel, fixed bars join the normal flow |
 
 ## Design decisions that are business rules, not taste
 

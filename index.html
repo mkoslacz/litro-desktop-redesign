@@ -115,7 +115,16 @@
 
   <h2>Handoff — back to Figma &amp; to dev</h2>
   <div class="note" style="margin-top:10px">
-    <b>To Figma (ready-made):</b> <a href="litro-desktop-redesign.fig" download><b>⬇ litro-desktop-redesign.fig</b></a> — a native Figma file with all five screens as editable frames (layers, texts, photos, exact sizes; single-line texts are auto-width). Drag it onto the Figma home screen / “Import” — done. Fonts used: <b>Outfit</b> + <b>DM Sans</b> (both in Figma’s Google Fonts catalog).<br><br>
+    <b>To Figma — the final file:</b> <a href="litro-final.fig" download><b>⬇ litro-final.fig</b></a> — one native Figma file with <b>everything: 35 editable frames</b> (layers, texts, photos, exact sizes; single-line texts are auto-width), laid out in labelled rows:<br>
+    <b>1.</b> Desktop, flux principal RO (Home C, Home D, Listing C, Hotel, Checkout, Thank you) · <b>2.</b> the same six in EN ·
+    <b>3.</b> Desktop states — listing cu celule compacte (B), cu iconițe (C), listing și home ca <b>membru FRIENDS autentificat</b> ·
+    <b>4.</b> Desktop archive A / B · <b>5.</b> Mobile RO (5 ecrane) · <b>6.</b> Mobile EN ·
+    <b>7.</b> Mobile states — celule compacte (B), rezumat pe orizontală (C), membru autentificat, inventar redus, hotel cu camera aleasă și bara de rezervare.<br>
+    Drag it onto the Figma home screen / “Import” — done. Fonts used: <b>Outfit</b> + <b>DM Sans</b> (both in Figma’s Google Fonts catalog).
+    Older exports (<code>litro-desktop-redesign.fig</code>, <code>litro-c-flow-en.fig</code>, <code>litro-mobile-web.fig</code>) are superseded by this one.<br><br>
+    <b>Cum au fost făcute stările:</b> ecranele acceptă parametri în URL — <code>?auth=in</code> (membru), <code>?density=a|b|c</code> (densitatea celulelor),
+    <code>?inv=many|some|few</code> (inventar demo, mobil), <code>?room=2</code> (camere preselectate, mobil) și <code>?nopanel=1</code> (modul de export: fără panoul de demo,
+    barele fixe intră în flux). Deci orice stare din fișier se poate deschide și live, ca link.<br><br>
     <b>Alternative route:</b> the <b>html.to.design</b> plugin (already used by the team for “LITRO Master Pages”) — capture these live pages: <code>home.html</code>, <code>listing.html</code>, <code>hotel.html</code>, <code>checkout.html</code>, <code>thankyou.html</code> from this site’s URL, or via its Chrome extension.<br><br>
     <b>To Figma — mobile:</b> <a href="litro-mobile-web.fig" download><b>⬇ litro-mobile-web.fig</b></a> — a native Figma file with all ten mobile screens as editable frames at 430&nbsp;px (Romanian on the top row, English below). Same import route as the desktop file: drag it onto the Figma home screen.<br><br>
     <b>To dev — mobile:</b> <code>litro-m.css</code> is the mobile stylesheet (same token block as <code>litro.css</code>, then only mobile components: bare fixe, sheet-uri, carduri pe o coloană) and <code>proto-m.js</code> is the mobile interaction engine (same state key and same price model as <code>proto.js</code>, so desktop and mobile stay in sync). The five <code>m-*.html</code> files are reference implementations at 390 px.<br><br>

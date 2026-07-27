@@ -444,10 +444,19 @@
      ============================================================ */
   let onInventory = null;   // callback setat de listing
   function initProtoTools() {
+    /* Stările de demo se pot fixa și din URL (?auth=in|out, ?density=a|b|c, ?inv=many|some|few),
+       ca fiecare variantă să poată fi exportată în Figma fără clic în panou. */
+    if (qp.get('auth')) document.body.dataset.auth = qp.get('auth');
+    if (qp.get('density')) document.body.dataset.density = qp.get('density');
     /* ?nopanel=1 — modul de export în Figma: fără panoul de demo, iar barele fixe
        intră în fluxul paginii (altfel ar cădea la mijlocul ramei, unde e marginea
        de jos a ferestrei în momentul capturii). */
-    if (qp.get('nopanel')) { document.body.dataset.export = '1'; return; }
+    if (qp.get('nopanel')) {
+      document.body.dataset.export = '1';
+      if (!document.body.dataset.auth) document.body.dataset.auth = 'out';
+      if (!document.body.dataset.density) document.body.dataset.density = 'a';
+      return;
+    }
     if (!document.body.dataset.auth) { let a; try { a = localStorage.getItem('litroAuth'); } catch (e) { } document.body.dataset.auth = a || 'out'; }
     if (!document.body.dataset.density) {
       let d; try { d = localStorage.getItem('litroDensity'); } catch (e) { }
@@ -852,7 +861,9 @@
       applyFilters();
       toast(t('Inventar demo: ', 'Demo inventory: ') + label, 'ok');
     };
-    demoCap = 99; demoCount = 81;
+    const INV = { many: [99, 81], some: [4, 4], few: [2, 2] };
+    const inv = INV[qp.get('inv')] || INV.many;   // ?inv=… fixează starea pentru export
+    demoCap = inv[0]; demoCount = inv[1];
 
     initCallback();
 
@@ -1045,6 +1056,10 @@
       }
       function sync() { renderRates(); renderBar(); }
       renderRates(); renderBar();
+      /* ?room=N — preselectează primele N camere online, ca starea „bara de rezervare
+         urcată" să poată fi exportată în Figma fără clic */
+      const pre = +(qp.get('room') || 0);
+      if (pre > 0) { rows.slice(0, pre).forEach(r => { sel[r.dataset.rid] = 1; }); sync(); }
       const cta = $('.bb-cta', bar);
       if (cta) cta.onclick = () => {
         if (!totalRooms()) return;
