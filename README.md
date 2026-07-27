@@ -16,6 +16,7 @@ inside that sandbox.
 | `m-home.html` `m-listing.html` `m-hotel.html` `m-checkout.html` `m-thankyou.html` (+ `-en`) | The same flow as **mobile web**, at 390px, in Romanian and English |
 | `litro.css` | The design system: colour/radius/shadow/type tokens + every component |
 | `litro-m.css` `proto-m.js` | Mobile stylesheet + mobile interaction engine (see below) |
+| `litro-mobile-web.fig` | Native Figma file with all ten mobile screens as editable 430px frames (RO row + EN row) |
 | `specs.html` | Measurement spec for developers (component by component, all values in px) |
 | `audit.html` | Production gap audit — live funnel vs these screens + call-centre strategy |
 | `preview-*.png` | Full-page renders of each screen |

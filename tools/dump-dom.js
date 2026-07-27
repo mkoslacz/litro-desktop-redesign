@@ -1,5 +1,6 @@
 // Dump absolute-positioned visual tree of a page via puppeteer-core
-// usage: node dump-dom.js <fileUrl> <out.json>
+// usage: node dump-dom.js <fileUrl> <out.json> [viewportWidth]
+// viewportWidth defaults to 1440 (desktop); pass 430 for the mobile screens.
 const puppeteer = require('puppeteer-core');
 const fs = require('fs');
 
@@ -10,7 +11,7 @@ const fs = require('fs');
     args: ['--force-device-scale-factor=1', '--hide-scrollbars'],
   });
   const page = await browser.newPage();
-  await page.setViewport({ width: 1440, height: 1200 });
+  await page.setViewport({ width: +(process.argv[4] || 1440), height: 1200 });
   await page.goto(process.argv[2], { waitUntil: 'networkidle0', timeout: 60000 });
   await page.evaluate(() => document.fonts.ready);
   await new Promise(r => setTimeout(r, 400));

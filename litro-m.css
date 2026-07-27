@@ -93,8 +93,11 @@ svg { flex: none; }
   padding: 9px 12px; box-shadow: 0 4px 14px rgba(1,43,85,.18);
 }
 .sumcard .ic { color: var(--navy-500); }
-.sumcard .t { font-weight: 700; font-size: 14.5px; color: var(--gray-900); line-height: 1.2; }
-.sumcard .d { color: var(--gray-700); font-size: 12.5px; margin-top: 2px; }
+/* două rânduri, ca în ramele mobile aprobate: denumirea sus, contextul dedesubt.
+   Inline ar merge doar la denumiri scurte — „Complex Mediteranean" ar trece pe
+   al doilea rând și ar sta peste titlu. */
+.sumcard .t { display: block; font-weight: 700; font-size: 14.5px; color: var(--gray-900); line-height: 1.2; }
+.sumcard .d { display: block; color: var(--gray-700); font-size: 12.5px; margin-top: 2px; }
 .sumcard .edit { margin-left: auto; color: var(--navy-500); font-weight: 700; font-size: 12.5px; white-space: nowrap; }
 
 /* rândul Filtre · Sortare · Hartă */
@@ -705,6 +708,15 @@ body.has-bar { padding-bottom: 92px; }
 .legal .lic { display: inline-block; background: var(--navy-500); color: #fff; font-weight: 700; border-radius: 5px; padding: 1px 7px; margin-right: 5px; font-size: 11px; }
 .legal .org { font-weight: 700; color: var(--gray-900); }
 .legal a { color: var(--navy-500); font-weight: 600; }
+
+/* ===== mod de export (?nopanel=1) — pentru capturile care ajung în Figma =====
+   Barele fixe devin parte din flux, ca să apară la baza ramei, nu la mijloc. */
+body[data-export] .pricebar {
+  position: static; transform: none; width: auto; box-shadow: none;
+  border-top: 1px solid var(--gray-400); padding-bottom: 12px;
+}
+body[data-export] .booking-bar { display: none; }
+body[data-export].has-bar { padding-bottom: 0; }
 
 /* Panou de prototip (demo, nu face parte din produs): limbă, vedere desktop/mobil,
    cont, densitatea celulelor și inventarul demo. Plutește peste pagină tocmai

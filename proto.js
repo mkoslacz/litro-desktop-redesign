@@ -547,6 +547,8 @@
   }
 
   function initProtoTools() {
+    /* ?nopanel=1 — folosit la exportul în Figma, ca panoul de demo să nu ajungă în ramă */
+    if (q.get('nopanel')) return;
     const ls = $('.langswitch');
     const langLinks = ls ? $$('a', ls).map(a => ({ t: a.textContent.trim(), href: a.getAttribute('href'), on: a.classList.contains('on') })) : [];
     const hasListing = !!$('.listing-grid');

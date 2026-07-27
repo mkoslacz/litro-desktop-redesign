@@ -21,7 +21,7 @@ Node's `readline` split lines in the wrong place.
 
 ## Writing a `.fig` file (HTML → Figma)
 
-1. `node dump-dom.js <fileUrl> out.json` — drives headless Chrome and dumps an absolute-positioned visual tree
+1. `node dump-dom.js <fileUrl> out.json [viewportWidth]` — drives headless Chrome and dumps an absolute-positioned visual tree
    (geometry, fills, gradients, borders, shadows, radii, text runs with real fonts, SVG icons rasterised at 3×,
    `::before`/`::after` overlays).
 2. `node generate-fig.js out.fig` — encodes those trees as `NODE_CHANGES` using a schema copied **verbatim** from
@@ -29,6 +29,19 @@ Node's `readline` split lines in the wrong place.
 
 **Critical:** the data chunk must be **zstd**-compressed. With deflate, Figma's importer accepts the file and then
 hangs forever at "0 of 1 files" with no error. The schema chunk stays deflate-raw (copied byte-for-byte).
+
+**Mobile export:** `generate-fig-m.js` is the 430px variant — it reads `dump-m-*.json` and lays the frames out in
+two rows (Romanian on top, English below, via the `oy` field). Dump the mobile pages with the width argument and
+with `?nopanel=1`:
+
+```
+node dump-dom.js "file://$PWD/m-home.html?nopanel=1" tools/dump-m-home.json 430
+node generate-fig-m.js litro-mobile-web.fig
+```
+
+`?nopanel=1` puts the prototype in **export mode**: the floating demo panel is not built, and the fixed bottom bars
+join the normal flow. Without it the bars are captured at the bottom edge of the 1200px capture window, which lands
+in the middle of a 4700px frame.
 
 Single-line texts are exported with `textAutoResize: WIDTH_AND_HEIGHT` so nothing re-wraps in Figma.
 

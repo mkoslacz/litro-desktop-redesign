@@ -444,6 +444,10 @@
      ============================================================ */
   let onInventory = null;   // callback setat de listing
   function initProtoTools() {
+    /* ?nopanel=1 — modul de export în Figma: fără panoul de demo, iar barele fixe
+       intră în fluxul paginii (altfel ar cădea la mijlocul ramei, unde e marginea
+       de jos a ferestrei în momentul capturii). */
+    if (qp.get('nopanel')) { document.body.dataset.export = '1'; return; }
     if (!document.body.dataset.auth) { let a; try { a = localStorage.getItem('litroAuth'); } catch (e) { } document.body.dataset.auth = a || 'out'; }
     if (!document.body.dataset.density) {
       let d; try { d = localStorage.getItem('litroDensity'); } catch (e) { }
