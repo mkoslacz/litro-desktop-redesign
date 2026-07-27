@@ -557,6 +557,21 @@
       html += '<div class="pt-row"><span class="pt-lbl">' + (EN() ? 'Language' : 'Limbă') + '</span><div class="pt-seg">' +
         langLinks.map(l => '<a href="' + (l.href || '#') + '" class="pt-b' + (l.on ? ' on' : '') + '">' + l.t + '</a>').join('') + '</div></div>';
     }
+    /* comutator desktop ↔ mobile web: pe un ecran mare nu ai cum să ajungi altfel
+       la versiunea de telefon, iar ecranele mobile sunt fișiere separate (m-*.html) */
+    const M_MAP = {
+      'home.html': 'm-home.html', 'home-b.html': 'm-home.html', 'home-c.html': 'm-home.html', 'home-d.html': 'm-home.html',
+      'listing.html': 'm-listing.html', 'listing-b.html': 'm-listing.html', 'listing-c.html': 'm-listing.html',
+      'hotel.html': 'm-hotel.html', 'checkout.html': 'm-checkout.html', 'thankyou.html': 'm-thankyou.html'
+    };
+    const here = (location.pathname.split('/').pop() || 'home-c.html').replace('-en.html', '.html');
+    const mFile = M_MAP[here];
+    if (mFile) {
+      const mHref = (EN() ? mFile.replace('.html', '-en.html') : mFile) + qs();
+      html += '<div class="pt-row"><span class="pt-lbl">' + (EN() ? 'View' : 'Vedere') + '</span><div class="pt-seg">' +
+        '<span class="pt-b on">Desktop</span>' +
+        '<a class="pt-b" href="' + mHref + '">' + (EN() ? 'Mobile' : 'Mobil') + '</a></div></div>';
+    }
     const authModes = EN() ? [['out', 'Guest'], ['in', 'Member']] : [['out', 'Musafir'], ['in', 'Membru']];
     html += '<div class="pt-row"><span class="pt-lbl">' + (EN() ? 'Account' : 'Cont') + '</span><div class="pt-seg pt-auth">' +
       authModes.map(([k, label]) => '<span class="pt-b' + (document.body.dataset.auth === k ? ' on' : '') + '" data-auth="' + k + '">' + label + '</span>').join('') + '</div></div>';

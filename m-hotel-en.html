@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#004B97">
+<title>Litoralul Romanesc — mobile · Hotel details</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="litro-m.css">
+</head>
+<body data-page="hotel">
+<div class="app">
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-7-6.1-7-11a7 7 0 1 1 14 0c0 4.9-7 11-7 11z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="10" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="16" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3.5 10h17M8 2.8V7M16 2.8V7" stroke="currentColor" stroke-width="2" fill="none"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 20c.5-3.4 3-5.4 6-5.4s5.5 2 6 5.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 5.4a3.2 3.2 0 0 1 0 5.9M18.2 14.9c1.7.8 2.6 2.3 2.9 4.6" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15.6 15.6 21 21" stroke="currentColor" stroke-width="2.4"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5.5 3.5h3l1.7 4.3-2 1.6a13 13 0 0 0 6.4 6.4l1.6-2 4.3 1.7v3a1.8 1.8 0 0 1-2 1.8C10.3 19.7 4.3 13.7 3.7 5.5a1.8 1.8 0 0 1 1.8-2z" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6.5h16M4 12h16M4 17.5h16" stroke="currentColor" stroke-width="2.2"/></symbol>
+    <symbol id="i-chev-d" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2"/></symbol>
+    <symbol id="i-chev-l" viewBox="0 0 24 24"><path d="m14.5 6-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2"/></symbol>
+    <symbol id="i-chev-r" viewBox="0 0 24 24"><path d="m9.5 6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2"/></symbol>
+    <symbol id="i-arrow-r" viewBox="0 0 24 24"><path d="M4 12h15M13.5 6 19.5 12l-6 6" fill="none" stroke="currentColor" stroke-width="2.2"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20.3S4 15 4 9.6A4.4 4.4 0 0 1 12 7a4.4 4.4 0 0 1 8 2.6c0 5.4-8 10.7-8 10.7z" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-pct" viewBox="0 0 24 24"><path d="M19 5 5 19" stroke="currentColor" stroke-width="2.2"/><circle cx="7.5" cy="7.5" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="16.5" cy="16.5" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-card" viewBox="0 0 24 24"><rect x="3" y="5.5" width="18" height="13" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 10h18M7 14.5h4" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-head" viewBox="0 0 24 24"><path d="M4.5 13a7.5 7.5 0 0 1 15 0" fill="none" stroke="currentColor" stroke-width="2"/><rect x="3" y="12.5" width="4" height="6.5" rx="1.8" fill="none" stroke="currentColor" stroke-width="2"/><rect x="17" y="12.5" width="4" height="6.5" rx="1.8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M19 19.5c0 1.6-1.6 2.2-4 2.3" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.5V12l3 2.4" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.2"/></symbol>
+    <symbol id="i-check-g" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.6"/></symbol>
+    <symbol id="i-filter" viewBox="0 0 24 24"><path d="M3.5 6h17M6.5 12h11M10 18h4" stroke="currentColor" stroke-width="2.2"/></symbol>
+    <symbol id="i-sort" viewBox="0 0 24 24"><path d="M7 4v16M7 20l-3.2-3.4M17 20V4M17 4l3.2 3.4" fill="none" stroke="currentColor" stroke-width="2.1"/></symbol>
+    <symbol id="i-map" viewBox="0 0 24 24"><path d="m3 6.5 6-2.5 6 2.5 6-2.5v13.5l-6 2.5-6-2.5-6 2.5z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 4v15.5M15 6.5V22" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-bed" viewBox="0 0 24 24"><path d="M3 18.5V6M3 14h18v4.5M3 11h18v-1a3 3 0 0 0-3-3H9" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="6.5" cy="8.5" r="1.6" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+    <symbol id="i-food" viewBox="0 0 24 24"><path d="M7 3v7M4.5 3v4.5a2.5 2.5 0 0 0 5 0V3M7 12v9M16.5 3c-1.8 1.5-2.5 4-2.5 6.5 0 1.5 1 2.5 2.5 2.5V21M16.5 3V12" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 2.6v5.6c0 4.5-3 8-7 9.8-4-1.8-7-5.3-7-9.8V5.6z" fill="none" stroke="currentColor" stroke-width="2"/><path d="m9 12 2.2 2.2L15.5 10" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-share" viewBox="0 0 24 24"><circle cx="18" cy="5.5" r="2.8" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="6" cy="12" r="2.8" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="18" cy="18.5" r="2.8" fill="none" stroke="currentColor" stroke-width="2"/><path d="m8.6 10.6 6.8-3.6M8.6 13.4l6.8 3.6" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-ruler" viewBox="0 0 24 24"><rect x="2.5" y="8" width="19" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7 8v3.5M11 8v5M15 8v3.5M19 8v5" stroke="currentColor" stroke-width="2"/></symbol>
+  </defs>
+</svg>
+
+<header class="m-head">
+  <button class="back" aria-label="Back"><svg width="23" height="23"><use href="#i-chev-l"/></svg></button>
+  <div class="m-logo">
+    <svg class="mark" viewBox="0 0 42 42"><circle cx="19" cy="23" r="13" fill="none" stroke="#fff" stroke-width="7"/><circle cx="33" cy="8.5" r="5.5" fill="#EB802D"/></svg>
+    <div><div class="l1">litoralul</div><div class="l2">romanesc<b>.ro</b></div></div>
+  </div>
+  <button class="act act-phone" aria-label="Call us"><svg width="21" height="21"><use href="#i-phone"/></svg></button>
+</header>
+
+<div class="m-sum">
+  <button class="sumcard">
+    <span class="ic"><svg width="20" height="20"><use href="#i-cal"/></svg></span>
+    <span style="min-width:0">
+      <span class="t" data-bind="hotel">Complex Mediteranean</span>
+      <span class="d" data-bind="sum">5 Jun – 12 Jun · 2 adults · 2 rooms</span>
+    </span>
+    <span class="edit">Edit</span>
+  </button>
+</div>
+
+<!-- galerie: swipe orizontal, tap = lightbox -->
+<div class="gal">
+  <div class="gal-track">
+    <img src="assets/pool-rooftop.jpg" alt="">
+    <img src="assets/room-seaview.jpg" alt="">
+    <img src="assets/lobby.jpg" alt="">
+    <img src="assets/pool-sunset.jpg" alt="">
+    <img src="assets/spa-indoor.jpg" alt="">
+    <img src="assets/apartment-family.jpg" alt="">
+  </div>
+  <div class="acts">
+    <span class="fav" aria-label="Save"><svg width="18" height="18"><use href="#i-heart"/></svg></span>
+    <span class="share" aria-label="Share"><svg width="18" height="18"><use href="#i-share"/></svg></span>
+  </div>
+  <span class="count">1 / 6</span>
+</div>
+
+<section class="sect tight">
+  <h1 class="hp-title">Complex Mediteranean <span class="stars">★★★★</span></h1>
+  <div class="hmeta"><svg width="14" height="14"><use href="#i-pin"/></svg> Mamaia, Casino area · 50 m from the beach · <a href="#">See on map</a></div>
+  <div class="rating-line" style="margin-top:10px">
+    <span class="rate-badge">9.2</span><span class="rate-word">Excellent</span><span class="rate-count">157 verified reviews</span>
+  </div>
+  <div class="hp-chips">
+    <span class="perk">✓ Free cancellation on standard offers</span>
+    <span class="perk blue">Holiday card accepted</span>
+    <span class="perk blue">Instant confirmation</span>
+  </div>
+  <div class="pop-band">
+    <svg width="18" height="18" style="color:#0E804B;flex:none"><use href="#i-check-g"/></svg>
+    <div>
+      <div class="t">This hotel is in demand for these dates</div>
+      <div class="d">Last booking for your dates: 3 hours ago. 4 rooms left from our allotment.</div>
+    </div>
+  </div>
+</section>
+
+<section class="sect tight">
+  <div class="sect-head"><h2 class="m-h2">Popular facilities</h2><a class="link-more" href="#">All (48)</a></div>
+  <div class="fac-chips">
+    <span>Outdoor pool</span><span>Kids’ pool</span><span>Private beach</span><span>Restaurant</span>
+    <span>Bar</span><span>Free parking</span><span>Free Wi-Fi</span><span>Playground</span>
+    <span>Spa</span><span>24h reception</span>
+  </div>
+</section>
+
+<!-- bara de sejur: editare inline a datelor/oaspeților, exact aici -->
+<section class="sect tight rooms-anchor">
+  <div class="sect-head"><h2 class="m-h2">Rooms and prices</h2></div>
+  <div class="stay-bar">
+    <button class="f" data-f="date">
+      <span class="ic"><svg width="19" height="19"><use href="#i-cal"/></svg></span>
+      <span><span class="lbl">Stay</span><br><span class="val"><span data-bind="dates">5 Jun – 12 Jun</span> · <span data-bind="nights">7</span> nights</span></span>
+      <span class="chg">Change</span>
+    </button>
+    <button class="f" data-f="guests">
+      <span class="ic"><svg width="19" height="19"><use href="#i-users"/></svg></span>
+      <span><span class="lbl">Guests and rooms</span><br><span class="val"><span data-bind="guests">2 adults</span> · <span data-bind="rooms">2 rooms</span></span></span>
+      <span class="chg">Change</span>
+    </button>
+  </div>
+
+  <div style="margin-top:12px">
+    <div style="font-size:12.5px;font-weight:700;color:var(--gray-700);margin-bottom:7px">Board filters:</div>
+    <div class="meal-chips">
+      <button class="mchip on" data-meal="">All</button>
+      <button class="mchip" data-meal="mic dejun">Breakfast</button>
+      <button class="mchip" data-meal="demipensiune">Half board</button>
+      <button class="mchip" data-meal="all inclusive">All inclusive</button>
+    </div>
+  </div>
+</section>
+
+<div style="padding:0 var(--pad) 4px">
+
+  <div class="room-card">
+    <img src="assets/room-seaview.jpg" alt="">
+    <div class="rc-head">
+      <h3>Sea-view double room + 2 sun beds included on the beach</h3>
+      <div class="rmeta">24 m² · max. 2 adults + 1 child · 1 double bed · balcony</div>
+    </div>
+    <div class="amen"><span>Air conditioning</span><span>Balcony</span><span>Wi-Fi</span><span>TV LED</span><span>Bathroom with shower</span></div>
+
+    <div class="rate" data-ppn="968" data-meal="mic dejun">
+      <div class="rl">
+        <div>
+          <span class="pill pill-teal" style="margin-bottom:5px">Early Booking · −15%</span>
+          <div class="rname">✓ Breakfast included</div>
+          <div class="rsub">Non-refundable · paid in advance</div>
+          <div class="rperk">Instant confirmation</div>
+        </div>
+      </div>
+      <div class="rfoot">
+        <div>
+          <span class="old-price">4 760 Lei</span>
+          <div class="price">4 046 <span class="cur">Lei</span></div>
+          <div class="price-note rnights">7 nights · 2 rooms</div>
+        </div>
+        <div class="ract"></div>
+      </div>
+    </div>
+
+    <div class="rate" data-ppn="1140" data-meal="mic dejun">
+      <div class="rl">
+        <div>
+          <span class="pill pill-teal" style="margin-bottom:5px">Summer Offer</span>
+          <div class="rname">✓ Breakfast included</div>
+          <div class="rsub">Flexible cancellation until 20 May</div>
+        </div>
+      </div>
+      <div class="rfoot">
+        <div>
+          <div class="price">4 760 <span class="cur">Lei</span></div>
+          <div class="price-note rnights">7 nights · 2 rooms</div>
+        </div>
+        <div class="ract"></div>
+      </div>
+    </div>
+
+    <div class="rate" data-ppn="1310" data-meal="demipensiune">
+      <div class="rl">
+        <div>
+          <div class="rname">✓ Half board</div>
+          <div class="rsub">Flexible cancellation until 20 May · confirmed within 2 hours</div>
+        </div>
+      </div>
+      <div class="rfoot">
+        <div>
+          <div class="price">5 490 <span class="cur">Lei</span></div>
+          <div class="price-note rnights">7 nights · 2 rooms</div>
+        </div>
+        <div class="ract"></div>
+      </div>
+    </div>
+
+    <div class="rate rate-request" data-ppn="1780" data-meal="all inclusive">
+      <div class="rl">
+        <div>
+          <span class="tag"><svg width="11" height="11"><use href="#i-phone"/></svg> Not available online</span>
+          <div class="rname">Premium all inclusive · front sea view</div>
+          <div class="rsub">On request only — we check availability in our own inventory.</div>
+        </div>
+      </div>
+      <div class="rfoot">
+        <div>
+          <div class="price">7 460 <span class="cur">Lei</span></div>
+          <div class="price-note rnights">7 nights · 2 rooms</div>
+        </div>
+        <button class="btn btn-outline-navy btn-sm btn-request"><svg width="15" height="15"><use href="#i-phone"/></svg> Request via consultant</button>
+      </div>
+    </div>
+
+    <div style="padding:0 14px 14px;font-size:11.5px;color:var(--gray-700)">
+      Prices include VAT. <button class="link-more" data-info="tax">The resort tax is paid at reception →</button>
+    </div>
+  </div>
+
+  <div class="room-card">
+    <img src="assets/apartment-family.jpg" alt="">
+    <div class="rc-head">
+      <h3>Family apartment with balcony + 2 sun beds included on the beach</h3>
+      <div class="rmeta">44 m² · max. 5 guests · 2 double beds, 1 sofa</div>
+    </div>
+    <div class="amen"><span>Air conditioning</span><span>2 balconies</span><span>Kitchen</span><span>Wi-Fi</span><span>Washing machine</span></div>
+
+    <div class="rate" data-ppn="1520" data-meal="mic dejun">
+      <div class="rl">
+        <div>
+          <span class="pill pill-teal" style="margin-bottom:5px">Early Booking · −15%</span>
+          <div class="rname">✓ Breakfast included</div>
+          <div class="rsub">Non-refundable · paid in advance</div>
+          <div class="rperk">Instant confirmation</div>
+        </div>
+      </div>
+      <div class="rfoot">
+        <div>
+          <span class="old-price">6 860 Lei</span>
+          <div class="price">5 831 <span class="cur">Lei</span></div>
+          <div class="price-note rnights">7 nights · 2 rooms</div>
+        </div>
+        <div class="ract"></div>
+      </div>
+    </div>
+
+    <div class="rate" data-ppn="1980" data-meal="all inclusive">
+      <div class="rl">
+        <div>
+          <div class="rname">✓ All inclusive</div>
+          <div class="rsub">Flexible cancellation until 20 May</div>
+        </div>
+      </div>
+      <div class="rfoot">
+        <div>
+          <div class="price">8 120 <span class="cur">Lei</span></div>
+          <div class="price-note rnights">7 nights · 2 rooms</div>
+        </div>
+        <div class="ract"></div>
+      </div>
+    </div>
+
+    <div class="rate rate-request" data-ppn="2260" data-meal="all inclusive">
+      <div class="rl">
+        <div>
+          <span class="tag"><svg width="11" height="11"><use href="#i-phone"/></svg> Not available online</span>
+          <div class="rname">Premium apartment · 2 balconies, sea view</div>
+          <div class="rsub">Limited stock for these dates · a consultant will confirm availability.</div>
+        </div>
+      </div>
+      <div class="rfoot">
+        <div>
+          <div class="price">9 240 <span class="cur">Lei</span></div>
+          <div class="price-note rnights">7 nights · 2 rooms</div>
+        </div>
+        <button class="btn btn-outline-navy btn-sm btn-request"><svg width="15" height="15"><use href="#i-phone"/></svg> Request via consultant</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="sect">
+  <div class="sect-head"><h2 class="m-h2">Guest reviews</h2><a class="link-more" href="#">All (157)</a></div>
+  <div class="rev-sum">
+    <div class="big">9.2</div>
+    <div>
+      <div style="font-weight:700">Excellent</div>
+      <div style="color:var(--gray-700);font-size:12.5px">157 reviews from customers who stayed here through us</div>
+    </div>
+  </div>
+  <div class="rev-bars">
+    <div class="rb"><span>Cleanliness</span><span class="track"><span class="fill" style="width:94%"></span></span><span>9.4</span></div>
+    <div class="rb"><span>Location</span><span class="track"><span class="fill" style="width:97%"></span></span><span>9.7</span></div>
+    <div class="rb"><span>Staff</span><span class="track"><span class="fill" style="width:91%"></span></span><span>9.1</span></div>
+    <div class="rb"><span>Value for money</span><span class="track"><span class="fill" style="width:87%"></span></span><span>8.7</span></div>
+  </div>
+  <div class="review">
+    <div class="rh"><span class="rate-badge">10</span> Andreea, family with kids · August 2025</div>
+    <div class="rt">“The location, the playgrounds, the pools. The kids didn’t want to leave. Varied breakfast.”</div>
+  </div>
+  <div class="review">
+    <div class="rh"><span class="rate-badge">9</span> Mihai, couple · July 2025</div>
+    <div class="rt">“The sea-view room is worth the difference. The included sun beds on the beach are a real plus.”</div>
+  </div>
+</section>
+
+<section class="sect">
+  <div class="sect-head"><h2 class="m-h2">Location</h2></div>
+  <div class="mapbox"><img src="assets/coastline.jpg" alt=""><span class="lbl">See on map</span></div>
+  <div style="margin-top:11px;font-size:13.5px;color:var(--gray-700);line-height:1.6">
+    <div>🏖 Modern Beach — <b>50 m</b> (1 min walk)</div>
+    <div>🎡 Mamaia Casino — <b>400 m</b></div>
+    <div>🎢 Aqua Magic — <b>1,2 km</b></div>
+    <div>✈️ Mihail Kogălniceanu Airport — <b>32 km</b></div>
+  </div>
+</section>
+
+<section class="sect">
+  <div class="band band-orange" data-friends style="box-shadow:none;border:1px solid var(--gray-300);margin-bottom:10px">
+    <span class="ic"><svg width="20" height="20"><use href="#i-pct"/></svg></span>
+    <div><div class="t">FRIENDS programme</div><div class="d">You earn 2% credits on the value of your stay. 1 credit = 1 Leu on your next booking.</div></div>
+  </div>
+  <div class="band band-navy" data-info="card" style="box-shadow:none;border:1px solid var(--gray-300);margin-bottom:10px">
+    <span class="ic"><svg width="20" height="20"><use href="#i-card"/></svg></span>
+    <div><div class="t">Holiday card accepted</div><div class="d">Edenred, Pluxee, Up România. The difference up to the value of the stay is paid by bank card.</div></div>
+  </div>
+  <div class="band band-navy" data-info="cancel" style="box-shadow:none;border:1px solid var(--gray-300);margin-bottom:0">
+    <span class="ic"><svg width="20" height="20"><use href="#i-shield"/></svg></span>
+    <div><div class="t">Free cancellation</div><div class="d">At least 10 days before check-in, on standard offers paid in full.</div></div>
+  </div>
+</section>
+
+<section class="sect">
+  <div class="acc">
+    <button>Hotel description <svg width="20" height="20"><use href="#i-chev-d"/></svg></button>
+    <div class="acc-b">
+      <p>Complex Mediteranean 3*** Mamaia sits on the promenade in the northern part of the resort, roughly 50 metres from the beach, between the Modern and Rex hotels and 1 km from the Casino.</p>
+      <p>The complex has two buildings and offers pools for adults and children, terraces, bars and its own restaurant.</p>
+    </div>
+  </div>
+  <div class="acc">
+    <button>General policies <svg width="20" height="20"><use href="#i-chev-d"/></svg></button>
+    <div class="acc-b">
+      <p><b>Check-in:</b> from 15:00 · <b>Check-out:</b> until 12:00</p>
+      <p><b>Resort tax:</b> 1% of the accommodation value excluding VAT, paid at reception (not included in the displayed price).</p>
+      <p><b>Room allocation</b> is done at reception, subject to availability.</p>
+      <p><b>Children:</b> age bands 0–9.99 and 0–13.99 for price and admission.</p>
+    </div>
+  </div>
+  <div class="acc">
+    <button>House rules <svg width="20" height="20"><use href="#i-chev-d"/></svg></button>
+    <div class="acc-b">
+      <p><b>Pets:</b> are not accepted at this hotel.</p>
+      <p><b>Smoking</b> is not allowed in the rooms or in enclosed common areas.</p>
+      <p><b>Quiet hours</b> between 23:00 and 08:00.</p>
+      <p>Payment at reception can be made by card or in cash.</p>
+    </div>
+  </div>
+  <div class="acc">
+    <button>Frequently asked questions <svg width="20" height="20"><use href="#i-chev-d"/></svg></button>
+    <div class="acc-b">
+      <p><b>What room types are available?</b><br>Standard and sea-view double rooms, triple rooms and family apartments.</p>
+      <p><b>Can I pay with a holiday card?</b><br>Yes, we accept Edenred, Pluxee and Up România.</p>
+      <p><b>What is the check-in time?</b><br>From 15:00, check-out until 12:00.</p>
+    </div>
+  </div>
+</section>
+
+<footer class="m-foot">
+  <div class="fcall">
+    <svg width="21" height="21"><use href="#i-phone"/></svg>
+    <div><div class="num">0241 999</div><div class="hrs">● Daily 10:00 – 18:00</div></div>
+  </div>
+  <div class="fgrp">
+    <h4>Terms and settings</h4>
+    <a href="#">Terms and conditions</a>
+    <a href="#">the Tourist Contract</a>
+    <a href="#">Cancellation policy</a>
+    <a href="#">Cookie settings</a>
+  </div>
+</footer>
+
+<div class="legal">
+  <div class="row"><span class="lic">Tourism Licence no. 536</span> Organising agency licensed by the Ministry of Tourism since 2005</div>
+  <div class="row"><span class="org">S.C. Creative Eye S.R.L.</span> · Reg. no. J13/2215/2003 · VAT RO15613488 · Constanța</div>
+</div>
+
+</div>
+
+<!-- bara de preț: vizibilă până alegi o cameră -->
+<div class="pricebar">
+  <div class="l">
+    <div class="from">from, for <span data-bind="nights">7</span> nights</div>
+    <div class="price" data-from-price>4 046 <span class="cur">Lei</span></div>
+  </div>
+  <button class="btn btn-primary">Choose a room</button>
+</div>
+
+<!-- bara de rezervare: urcă de jos după prima cameră aleasă -->
+<div class="booking-bar bookbar">
+  <div class="bb-top">
+    <div class="bb-sum"></div>
+    <div class="bb-tot"><div class="l">Stay total</div><div class="v">0 Lei</div></div>
+  </div>
+  <button class="btn btn-primary btn-block bb-cta">Continue to booking <svg width="19" height="19"><use href="#i-arrow-r"/></svg></button>
+</div>
+
+<script src="proto-m.js"></script>
+</body>
+</html>

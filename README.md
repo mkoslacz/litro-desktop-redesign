@@ -13,7 +13,9 @@ inside that sandbox.
 |---|---|
 | `index.html` | Overview page — screens, brand mapping, handoff instructions |
 | `home.html` `listing.html` `hotel.html` `checkout.html` `thankyou.html` | The five 1440px desktop screens |
+| `m-home.html` `m-listing.html` `m-hotel.html` `m-checkout.html` `m-thankyou.html` (+ `-en`) | The same flow as **mobile web**, at 390px, in Romanian and English |
 | `litro.css` | The design system: colour/radius/shadow/type tokens + every component |
+| `litro-m.css` `proto-m.js` | Mobile stylesheet + mobile interaction engine (see below) |
 | `specs.html` | Measurement spec for developers (component by component, all values in px) |
 | `audit.html` | Production gap audit — live funnel vs these screens + call-centre strategy |
 | `preview-*.png` | Full-page renders of each screen |
@@ -28,6 +30,37 @@ inside that sandbox.
 Szallas DS layout, spacing and typography (Outfit + DM Sans) are kept as-is. LITRO colours follow the
 already-approved LITRO **mobile** redesign: navy `#004B97` for brand, links, rating badges and prices;
 orange `#EB802D` for CTAs and stars; red discount pills and green perks unchanged from the DS.
+
+## Mobile web
+
+`m-*.html` is the same C flow — home → listing → hotel → checkout → confirmation — rebuilt for a
+390px viewport (the width of the `Mobile (REDESIGN)` frames in *🟠 LITRO Master Pages*). It reuses the
+patterns the LITRO team already approved on mobile: navy app bar, the white search-summary card with an
+orange border, the **Filtre · Sortare · Hartă** row, the 3-step checkout stepper and the editable advance.
+
+- `litro-m.css` repeats the **same `:root` token block** as `litro.css` (that file stays the source of
+  truth) and then defines only mobile components — fixed bars, bottom sheets, one-column cards.
+- `proto-m.js` is a separate engine, but it shares the `litro` localStorage key and the **same price
+  model** as `proto.js`, so destination / dates / guests carry across desktop and mobile and both price
+  a stay identically. Desktop files are untouched.
+- Mobile-only interaction: search, calendar, guests, filters and sort open as full-screen sheets; the
+  hotel gallery is swipeable; the booking bar slides up from the bottom after the first room is added;
+  checkout keeps a fixed bar with the amount due today.
+- The page column is capped at 430px and centred above 460px viewport width, so the screens can be
+  reviewed in a desktop browser without a device.
+
+### The floating "Prototype · settings" panel
+
+Demo switches never belong in the product UI, so they live in one floating panel — bottom right on
+mobile, bottom left on desktop:
+
+| Row | What it does |
+|---|---|
+| Language | RO ↔ EN, carrying destination and dates in the URL |
+| View | Desktop ↔ Mobile — the only way to reach the phone screens from a full-size browser window, and back |
+| Account | Guest ↔ Member (hides the "sign in for FRIENDS" bands) |
+| Card view *(listing)* | A detailed · B compact with the date/board/room icon row · C horizontal summary |
+| Demo inventory *(listing)* | Many / Some / Few results — drives the count, the empty state and the flexible-date banner |
 
 ## Design decisions that are business rules, not taste
 
