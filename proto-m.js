@@ -49,6 +49,8 @@
   const roomsTxt = () => plural(S.rooms, t('cameră', 'room'), t('camere', 'rooms'));
   const staysTxt = n => plural(n, t('cazare disponibilă', 'available stay'), t('cazări disponibile', 'available stays'));
 
+  const PAGE_SIZE = 30;          // paginare, nu infinite scroll
+
   const RESORTS = [
     ['Mamaia', 319], ['Mamaia Nord', 58], ['Eforie Nord', 184], ['Eforie Sud', 76], ['Costinești', 97],
     ['Neptun-Olimp', 112], ['Jupiter', 64], ['Venus', 71], ['Saturn', 49], ['Mangalia', 38],
@@ -779,6 +781,7 @@
         if (vis.length > 1) { vis[1].after(band); band.style.display = ''; } else band.style.display = 'none';
       }
       syncRescue(shown);
+      syncPager(displayN);
       if (!shown) showEmpty(); else hideEmpty();
       syncChips(); syncTabs();
     }
@@ -812,9 +815,6 @@
       const near = $('.near-sect');
       if (near) near.classList.toggle('near-hi', thin);
 
-      const pager = $('.pager');
-      if (pager) pager.style.display = thin ? 'none' : '';
-
       let note = $('.thin-note');
       if (thin && !note) { note = el('div', 'thin-note'); main.insertBefore(note, main.firstChild); }
       if (note) {
@@ -823,6 +823,46 @@
           '<span><b>Vezi și alte variante.</b> Mută datele mai jos, sari la o stațiune vecină sau lasă-ne să căutăm în tot inventarul.</span>',
           '<span><b>Look at other options.</b> Shift the dates below, jump to a nearby resort, or let us search our whole inventory.</span>');
       }
+    }
+
+    /* Paginare de 30 — pe telefon infinite scroll ascunde și footerul, și
+       poziția în listă; pagerul păstrează ambele. */
+    let page = 1;
+    function syncPager(total) {
+      const pager = $('.pager');
+      if (!pager) return;
+      const pages = Math.max(1, Math.ceil((total || 0) / PAGE_SIZE));
+      if (page > pages) page = 1;
+
+      let range = $('.pg-range', main);
+      if (!range) { range = el('div', 'pg-range'); pager.before(range); }
+      const show = total > PAGE_SIZE;
+      pager.style.display = show ? '' : 'none';
+      range.style.display = show ? '' : 'none';
+      if (!show) return;
+
+      const from = (page - 1) * PAGE_SIZE + 1, to = Math.min(page * PAGE_SIZE, total);
+      range.innerHTML = t('Afișăm <b>' + from + '–' + to + '</b> din <b>' + total + '</b> cazări',
+                          'Showing <b>' + from + '–' + to + '</b> of <b>' + total + '</b> stays');
+
+      const nums = [];
+      for (let i = 1; i <= pages; i++) {
+        if (i === 1 || i === pages || Math.abs(i - page) <= 1) nums.push(i);
+        else if (nums[nums.length - 1] !== '…') nums.push('…');
+      }
+      pager.innerHTML =
+        (page > 1 ? '<a href="#" data-p="' + (page - 1) + '">‹</a>' : '') +
+        nums.map(n => n === '…' ? '<span class="dots">…</span>'
+          : '<a href="#" data-p="' + n + '"' + (n === page ? ' class="on"' : '') + '>' + n + '</a>').join('') +
+        (page < pages ? '<a href="#" data-p="' + (page + 1) + '">›</a>' : '');
+
+      $$('[data-p]', pager).forEach(a => a.onclick = e => {
+        e.preventDefault();
+        page = +a.dataset.p;
+        syncPager(total);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        toast(t('Pagina ', 'Page ') + page + t(' — în prototip lista rămâne aceeași', ' — the list stays the same in this prototype'));
+      });
     }
 
     let emptyBox = null;
@@ -943,15 +983,6 @@
     initCallback();
 
     $$('.near-card').forEach(c => c.onclick = () => { S.dest = $('.t', c).textContent.trim(); save(); goto('m-listing.html'); });
-
-    $$('.pager a').forEach(a => a.onclick = e => {
-      e.preventDefault();
-      if (a.classList.contains('on')) return;
-      $$('.pager a').forEach(x => x.classList.remove('on'));
-      if (!/›/.test(a.textContent)) a.classList.add('on');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      toast(t('Pagina ', 'Page ') + a.textContent.trim() + t(' — în prototip lista rămâne aceeași', ' — the list stays the same in this prototype'));
-    });
 
     applyFilters();
   }

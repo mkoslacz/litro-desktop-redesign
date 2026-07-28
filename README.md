@@ -73,6 +73,7 @@ linked to directly — and so the Figma export can capture each variant without 
 | `?density=a\|b\|c` | Listing card density |
 | `?inv=many\|some\|few` | Demo inventory (mobile listing) |
 | `?room=2` | Pre-selects rooms so the booking bar is up (mobile hotel) |
+| `?f=own` | Enter the listing with filters already applied (comma-separated keys; clears the page's presets first) |
 | `?nopanel=1` | Export mode: no demo panel, fixed bars join the normal flow |
 
 ## The charter set — "Garantat de noi"
@@ -112,6 +113,14 @@ are driven by the visible result count rather than being always-on decoration:
 | 5 or fewer | Flexible-date strip, a "look at other options" line and the nearby-resorts band appear; "load more" and the pager disappear; the headline switches to the real count |
 | 2 or fewer | The call-centre band moves directly under the last result, turns orange and names the number left |
 | 0 | Empty state: clear the filters, or hand the search to a consultant |
+
+## Pagination, not infinite scroll
+
+Results are paginated at **30 per page** on both desktop and mobile. "Show more results" was replaced
+by a pager plus a range line — *Afișăm 1–30 din 81 cazări* — because a load-more button hides both how
+much is left and where you are, and infinite scroll additionally buries the footer and makes a result
+impossible to return to. The pager hides itself below 31 results, so a filtered set of three does not
+get decoration it does not need.
 
 ## Design decisions that are business rules, not taste
 

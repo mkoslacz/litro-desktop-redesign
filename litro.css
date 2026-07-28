@@ -867,3 +867,9 @@ body[data-auth="in"] .login-band { display: none; }
 /* antetul: pentru un vizitator nelogat „Autentifică-te" e o acțiune, nu un text */
 .h-user.guest { border: 1.5px solid var(--navy-500); color: var(--navy-500); border-radius: 100px; padding: 7px 15px; font-weight: 700; }
 .h-user.guest:hover { background: var(--navy-100); }
+
+/* paginare: linia „afișăm X–Y din N" deasupra pagerului */
+.pagerwrap { padding: 18px 0 8px; }
+.pg-range { text-align: center; color: var(--gray-700); font-size: 14px; }
+.pg-range b { color: var(--gray-900); }
+.pagerwrap .pager { padding-top: 10px; }

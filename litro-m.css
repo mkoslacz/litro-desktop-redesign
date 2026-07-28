@@ -798,3 +798,8 @@ body[data-auth="in"] .m-head .act-user .dot { display: none; }
 .m-head .avatar { width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,.22); display: none; align-items: center; justify-content: center; font-weight: 800; font-size: 12.5px; }
 body[data-auth="in"] .m-head .act-user .ico { display: none; }
 body[data-auth="in"] .m-head .avatar { display: flex; }
+
+/* paginare: linia „afișăm X–Y din N" deasupra pagerului */
+.pg-range { text-align: center; color: var(--gray-700); font-size: 13px; padding: 6px 0 2px; }
+.pg-range b { color: var(--gray-900); }
+.pager .dots { display: inline-flex; align-items: center; color: var(--gray-600); padding: 0 2px; }

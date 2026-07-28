@@ -34,6 +34,8 @@
   const fmtShort = s => { const d = parse(s); return d.getDate() + ' ' + monN(d.getMonth()); };
   const fmtRange = (a, b) => fmtShort(a) + ' – ' + fmtShort(b);
 
+  const PAGE_SIZE = 30;          // paginare, nu infinite scroll
+
   const RESORTS = [
     ['Mamaia', 319], ['Mamaia Nord', 58], ['Eforie Nord', 184], ['Eforie Sud', 76], ['Costinești', 97],
     ['Neptun-Olimp', 112], ['Jupiter', 64], ['Venus', 71], ['Saturn', 49], ['Mangalia', 38],
@@ -879,7 +881,54 @@
       }
       // listing B: banner de date flexibile doar când sunt puține rezultate
       syncRescue(shown);
+      syncPager(displayN);
       if (!shown) showEmptyState(); else hideEmptyState();
+    }
+
+    /* ------------------------------------------------------------
+       Paginare de 30 de rezultate. „Afișează mai multe" ascundea câte
+       cazări mai sunt și unde te afli în listă; un pager spune și una,
+       și alta, și se poate reveni la o pagină anume.
+       ------------------------------------------------------------ */
+    let page = 1;
+    function syncPager(total) {
+      const main = $('.listing-grid main');
+      if (!main) return;
+      const pages = Math.max(1, Math.ceil((total || 0) / PAGE_SIZE));
+      if (page > pages) page = 1;
+
+      let wrap = $('.pagerwrap', main);
+      if (!wrap) {
+        wrap = el('div', 'pagerwrap', '<div class="pg-range"></div><div class="pager"></div>');
+        const more = $('.show-more', main);
+        if (more) more.replaceWith(wrap); else (($('.near-band', main) || null) ? $('.near-band', main).before(wrap) : main.appendChild(wrap));
+      }
+      wrap.style.display = (total > PAGE_SIZE) ? '' : 'none';
+      if (total <= PAGE_SIZE) return;
+
+      const from = (page - 1) * PAGE_SIZE + 1, to = Math.min(page * PAGE_SIZE, total);
+      $('.pg-range', wrap).innerHTML = EN()
+        ? 'Showing <b>' + from + '–' + to + '</b> of <b>' + total + '</b> stays'
+        : 'Afișăm <b>' + from + '–' + to + '</b> din <b>' + total + '</b> cazări';
+
+      const nums = [];
+      for (let i = 1; i <= pages; i++) {
+        if (i === 1 || i === pages || Math.abs(i - page) <= 1) nums.push(i);
+        else if (nums[nums.length - 1] !== '…') nums.push('…');
+      }
+      $('.pager', wrap).innerHTML =
+        (page > 1 ? '<a href="#" data-p="' + (page - 1) + '" aria-label="' + lang('Pagina anterioară', 'Previous page') + '">‹</a>' : '') +
+        nums.map(n => n === '…' ? '<span class="dots">…</span>'
+          : '<a href="#" data-p="' + n + '"' + (n === page ? ' class="on"' : '') + '>' + n + '</a>').join('') +
+        (page < pages ? '<a href="#" data-p="' + (page + 1) + '" aria-label="' + lang('Pagina următoare', 'Next page') + '">›</a>' : '');
+
+      $$('[data-p]', wrap).forEach(a => a.onclick = e => {
+        e.preventDefault();
+        page = +a.dataset.p;
+        syncPager(total);
+        window.scrollTo({ top: $('.listing-grid').offsetTop - 90, behavior: 'smooth' });
+        toast(lang('Pagina ', 'Page ') + page + lang(' — în prototip lista rămâne aceeași', ' — the list stays the same in this prototype'));
+      });
     }
 
     /* ------------------------------------------------------------
@@ -919,9 +968,6 @@
 
       const near = $('.near-band');
       if (near) near.classList.toggle('near-hi', thin);
-
-      const more = $('.show-more');
-      if (more) more.style.display = thin ? 'none' : '';
 
       /* explicație scurtă deasupra listei, ca utilizatorul să știe de ce s-a schimbat pagina */
       let note = $('.thin-note');
@@ -1032,7 +1078,7 @@
              și confirmarea instantanee, deci e și cea mai bună experiență */
           return ((+b.dataset.own || 0) - (+a.dataset.own || 0)) || ((+a.dataset.rank || 0) - (+b.dataset.rank || 0));
         });
-        const anchor = $('.show-more', main);
+        const anchor = $('.pagerwrap', main) || $('.show-more', main);
         list.forEach(c => main.insertBefore(c, anchor));
         closeAllPops();
         toast('Sortat: ' + it.textContent, 'ok');
@@ -1086,6 +1132,13 @@
     });
 
     /* --- demo: comutator de inventar (mult / puțin) — arată starea „multe" vs „puține" rezultate --- */
+    /* starea inițială vine din primul buton (sau din cel marcat .on), altfel
+       lista ar raporta cele 6 carduri demo în loc de mărimea reală a rezultatului */
+    const invFirst = $('.invdemo [data-cap].on') || $('.invdemo [data-cap]');
+    if (invFirst) {
+      invFirst.classList.add('on');
+      demoCap = +invFirst.dataset.cap; demoCount = +invFirst.dataset.count;
+    }
     $$('.invdemo [data-cap]').forEach(b => b.onclick = () => {
       $$('.invdemo [data-cap]').forEach(x => x.classList.remove('on'));
       b.classList.add('on');
@@ -1667,13 +1720,13 @@
       };
       tabs.forEach((t, i) => t.onclick = () => { tabs.forEach(x => x.classList.remove('on')); t.classList.add('on'); paintTab(i); });
     }
-    $$('.pager a').forEach(a => a.onclick = e => {
+    $$('.pager a:not([data-p])').forEach(a => a.onclick = e => {
       e.preventDefault();
       if (a.classList.contains('on')) return;
       $$('.pager a').forEach(x => x.classList.remove('on'));
       if (!/›/.test(a.textContent)) a.classList.add('on');
-      window.scrollTo({ top: $('.listing-grid').offsetTop - 90, behavior: 'smooth' });
-      toast('Pagina ' + a.textContent.trim() + ' — în prototip lista rămâne aceeași');
+      window.scrollTo({ top: ($('.listing-grid') || document.body).offsetTop - 90, behavior: 'smooth' });
+      toast(lang('Pagina ', 'Page ') + a.textContent.trim() + lang(' — în prototip lista rămâne aceeași', ' — the list stays the same in this prototype'));
     });
     $$('.theme').forEach(t => t.onclick = () => { save(); goto(listingHref() + qs()); });
     const nlBtn = $('.nl .btn');
