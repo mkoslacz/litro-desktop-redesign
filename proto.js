@@ -56,16 +56,16 @@
     payMode: 'advance', voucher: 0, promo: null, flex: 'exact'
   };
   let S = Object.assign({}, DEF);
-  /* schema stării s-a schimbat (destinația implicită e acum „tot litoralul");
-     sesiunile mai vechi ar readuce Mamaia, deci le lăsăm să expire o dată */
-  const STATE_V = '2';
-  try {
-    if (localStorage.getItem('litroV') !== STATE_V) { localStorage.removeItem('litro'); localStorage.setItem('litroV', STATE_V); }
-    S = Object.assign(S, JSON.parse(localStorage.getItem('litro') || '{}'));
-  } catch (e) { }
+  try { S = Object.assign(S, JSON.parse(localStorage.getItem('litro') || '{}')); } catch (e) { }
   const q = new URLSearchParams(location.search);
   ['dest', 'from', 'to', 'hotel', 'rate'].forEach(k => { if (q.get(k)) S[k] = q.get(k); });
   ['adults', 'kids', 'rooms', 'ratePrice'].forEach(k => { if (q.get(k)) S[k] = +q.get(k); });
+  /* Intrarea „la rece" — URL fără parametrul dest, adică din Google, dintr-un
+     link sau din pagina de prezentare — pornește de la tot litoralul, chiar dacă
+     sesiunea ține minte ultima stațiune. Navigarea din aplicație poartă mereu
+     dest în qs(), deci acolo căutarea se păstrează. */
+  if (!q.has('dest')) S.dest = '';
+
   const save = () => localStorage.setItem('litro', JSON.stringify(S));
   const nights = () => nightsBetween(S.from, S.to);
 
