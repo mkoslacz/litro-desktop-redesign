@@ -748,8 +748,9 @@ body[data-export].has-bar { padding-bottom: 0; }
   font-size: 11.5px; font-weight: 700; border-radius: 7px; padding: 3px 8px; white-space: nowrap; }
 .own-badge svg { width: 12px; height: 12px; }
 .own-badge.ghost { background: var(--navy-100); color: var(--navy-500); box-shadow: inset 0 0 0 1px #CBDEF2; }
-.lcard[data-own="1"] { box-shadow: inset 3px 0 0 var(--navy-500), var(--shadow-card); }
-.hcard[data-own="1"] { border-color: var(--navy-500); }
+.lcard[data-own="1"] { background: #F7FBFF; box-shadow: inset 3px 0 0 var(--navy-500), 0 0 0 1px #D3E4F4, var(--shadow-card); }
+.lcard[data-own="1"] .lc-quote { background: #EEF5FC; }
+.hcard[data-own="1"] { background: #F7FBFF; border-color: #BCD6EE; }
 .own-note { color: var(--gray-700); font-size: 13px; margin: -6px 0 12px; }
 
 /* anti-dead-end: banda de salvare și stațiunile din apropiere devin vizibile
@@ -759,3 +760,41 @@ body[data-export].has-bar { padding-bottom: 0; }
 .sect.near-hi { box-shadow: inset 0 0 0 1.5px var(--navy-500); border-radius: var(--r-l); }
 .thin-note { display: flex; gap: 8px; background: var(--orange-100); border: 1px solid #F3CFA5; color: #7A3E06;
   border-radius: var(--r-m); padding: 10px 12px; font-size: 13px; font-weight: 600; margin-bottom: 12px; }
+
+/* butonul mare „Garantat de noi" — în capul sheet-ului de filtre */
+.own-cta { display: flex; align-items: center; gap: 11px; width: 100%; text-align: left; background: #fff;
+  border: 1.5px solid var(--navy-500); border-radius: var(--r-l); padding: 12px 13px; margin-bottom: 16px; }
+.own-cta .ic { width: 32px; height: 32px; border-radius: 9px; background: var(--navy-100); color: var(--navy-500);
+  display: flex; align-items: center; justify-content: center; flex: none; }
+.own-cta .ic svg { width: 18px; height: 18px; }
+.own-cta .tx { flex: 1; min-width: 0; }
+.own-cta .t { display: block; font-weight: 700; font-size: 14.5px; color: var(--navy-900); }
+.own-cta .d { display: block; color: var(--gray-700); font-size: 12px; margin-top: 2px; }
+.own-cta .sw { width: 42px; height: 25px; border-radius: 100px; background: var(--gray-400); position: relative; flex: none; transition: background .18s; }
+.own-cta .sw::after { content: ""; position: absolute; top: 3px; left: 3px; width: 19px; height: 19px; border-radius: 50%; background: #fff; transition: transform .18s; }
+.own-cta.on { background: var(--navy-100); }
+.own-cta.on .ic { background: var(--navy-500); color: #fff; }
+.own-cta.on .sw { background: var(--navy-500); }
+.own-cta.on .sw::after { transform: translateX(17px); }
+
+/* histogramul de preț din sheet */
+.histo { display: flex; align-items: flex-end; gap: 3px; height: 58px; margin: 2px 0 8px; }
+.histo i { flex: 1; background: var(--navy-100); border-radius: 3px 3px 0 0; }
+
+/* banda de autentificare de pe homepage — dispare pentru membri */
+.login-band { display: flex; gap: 12px; background: linear-gradient(140deg, var(--navy-900), var(--navy-500) 75%, #1E6FBE);
+  color: #fff; border-radius: var(--r-l); padding: 15px 16px; }
+.login-band .ic { width: 38px; height: 38px; border-radius: 10px; background: rgba(255,255,255,.16); display: flex; align-items: center; justify-content: center; flex: none; }
+.login-band .t { font-family: var(--font-title); font-size: 17px; font-weight: 700; }
+.login-band .d { color: rgba(255,255,255,.9); font-size: 13px; margin-top: 3px; }
+.login-band .acts { display: flex; gap: 8px; margin-top: 12px; }
+.login-band .btn-white { background: #fff; color: var(--navy-700); }
+.login-band .btn-ghost { border: 1.5px solid rgba(255,255,255,.6); color: #fff; }
+body[data-auth="in"] .login-band { display: none; }
+/* pastila de cont din bara de aplicație */
+.m-head .act-user { position: relative; }
+.m-head .act-user .dot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; border-radius: 50%; background: var(--orange-500); border: 1.5px solid var(--navy-500); }
+body[data-auth="in"] .m-head .act-user .dot { display: none; }
+.m-head .avatar { width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,.22); display: none; align-items: center; justify-content: center; font-weight: 800; font-size: 12.5px; }
+body[data-auth="in"] .m-head .act-user .ico { display: none; }
+body[data-auth="in"] .m-head .avatar { display: flex; }

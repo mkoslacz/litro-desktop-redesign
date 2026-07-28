@@ -87,6 +87,19 @@ waiting for the hotel. The prototype makes that set findable and promotable:
 - The listing gets a **"Garantat de noi" filter**, and the default "Recomandate de noi" sort puts the
   charter set first.
 - The hotel page carries the badge under the title (`data-own="1"` on `<body>`).
+- The charter cards get a light navy tint and hairline border on top of the left accent, so the set
+  reads as a group in a scan without shouting.
+- The row's "see all" link opens the listing already filtered: `?f=own` (any filter key works, and it
+  clears the page's preset filters first, so the link lands on exactly one intention).
+
+## Signing in
+
+The prototype had no way to sign in, only to join FRIENDS. Now: an account button in the mobile app
+bar (with an orange dot for guests, an avatar for members), the desktop header entry rendered as a
+real button for guests, and a **"Ai deja cont? Autentifică-te"** band on the homepage that disappears
+for members. All three open the same sign-in / create-account sheet, which explains what an account
+buys — bookings and vouchers in one place, paying the balance online, 2% FRIENDS credits — and
+flipping it to signed-in updates the prototype panel too. Fields are mock placeholders; nothing is sent.
 
 ## Anti-dead-end behaviour on the listing
 

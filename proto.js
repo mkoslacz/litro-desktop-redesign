@@ -507,6 +507,7 @@
       user.setAttribute('data-pop-anchor', '');
       user.onclick = e => {
         e.stopPropagation();
+        if (document.body.dataset.auth !== 'in') { closeAllPops(); return loginModal(false); }
         const was = m.classList.contains('open'); closeAllPops(); if (was) return;
         const r = user.getBoundingClientRect();
         m.style.top = (r.bottom + window.scrollY + 8) + 'px';
@@ -543,6 +544,7 @@
       const nameNode = Array.from(hu.childNodes).find(n => n.nodeType === 3 && n.textContent.trim());
       if (nameNode) nameNode.textContent = mode === 'in' ? ' Ana ' : (EN() ? ' Sign in ' : ' Autentifică-te ');
       if (av) av.style.display = mode === 'in' ? '' : 'none';
+      hu.classList.toggle('guest', mode !== 'in');
     }
   }
 
@@ -625,18 +627,64 @@
     /* --- densitate celule: implicit A; comutatorul e în panoul de prototip (initProtoTools) --- */
     if (!document.body.dataset.density) document.body.dataset.density = 'a';
 
-    /* --- reordonare bară filtre: sus „recente" apoi „populare" (compact), disponibilitatea mai jos, restul ca înainte --- */
+    /* --- ordinea barei de filtre ---------------------------------------
+       Sub hartă stă butonul mare „Garantat de noi" — setul contractat direct
+       e prima decizie pe care vrem s-o ia utilizatorul. Apoi filtrele lui
+       recente, cele populare, disponibilitatea, prețul și restul grupelor.
+       Ordinea trăiește aici, ca să fie una singură pentru RO și EN.        */
     const aside = $('.listing-grid aside');
     if (aside) {
       const fboxByTitle = ts => $$('.fbox', aside).find(b => { const h = $('h3', b); return h && ts.some(t => h.textContent.trim().startsWith(t)); });
+      const ORDER = [
+        ['Filtrele tale recente', 'Your recent filters'],
+        ['Filtre populare', 'Popular filters'],
+        null,                                              // marcaj: aici intră caseta de disponibilitate
+        ['Preț pe noapte', 'Price per night'],
+        ['Pe baza recenziilor', 'By review score'],
+        ['Masă', 'Board'],
+        ['Tip de cazare', 'Property type'],
+        ['Plată și anulare', 'Payment'],
+        ['Reduceri', 'Discounts'],
+        ['Card de vacanță', 'Holiday card'],
+      ];
       const mapCard = $('.map-card', aside);
-      const recent = fboxByTitle(['Filtrele tale recente', 'Your recent filters']);
-      const popular = fboxByTitle(['Filtre populare', 'Popular filters']);
       const avail = $('.fbox.avail', aside);
-      if (mapCard && recent) mapCard.after(recent);
-      if (recent && popular) recent.after(popular);
-      if (popular && avail) popular.after(avail);
+      const ownCta = buildOwnCta();
+      if (mapCard) mapCard.after(ownCta); else aside.prepend(ownCta);
+
+      let prev = ownCta;
+      ORDER.forEach(titles => {
+        const box = titles === null ? avail : fboxByTitle(titles);
+        if (!box) return;
+        prev.after(box);
+        prev = box;
+      });
+      const popular = fboxByTitle(['Filtre populare', 'Popular filters']);
       if (popular) popular.classList.add('fbox-compact');
+      /* disponibilitatea rămâne cu două opțiuni: ce se poate rezerva și ce se
+         confirmă instantaneu; restul rândurilor erau zgomot */
+      if (avail) $$('.frow', avail).slice(2).forEach(r => r.remove());
+    }
+
+    /* butonul mare de sub hartă — comută același filtru ca pastila „Garantat de noi" */
+    function buildOwnCta() {
+      const box = el('div', 'own-cta');
+      box.innerHTML = '<span class="ic">' + SHIELD + '</span>' +
+        '<div><div class="t">' + lang('Garantat de noi', 'Guaranteed by us') + '</div>' +
+        '<div class="d">' + lang('46 hoteluri contractate direct — disponibilitate reală și confirmare instantanee',
+          '46 hotels contracted directly — real availability and instant confirmation') + '</div></div>' +
+        '<span class="sw"></span>';
+      box.onclick = () => {
+        const chip = $('.pfilter[data-f="own"]');
+        if (chip) chip.classList.toggle('on');
+        box.classList.toggle('on', chip ? chip.classList.contains('on') : !box.classList.contains('on'));
+        applyFilters(); syncChips();
+      };
+      return box;
+    }
+    function syncOwnCta() {
+      const box = $('.own-cta'), chip = $('.pfilter[data-f="own"]');
+      if (box) box.classList.toggle('on', !!chip && chip.classList.contains('on'));
     }
 
     /* --- rând de iconițe mari (rezumat pentru modul compact B): date · masă · cameră --- */
@@ -778,6 +826,21 @@
     });
 
     /* --- filters --- */
+    /* ?f=own,instant… — permite intrarea în listing cu filtre deja aplicate,
+       ca linkul „vezi toate cele garantate de noi" să ducă exact acolo */
+    const fParam = (q.get('f') || '').split(',').filter(Boolean);
+    if (fParam.length) {
+      /* linkul aduce utilizatorul cu o singură intenție — filtrele presetate
+         din pagină ar dilua-o, așa că pornim de la zero */
+      $$('.pfilter.on').forEach(p => p.classList.remove('on'));
+      $$('.fbox:not(.avail) .cb.on').forEach(c => c.classList.remove('on'));
+      fParam.forEach(k => {
+        const el0 = $('[data-f="' + k + '"]');
+        if (!el0) return;
+        const cb = $('.cb', el0);
+        if (cb) cb.classList.add('on'); else el0.classList.add('on');
+      });
+    }
     let demoCap = Infinity, demoCount = null;   // comutator demo de inventar (listing B)
     function applyFilters() {
       const active = {
@@ -825,7 +888,7 @@
        singura cale de ieșire — alte date, altă stațiune sau consultantul.
        ------------------------------------------------------------ */
     function syncRescue(shown) {
-      const thin = shown <= 5, dead = shown > 0 && shown <= 2;
+      const thin = shown <= 5, dead = shown <= 2;
 
       /* titlul listei poartă de obicei nota generală („8.7/10 din 11 395 recenzii");
          când inventarul se subțiază, numărul real e informația care contează */
@@ -841,12 +904,15 @@
       if (fstrip && (document.body.dataset.listing === 'b' || document.body.dataset.listing === 'c'))
         fstrip.style.display = thin ? '' : 'none';
 
-      const rescue = $('main > .rescue');
+      const rescue = $('main > .rescue:not(.rescue-empty)');
       if (rescue) {
-        rescue.style.display = thin ? '' : 'none';
+        /* la zero rezultate vorbește caseta de stare goală — n-are rost să spunem de două ori acelaşi lucru */
+        rescue.style.display = (thin && shown > 0) ? '' : 'none';
         rescue.classList.toggle('rescue-hi', dead);
         const tt = $('.t', rescue);
-        if (tt) tt.textContent = dead
+        if (tt) tt.textContent = !shown
+          ? (EN() ? 'No stay matches these dates' : 'Nicio cazare pentru aceste date')
+          : dead
           ? (EN() ? 'Only ' + shown + ' stays left for these dates' : 'Au mai rămas doar ' + shown + ' cazări pentru aceste date')
           : (EN() ? 'Not finding what you want for ' + fmtRange(S.from, S.to) + '?' : 'Nu găsești ce cauți pentru ' + fmtRange(S.from, S.to) + '?');
       }
@@ -874,14 +940,24 @@
     let emptyBox = null;
     function showEmptyState() {
       if (emptyBox) return;
-      emptyBox = el('div', 'rescue');
+      /* două cauze diferite, două mesaje diferite: filtre prea strânse
+         versus pur și simplu nu avem nimic liber în perioada aleasă */
+      const filtered = $$('.pfilter.on').length > 0 || $$('.fbox:not(.avail) .cb.on').length > 0;
+      emptyBox = el('div', 'rescue rescue-empty rescue-hi');
       emptyBox.innerHTML = '<span class="ic"><svg width="22" height="22"><use href="#i-phone"/></svg></span>' +
-        '<div><div class="t">Niciun rezultat pentru filtrele alese</div>' +
-        '<div class="d">Relaxează filtrele sau lasă-ne consultanții să caute în tot inventarul nostru de pe litoral.</div></div>' +
-        '<div class="acts"><button class="btn btn-outline-navy" data-clear-all>Șterge filtrele</button>' +
-        '<span class="phone">0241 999</span></div>';
+        '<div><div class="t">' + (filtered
+          ? lang('Niciun rezultat pentru filtrele alese', 'No results for the filters you picked')
+          : lang('Nicio cazare liberă pentru ' + fmtRange(S.from, S.to), 'No stay available for ' + fmtRange(S.from, S.to))) + '</div>' +
+        '<div class="d">' + (filtered
+          ? lang('Relaxează filtrele sau lasă-ne consultanții să caute în tot inventarul nostru de pe litoral.',
+                 'Relax the filters, or let our consultants search our whole seaside inventory.')
+          : lang('Încearcă alte date din banda de mai jos, o stațiune vecină, sau lasă-ne numărul — consultanții văd și camerele eliberate azi.',
+                 'Try other dates from the strip below, a nearby resort, or leave us your number — our consultants also see rooms released today.')) + '</div></div>' +
+        '<div class="acts">' + (filtered
+          ? '<button class="btn btn-outline-navy" data-clear-all>' + lang('Șterge filtrele', 'Clear filters') + '</button>'
+          : '') + '<span class="phone">0241 999</span></div>';
       $('.listing-grid main').prepend(emptyBox);
-      $('[data-clear-all]', emptyBox).onclick = clearAll;
+      const ca = $('[data-clear-all]', emptyBox); if (ca) ca.onclick = clearAll;
     }
     function hideEmptyState() { if (emptyBox) { emptyBox.remove(); emptyBox = null; } }
 
@@ -917,6 +993,7 @@
       });
       if (clear) wrap.appendChild(clear);
       if (!labels.length && clear) clear.style.display = 'none'; else if (clear) clear.style.display = '';
+      syncOwnCta();
     }
     function clearAll() {
       $$('.pfilter.on').forEach(p => p.classList.remove('on'));
@@ -1538,7 +1615,13 @@
       if (match) S.dest = match[0];
       save(); goto(listingHref() + qs());
     });
+    /* linkurile care poartă un filtru merg singure, cu tot cu starea căutării */
+    $$('[data-filter]').forEach(a => a.onclick = e => {
+      e.preventDefault();
+      save(); goto(listingHref() + qs() + '&f=' + a.dataset.filter);
+    });
     $$('.offer-card, .camp .btn, .link-more').forEach(c => {
+      if (c.hasAttribute('data-filter')) return;
       if (c.closest('.sec-head') || c.classList.contains('offer-card') || c.closest('.camp')) {
         c.onclick = e => {
           if (c.tagName === 'A' && /toate facilitățile/i.test(c.textContent)) return;
@@ -1641,6 +1724,31 @@
         '<p>Restul cazărilor se rezervă la cerere, cu confirmare în câteva ore.</p>');
   }
 
+  /* Autentificarea e o promisiune comercială (credite, rezervări la un loc),
+     nu doar un formular — de aceea o explicăm oriunde o cerem. */
+  function loginModal(register) {
+    const m = openModal(register ? lang('Creează cont', 'Create an account') : lang('Autentifică-te', 'Sign in'),
+      (lang('<p>Autentifică-te ca să ai rezervările, voucherele și facturile într-un singur loc, să plătești restul online și să primești <b>2% credite FRIENDS</b> la fiecare sejur.</p><div class="fld" style="margin-top:14px"><label>E-mail</label><div class="inp ph">ana@exemplu.ro</div></div><div class="fld"><label>Parolă</label><div class="inp ph">••••••••</div></div><p style="font-size:12.5px">Ai uitat parola? <a href="#">Îți trimitem un link de resetare</a></p>', '<p>Sign in to keep your bookings, vouchers and invoices in one place, pay the balance online, and earn <b>2% FRIENDS credits</b> on every stay.</p><div class="fld" style="margin-top:14px"><label>E-mail</label><div class="inp ph">ana@example.com</div></div><div class="fld"><label>Password</label><div class="inp ph">••••••••</div></div><p style="font-size:12.5px">Forgot your password? <a href="#">We will send you a reset link</a></p>')) +
+      '<button class="btn btn-primary" style="width:100%;padding:13px 0;margin-top:6px" data-do>' +
+      (register ? lang('Creează cont', 'Create account') : lang('Autentifică-te', 'Sign in')) + '</button>' +
+      '<p style="text-align:center;margin-top:10px;font-size:13px">' +
+      (register ? lang('Ai deja cont? ', 'Already have an account? ') : lang('Nu ai cont? ', 'No account yet? ')) +
+      '<a href="#" data-swap><b>' + (register ? lang('Autentifică-te', 'Sign in') : lang('Creează cont', 'Create one')) + '</b></a></p>');
+    $$('.inp', m).forEach(i => { i.contentEditable = 'true';
+      i.onfocus = () => { if (i.classList.contains('ph')) { i.textContent = ''; i.classList.remove('ph'); } }; });
+    $('[data-swap]', m).onclick = e => { e.preventDefault(); loginModal(!register); };
+    $('[data-do]', m).onclick = () => {
+      closeModal(); applyAuth('in');
+      try { localStorage.setItem('litroAuth', 'in'); } catch (e) { }
+      $$('.pt-auth .pt-b').forEach(b => b.classList.toggle('on', b.dataset.auth === 'in'));
+      toast(lang('Ești autentificat — bannerele pentru membri au dispărut', 'You are signed in — the member banners are gone'), 'ok');
+    };
+  }
+  function initLogin() {
+    $$('[data-login]').forEach(b => b.onclick = e => { e.stopPropagation(); loginModal(false); });
+    $$('[data-register]').forEach(b => b.onclick = e => { e.stopPropagation(); loginModal(true); });
+  }
+
   function initOwnInventory() {
     $$('.lcard[data-own="1"]').forEach(c => {
       const tags = $('.lc-tags', c) || $('.lc-mid', c);
@@ -1669,6 +1777,7 @@
     initThanks();
     initGeneric();
     initOwnInventory();
+    initLogin();
     repriceEverything();
   });
 })();

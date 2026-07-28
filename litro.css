@@ -816,8 +816,9 @@ table.rates { width: 100%; border-collapse: collapse; font-size: 14px; }
 .own-badge svg { width: 13px; height: 13px; }
 .own-badge.ghost { background: var(--navy-100); color: var(--navy-500); box-shadow: inset 0 0 0 1px #CBDEF2; }
 /* accent discret pe cardul din inventarul propriu — se vede în listă fără să țipe */
-.lcard[data-own="1"] { box-shadow: inset 3px 0 0 var(--navy-500), var(--shadow-card); }
-.hcard[data-own="1"] .ph::after { content: ""; position: absolute; inset: 0; box-shadow: inset 0 0 0 2px var(--navy-500); border-radius: inherit; pointer-events: none; }
+.lcard[data-own="1"] { background: #F7FBFF; box-shadow: inset 3px 0 0 var(--navy-500), 0 0 0 1px #D3E4F4, var(--shadow-card); }
+.lcard[data-own="1"] .quote { background: #EEF5FC; }
+.hcard[data-own="1"] { background: #F7FBFF; box-shadow: 0 0 0 1.5px #BCD6EE, var(--shadow-card); }
 
 /* rândul de hoteluri promovate (home + baza listingului) */
 .own-row .hcard { position: relative; }
@@ -835,3 +836,34 @@ table.rates { width: 100%; border-collapse: collapse; font-size: 14px; }
 .thin-note { display: flex; align-items: center; gap: 8px; background: var(--orange-100); border: 1px solid #F3CFA5;
   color: #7A3E06; border-radius: var(--r-m); padding: 10px 14px; font-size: 14px; font-weight: 600; margin-bottom: 14px; }
 .thin-note b { font-weight: 800; }
+
+/* butonul mare „Garantat de noi" de sub hartă — prima decizie din bara de filtre */
+.own-cta { display: flex; align-items: center; gap: 12px; background: #fff; border: 1.5px solid var(--navy-500);
+  border-radius: var(--r-l); padding: 13px 14px; margin-bottom: 14px; cursor: pointer; transition: background .15s; }
+.own-cta:hover { background: var(--navy-100); }
+.own-cta .ic { width: 34px; height: 34px; border-radius: 10px; background: var(--navy-100); color: var(--navy-500);
+  display: flex; align-items: center; justify-content: center; flex: none; }
+.own-cta .ic svg { width: 19px; height: 19px; }
+.own-cta .t { font-weight: 700; font-size: 15px; color: var(--navy-900); }
+.own-cta .d { color: var(--gray-700); font-size: 12px; line-height: 1.35; margin-top: 2px; }
+.own-cta .sw { width: 42px; height: 25px; border-radius: 100px; background: var(--gray-400); position: relative; flex: none; transition: background .18s; }
+.own-cta .sw::after { content: ""; position: absolute; top: 3px; left: 3px; width: 19px; height: 19px; border-radius: 50%; background: #fff; transition: transform .18s; }
+.own-cta.on { background: var(--navy-100); box-shadow: 0 0 0 3px rgba(0,75,151,.14); }
+.own-cta.on .sw { background: var(--navy-500); }
+.own-cta.on .sw::after { transform: translateX(17px); }
+.own-cta.on .ic { background: var(--navy-500); color: #fff; }
+
+/* banda de autentificare de pe homepage — dispare pentru membri */
+.login-band { display: flex; align-items: center; gap: 18px; background: linear-gradient(120deg, var(--navy-900), var(--navy-500) 70%, #1E6FBE);
+  color: #fff; border-radius: var(--r-l); padding: 20px 26px; }
+.login-band .ic { width: 46px; height: 46px; border-radius: var(--r-m); background: rgba(255,255,255,.16); display: flex; align-items: center; justify-content: center; flex: none; }
+.login-band .t { font-family: var(--font-title); font-size: 22px; font-weight: 700; }
+.login-band .d { color: rgba(255,255,255,.9); font-size: 14.5px; margin-top: 4px; max-width: 620px; }
+.login-band .acts { margin-left: auto; display: flex; gap: 10px; flex: none; }
+.login-band .btn { padding: 12px 22px; font-size: 15px; }
+.login-band .btn-white { background: #fff; color: var(--navy-700); }
+.login-band .btn-ghost { border: 1.5px solid rgba(255,255,255,.6); color: #fff; }
+body[data-auth="in"] .login-band { display: none; }
+/* antetul: pentru un vizitator nelogat „Autentifică-te" e o acțiune, nu un text */
+.h-user.guest { border: 1.5px solid var(--navy-500); color: var(--navy-500); border-radius: 100px; padding: 7px 15px; font-weight: 700; }
+.h-user.guest:hover { background: var(--navy-100); }

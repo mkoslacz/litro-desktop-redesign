@@ -98,9 +98,9 @@
   const spin = el('div', 'spin'); document.body.appendChild(spin);
   const qs = () => '?dest=' + encodeURIComponent(S.dest) + '&from=' + S.from + '&to=' + S.to +
     '&adults=' + S.adults + '&kids=' + S.kids + '&rooms=' + S.rooms;
-  function goto(url, delay) {
+  function goto(url, delay, extra) {
     spin.classList.add('on');
-    setTimeout(() => { location.href = enp(url) + qs(); }, delay == null ? 400 : delay);
+    setTimeout(() => { location.href = enp(url) + qs() + (extra || ''); }, delay == null ? 400 : delay);
   }
 
   /* ---------- toast ---------- */
@@ -485,7 +485,7 @@
         seg('pt-den', [['a', t('Detaliat', 'Detailed')], ['b', t('Compact', 'Compact')], ['c', t('Rezumat', 'Summary')]]
           .map(([k, l]) => btn('data-d="' + k + '" title="' + l + '"', k.toUpperCase(), document.body.dataset.density === k)).join('')) + '</div>';
       html += '<div class="pt-row"><span class="pt-lbl">' + t('Inventar demo', 'Demo inventory') + '</span>' +
-        seg('pt-inv', [['99', '81', t('Mult', 'Many')], ['4', '4', t('Mediu', 'Some')], ['2', '2', t('Puțin', 'Few')]]
+        seg('pt-inv', [['99', '81', t('Mult', 'Many')], ['4', '4', t('Mediu', 'Some')], ['2', '2', t('Puțin', 'Few')], ['0', '0', 'Zero']]
           .map(([cap, cnt, l], i) => btn('data-cap="' + cap + '" data-count="' + cnt + '"', l, i === 0)).join('')) + '</div>';
     }
     html += '<span class="pt-min" aria-label="' + t('Restrânge', 'Collapse') + '">–</span>';
@@ -565,21 +565,41 @@
   /* ============================================================
      LISTING
      ============================================================ */
+  /* Grupele de filtre, în ordinea din bara laterală de desktop: setul garantat
+     de noi stă separat, ca buton mare deasupra; apoi populare, disponibilitate,
+     preț, recenzii, masă, tip, plată, reduceri, card de vacanță, distanță. */
   const FILTERS = () => EN() ? [
-    { g: 'Popular filters', items: [['own', 'Guaranteed by us (own inventory)', 46], ['instant', 'Instant confirmation', 129], ['beach', 'Max. 100 m from the beach', 158], ['pool', 'With a pool', 109], ['breakfast', 'Breakfast included', 108], ['friends', 'Lower FRIENDS price', 200]] },
-    { g: 'Distance to the beach', items: [['d100', 'Right on the beach (0–100 m)', 158], ['d300', 'Up to 300 m', 241], ['d600', 'Up to 600 m', 302]] },
+    { g: 'Popular filters', items: [['pool', 'With a pool', 109], ['breakfast', 'Breakfast included', 108], ['beach', 'Max. 100 m from the beach', 158], ['park', 'Free parking', 210], ['pets', 'Pets allowed', 18]] },
+    { g: 'Availability', items: [['availOnly', 'Available stays only', 81], ['instant', 'Instant confirmation only', 63]] },
+    { g: 'By review score', items: [['r9', '9+ Exceptional', 24], ['r8', '8+ Excellent', 46], ['r7', '7+ Very good', 61]] },
     { g: 'Board', items: [['mBreak', 'Breakfast', 108], ['mHalf', 'Half board', 74], ['mAll', 'All inclusive', 112]] },
-    { g: 'Facilities', items: [['spa', 'Wellness & SPA', 97], ['kids', 'Kids’ facilities', 141], ['park', 'Free parking', 210], ['pets', 'Pets allowed', 18]] }
+    { g: 'Property type', items: [['tHotel', 'Hotel', 70], ['tVilla', 'Villa', 24], ['tApart', 'Apartment', 31], ['tGuest', 'Guest house', 12]] },
+    { g: 'Payment and cancellation', items: [['freeCancel', 'Free cancellation', 200], ['payOnline', 'Pay online', 74], ['payHotel', 'Pay at the hotel', 7]] },
+    { g: 'Discounts', items: [['friends', 'FRIENDS discount', 58], ['early', 'Early Booking', 41], ['extra', 'Extra Discount', 8]] },
+    { g: 'Holiday card', items: [['cEdenred', 'Edenred', 31], ['cPluxee', 'Pluxee', 28], ['cUp', 'Up România', 24]] },
+    { g: 'Distance to the beach', items: [['d100', 'Right on the beach (0–100 m)', 158], ['d300', 'Up to 300 m', 241], ['d600', 'Up to 600 m', 302]] },
+    { g: 'Facilities', items: [['spa', 'Wellness & SPA', 97], ['kids', 'Kids’ facilities', 141]] }
   ] : [
-    { g: 'Filtre populare', items: [['own', 'Garantat de noi (inventar propriu)', 46], ['instant', 'Confirmare instantanee', 129], ['beach', 'La max. 100 m de plajă', 158], ['pool', 'Cu piscină', 109], ['breakfast', 'Mic dejun inclus', 108], ['friends', 'Preț FRIENDS mai mic', 200]] },
-    { g: 'Distanța față de plajă', items: [['d100', 'Direct pe plajă (0–100 m)', 158], ['d300', 'Până în 300 m', 241], ['d600', 'Până în 600 m', 302]] },
+    { g: 'Filtre populare', items: [['pool', 'Cu piscină', 109], ['breakfast', 'Mic dejun inclus', 108], ['beach', 'La max. 100 m de plajă', 158], ['park', 'Parcare gratuită', 210], ['pets', 'Acceptă animale', 18]] },
+    { g: 'Disponibilitate', items: [['availOnly', 'Doar cazări disponibile', 81], ['instant', 'Doar cu confirmare instantanee', 63]] },
+    { g: 'Pe baza recenziilor', items: [['r9', '9+ Excepțional', 24], ['r8', '8+ Excelent', 46], ['r7', '7+ Foarte bine', 61]] },
     { g: 'Masă', items: [['mBreak', 'Mic dejun', 108], ['mHalf', 'Demipensiune', 74], ['mAll', 'All inclusive', 112]] },
-    { g: 'Facilități', items: [['spa', 'Wellness & SPA', 97], ['kids', 'Facilități pentru copii', 141], ['park', 'Parcare gratuită', 210], ['pets', 'Acceptă animale', 18]] }
+    { g: 'Tip de cazare', items: [['tHotel', 'Hotel', 70], ['tVilla', 'Vilă', 24], ['tApart', 'Apartament', 31], ['tGuest', 'Pensiune', 12]] },
+    { g: 'Plată și anulare', items: [['freeCancel', 'Anulare gratuită', 200], ['payOnline', 'Plată online', 74], ['payHotel', 'Plata la recepție', 7]] },
+    { g: 'Reduceri', items: [['friends', 'Reducere FRIENDS', 58], ['early', 'Înscrieri Timpurii', 41], ['extra', 'Extra Discount', 8]] },
+    { g: 'Card de vacanță', items: [['cEdenred', 'Edenred', 31], ['cPluxee', 'Pluxee', 28], ['cUp', 'Up România', 24]] },
+    { g: 'Distanța față de plajă', items: [['d100', 'Direct pe plajă (0–100 m)', 158], ['d300', 'Până în 300 m', 241], ['d600', 'Până în 600 m', 302]] },
+    { g: 'Facilități', items: [['spa', 'Wellness & SPA', 97], ['kids', 'Facilități pentru copii', 141]] }
   ];
+  /* prețul stă între disponibilitate și recenzii — indexul grupei după care se inserează */
+  const PRICE_AFTER = 1;
+
   const SORTS = () => EN()
     ? [['rec', 'Recommended by us'], ['price', 'Price, low to high'], ['pricedesc', 'Price, high to low'], ['score', 'Top rated'], ['beach', 'Closest to the beach']]
     : [['rec', 'Recomandate de noi'], ['price', 'Preț crescător'], ['pricedesc', 'Preț descrescător'], ['score', 'Cele mai bine notate'], ['beach', 'Cel mai aproape de plajă']];
   let activeFilters = {}, activeSort = 'rec', demoCap = Infinity, demoCount = null;
+  /* ?f=own,instant… — intrarea în listing cu filtre deja aplicate */
+  (qp.get('f') || '').split(',').filter(Boolean).forEach(k => { activeFilters[k] = true; });
 
   function initListing() {
     if (PAGE() !== 'listing') return;
@@ -769,16 +789,19 @@
        rezultate ar fi zgomot; cu 2 sunt singura cale de ieșire.
        ------------------------------------------------------------ */
     function syncRescue(shown) {
-      const thin = shown <= 5, dead = shown > 0 && shown <= 2;
+      const thin = shown <= 5, dead = shown <= 2;
       const fx = $('.flexi');
       if (fx) fx.style.display = thin ? '' : 'none';
 
       const call = $('.band-call');
       if (call) {
-        call.style.display = thin ? '' : 'none';
+        /* la zero rezultate vorbește caseta de stare goală */
+        call.style.display = (thin && shown > 0) ? '' : 'none';
         call.classList.toggle('band-hi', dead);
         const tt = $('.t', call);
-        if (tt) tt.textContent = dead
+        if (tt) tt.textContent = !shown
+          ? t('Nicio cazare pentru aceste date', 'No stay matches these dates')
+          : dead
           ? t('Au mai rămas doar ' + shown + ' cazări', 'Only ' + shown + ' stays left')
           : t('Nu găsești ce cauți?', 'Can’t find what you’re looking for?');
         /* când sunt puține rezultate, banda urcă imediat sub ultimul card */
@@ -805,14 +828,21 @@
     let emptyBox = null;
     function showEmpty() {
       if (emptyBox) return;
+      const filtered = countActive() > 0;
       emptyBox = el('div', 'rescue');
-      emptyBox.innerHTML = '<div class="t">' + t('Niciun rezultat pentru filtrele alese', 'No results for the filters you picked') + '</div>' +
-        '<div class="d">' + t('Relaxează filtrele sau lasă-ne consultanții să caute în tot inventarul nostru de pe litoral.',
-          'Relax the filters, or let our consultants search the whole of our seaside inventory.') + '</div>' +
-        '<div class="cbrow"><button class="btn btn-outline-navy btn-sm" data-clear>' + t('Șterge filtrele', 'Clear filters') + '</button>' +
-        '<a class="btn btn-primary btn-sm" href="tel:0241999">' + t('Sună 0241 999', 'Call 0241 999') + '</a></div>';
+      emptyBox.innerHTML = '<div class="t">' + (filtered
+          ? t('Niciun rezultat pentru filtrele alese', 'No results for the filters you picked')
+          : t('Nicio cazare liberă pentru ' + fmtRange(S.from, S.to), 'No stay available for ' + fmtRange(S.from, S.to))) + '</div>' +
+        '<div class="d">' + (filtered
+          ? t('Relaxează filtrele sau lasă-ne consultanții să caute în tot inventarul nostru de pe litoral.',
+              'Relax the filters, or let our consultants search the whole of our seaside inventory.')
+          : t('Încearcă alte date din banda de mai jos, o stațiune vecină, sau lasă-ne numărul — consultanții văd și camerele eliberate azi.',
+              'Try other dates from the strip below, a nearby resort, or leave us your number — our consultants also see rooms released today.')) + '</div>' +
+        '<div class="cbrow">' + (filtered
+          ? '<button class="btn btn-outline-navy btn-sm" data-clear>' + t('Șterge filtrele', 'Clear filters') + '</button>'
+          : '') + '<a class="btn btn-primary btn-sm" href="tel:0241999">' + t('Sună 0241 999', 'Call 0241 999') + '</a></div>';
       main.prepend(emptyBox);
-      $('[data-clear]', emptyBox).onclick = clearAll;
+      const ca = $('[data-clear]', emptyBox); if (ca) ca.onclick = clearAll;
     }
     function hideEmpty() { if (emptyBox) { emptyBox.remove(); emptyBox = null; } }
     function clearAll() { activeFilters = {}; applyFilters(); toast(t('Filtre șterse', 'Filters cleared')); }
@@ -821,6 +851,7 @@
       const wrap = $('.fchips');
       if (!wrap) return;
       const labels = [];
+      if (activeFilters.own) labels.push(['own', t('Garantat de noi', 'Guaranteed by us')]);
       FILTERS().forEach(g => g.items.forEach(([k, l]) => { if (activeFilters[k]) labels.push([k, l]); }));
       wrap.innerHTML = labels.map(([k, l]) => '<button class="fchip" data-k="' + k + '">' + l + ' <span class="x">✕</span></button>').join('') +
         (labels.length ? '<button class="clr">' + t('Șterge tot', 'Clear all') + '</button>' : '');
@@ -834,13 +865,11 @@
       const sh = openSheet({
         title: t('Filtre', 'Filters'), full: true, clear: t('Șterge tot', 'Clear all'),
         foot: '<button class="btn btn-primary btn-block" data-ok></button>',
-        body: FILTERS().map(g => '<div class="fgroup"><div class="fh"><h4>' + g.g + '</h4></div>' +
-          g.items.map(([k, l, c]) => '<label class="frow" data-k="' + k + '"><span class="cb' + (draft[k] ? ' on' : '') + '"></span>' + l + '<span class="c">(' + c + ')</span></label>').join('') + '</div>').join('') +
-          '<div class="fgroup"><div class="fh"><h4>' + t('Buget pe noapte', 'Budget per night') + '</h4></div>' +
-          '<input class="range" type="range" min="100" max="1200" step="50" value="1200">' +
-          '<div class="range-lbl"><span>100 Lei</span><span><b class="bmax">1 200</b> Lei</span></div></div>' +
-          '<div class="fgroup"><div class="fh"><h4>' + t('Categorie', 'Star rating') + '</h4></div><div class="starbox">' +
-          [['5', 129], ['4', 109], ['3', 158], ['≤2', 58]].map(([n, c]) => '<button><span class="n">' + n + ' ★</span><span class="c">(' + c + ')</span></button>').join('') + '</div></div>'
+        body: ownCtaHtml(draft.own) +
+          FILTERS().map((g, i) =>
+            '<div class="fgroup"><div class="fh"><h4>' + g.g + '</h4></div>' +
+            g.items.map(([k, l, c]) => '<label class="frow" data-k="' + k + '"><span class="cb' + (draft[k] ? ' on' : '') + '"></span>' + l + '<span class="c">(' + c + ')</span></label>').join('') +
+            '</div>' + (i === PRICE_AFTER ? priceHtml() : '')).join('')
       });
       const ok = $('[data-ok]', sh);
       const count = () => cards.filter(c => matches(c, draft)).length;
@@ -856,10 +885,16 @@
         $('.cb', r).classList.toggle('on', !!draft[k]);
         syncOk();
       });
-      $$('.starbox button', sh).forEach(b => b.onclick = () => b.classList.toggle('on'));
+      const cta = $('[data-own-cta]', sh);
+      if (cta) cta.onclick = () => { draft.own = !draft.own; cta.classList.toggle('on', !!draft.own); syncOk(); };
       const rng = $('.range', sh), bmax = $('.bmax', sh);
       if (rng) rng.oninput = () => bmax.textContent = money(+rng.value);
-      $('.clear', sh).onclick = () => { Object.keys(draft).forEach(k => delete draft[k]); $$('.cb', sh).forEach(c => c.classList.remove('on')); $$('.starbox button', sh).forEach(b => b.classList.remove('on')); syncOk(); };
+      $('.clear', sh).onclick = () => {
+        Object.keys(draft).forEach(k => delete draft[k]);
+        $$('.cb', sh).forEach(c => c.classList.remove('on'));
+        if (cta) cta.classList.remove('on');
+        syncOk();
+      };
       ok.onclick = () => { if (ok.classList.contains('btn-disabled')) return; activeFilters = draft; closeSheet(); applyFilters(); };
       syncOk();
     }
@@ -901,7 +936,7 @@
       applyFilters();
       toast(t('Inventar demo: ', 'Demo inventory: ') + label, 'ok');
     };
-    const INV = { many: [99, 81], some: [4, 4], few: [2, 2] };
+    const INV = { many: [99, 81], some: [4, 4], few: [2, 2], zero: [0, 0] };
     const inv = INV[qp.get('inv')] || INV.many;   // ?inv=… fixează starea pentru export
     demoCap = inv[0]; demoCount = inv[1];
 
@@ -1337,6 +1372,11 @@
      ============================================================ */
   function initGeneric() {
     $$('a[href="#"]').forEach(a => a.onclick = e => { e.preventDefault(); toast(t('În prototip: ', 'In the prototype: ') + a.textContent.trim()); });
+    /* linkurile care poartă un filtru duc în listing cu filtrul deja pus */
+    $$('[data-filter]').forEach(a => a.onclick = e => {
+      e.preventDefault();
+      save(); goto('m-listing.html', null, '&f=' + a.dataset.filter);
+    });
     $$('[data-friends]').forEach(b => b.onclick = e => {
       e.stopPropagation();
       openModal(t('Program FRIENDS', 'FRIENDS programme'),
@@ -1391,6 +1431,40 @@
       '<p>The rest of the stays are booked on request, with confirmation within a few hours.</p>'));
   }
 
+  function loginModal(register) {
+    const box = openModal(register ? t('Creează cont', 'Create an account') : t('Autentifică-te', 'Sign in'),
+      t('<p>Autentifică-te ca să ai rezervările, voucherele și facturile într-un singur loc, să plătești restul online și să primești <b>2% credite FRIENDS</b> la fiecare sejur.</p><div class="fld" style="margin-top:14px"><label>E-mail</label><div class="inp ph">ana@exemplu.ro</div></div><div class="fld"><label>Parolă</label><div class="inp ph">••••••••</div></div><p style="font-size:12.5px">Ai uitat parola? <a href="#">Îți trimitem un link de resetare</a></p>', '<p>Sign in to keep your bookings, vouchers and invoices in one place, pay the balance online, and earn <b>2% FRIENDS credits</b> on every stay.</p><div class="fld" style="margin-top:14px"><label>E-mail</label><div class="inp ph">ana@example.com</div></div><div class="fld"><label>Password</label><div class="inp ph">••••••••</div></div><p style="font-size:12.5px">Forgot your password? <a href="#">We will send you a reset link</a></p>') +
+      '<button class="btn btn-primary btn-block" style="margin-top:6px" data-do>' +
+      (register ? t('Creează cont', 'Create account') : t('Autentifică-te', 'Sign in')) + '</button>' +
+      '<p style="text-align:center;margin-top:10px;font-size:13px">' +
+      (register ? t('Ai deja cont? ', 'Already have an account? ') : t('Nu ai cont? ', 'No account yet? ')) +
+      '<a href="#" data-swap><b>' + (register ? t('Autentifică-te', 'Sign in') : t('Creează cont', 'Create one')) + '</b></a></p>');
+    $$('.inp', box).forEach(i => { i.contentEditable = 'true';
+      i.onfocus = () => { if (i.classList.contains('ph')) { i.textContent = ''; i.classList.remove('ph'); } }; });
+    $('[data-swap]', box).onclick = e => { e.preventDefault(); loginModal(!register); };
+    $('[data-do]', box).onclick = () => {
+      closeModal();
+      document.body.dataset.auth = 'in';
+      try { localStorage.setItem('litroAuth', 'in'); } catch (e) { }
+      $$('.pt-auth .pt-b').forEach(b => b.classList.toggle('on', b.dataset.auth === 'in'));
+      toast(t('Ești autentificat — bannerele pentru membri au dispărut', 'You are signed in — the member banners are gone'), 'ok');
+    };
+  }
+  function initLogin() {
+    const u = $('.m-head .act-user');
+    if (u) u.onclick = () => {
+      if (document.body.dataset.auth === 'in') {
+        return openModal(t('Contul meu', 'My account'), '<div class="menu-list">' +
+          [t('Rezervările mele', 'My bookings'), t('Credite FRIENDS: 128', 'FRIENDS credits: 128'),
+           t('Datele mele', 'My details'), t('Ieși din cont', 'Sign out')]
+          .map(x => '<a href="#">' + x + '</a>').join('') + '</div>');
+      }
+      loginModal(false);
+    };
+    $$('[data-login]').forEach(b => b.onclick = e => { e.stopPropagation(); loginModal(false); });
+    $$('[data-register]').forEach(b => b.onclick = e => { e.stopPropagation(); loginModal(true); });
+  }
+
   function initOwnInventory() {
     $$('.lcard[data-own="1"]').forEach(c => {
       const perks = $('.lc-perks', c);
@@ -1407,6 +1481,23 @@
     $$('.own-badge').forEach(b => b.onclick = e => { e.stopPropagation(); e.preventDefault(); ownModal(); });
   }
 
+  /* Setul contractat direct nu e un filtru ca oricare altul — stă ca buton mare
+     în capul sheet-ului, exact ca sub hartă pe desktop. */
+  function ownCtaHtml(on) {
+    return '<button class="own-cta' + (on ? ' on' : '') + '" data-own-cta>' +
+      '<span class="ic">' + SHIELD + '</span>' +
+      '<span class="tx"><span class="t">' + t('Garantat de noi', 'Guaranteed by us') + '</span>' +
+      '<span class="d">' + t('46 hoteluri contractate direct de noi', '46 hotels contracted directly by us') + '</span></span>' +
+      '<span class="sw"></span></button>';
+  }
+  function priceHtml() {
+    return '<div class="fgroup"><div class="fh"><h4>' + t('Preț pe noapte', 'Price per night') + '</h4></div>' +
+      '<div class="histo">' + [18, 32, 54, 78, 96, 88, 64, 47, 33, 24, 16, 11, 7, 5].map(h =>
+        '<i style="height:' + h + '%"></i>').join('') + '</div>' +
+      '<input class="range" type="range" min="100" max="1200" step="50" value="1200">' +
+      '<div class="range-lbl"><span>100 Lei</span><span><b class="bmax">1 200</b> Lei</span></div></div>';
+  }
+
   /* ---------- boot ---------- */
   document.addEventListener('DOMContentLoaded', () => {
     initHeader();
@@ -1421,6 +1512,7 @@
     initThanks();
     initGeneric();
     initOwnInventory();
+    initLogin();
     repriceEverything();
   });
 })();
