@@ -56,7 +56,13 @@
     payMode: 'advance', voucher: 0, promo: null, flex: 'exact'
   };
   let S = Object.assign({}, DEF);
-  try { S = Object.assign(S, JSON.parse(localStorage.getItem('litro') || '{}')); } catch (e) { }
+  /* schema stării s-a schimbat (destinația implicită e acum „tot litoralul");
+     sesiunile mai vechi ar readuce Mamaia, deci le lăsăm să expire o dată */
+  const STATE_V = '2';
+  try {
+    if (localStorage.getItem('litroV') !== STATE_V) { localStorage.removeItem('litro'); localStorage.setItem('litroV', STATE_V); }
+    S = Object.assign(S, JSON.parse(localStorage.getItem('litro') || '{}'));
+  } catch (e) { }
   const q = new URLSearchParams(location.search);
   ['dest', 'from', 'to', 'hotel', 'rate'].forEach(k => { if (q.get(k)) S[k] = q.get(k); });
   ['adults', 'kids', 'rooms', 'ratePrice'].forEach(k => { if (q.get(k)) S[k] = +q.get(k); });
@@ -171,7 +177,8 @@
 
     /* --- destination popover --- */
     const popD = el('div', 'pop pop-dest');
-    popD.innerHTML = '<input class="search-in" placeholder="Caută stațiune sau hotel…"><div class="list"></div>';
+    popD.innerHTML = '<input class="search-in" placeholder="' +
+      lang('Caută stațiune sau hotel…', 'Search a resort or hotel…') + '"><div class="list"></div>';
     card.appendChild(popD);
     function renderDest(filter) {
       const list = $('.list', popD);
@@ -183,8 +190,8 @@
       list.innerHTML = allRow + '<div class="grp">' + (EN() ? 'Or pick one resort' : 'Sau alege o stațiune') + '</div>' + rows.map(r =>
         '<div class="dest-item' + (r[0] === S.dest ? ' sel' : '') + '" data-d="' + r[0] + '">' +
         '<svg width="16" height="16" class="ic"><use href="#i-pin"/></svg>' + r[0] +
-        '<span class="c">' + r[1] + ' cazări</span></div>').join('') +
-        (rows.length ? '' : '<div class="dest-item">Nicio stațiune găsită</div>');
+        '<span class="c">' + r[1] + lang(' cazări', ' stays') + '</span></div>').join('') +
+        (rows.length ? '' : '<div class="dest-item">' + lang('Nicio stațiune găsită', 'No resort found') + '</div>');
       $$('.dest-item[data-d]', list).forEach(it => it.onclick = () => {
         S.dest = it.dataset.d; save(); paint(); closeAllPops();
         if (document.body.dataset.page === 'listing') { rerunSearch(); }

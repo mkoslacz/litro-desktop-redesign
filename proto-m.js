@@ -67,7 +67,13 @@
     payMode: 'advance', voucher: 0, promo: null, flex: 'Date exacte'
   };
   let S = Object.assign({}, DEF);
-  try { S = Object.assign(S, JSON.parse(localStorage.getItem('litro') || '{}')); } catch (e) { }
+  /* schema stării s-a schimbat (destinația implicită e acum „tot litoralul");
+     sesiunile mai vechi ar readuce Mamaia, deci le lăsăm să expire o dată */
+  const STATE_V = '2';
+  try {
+    if (localStorage.getItem('litroV') !== STATE_V) { localStorage.removeItem('litro'); localStorage.setItem('litroV', STATE_V); }
+    S = Object.assign(S, JSON.parse(localStorage.getItem('litro') || '{}'));
+  } catch (e) { }
   const qp = new URLSearchParams(location.search);
   ['dest', 'from', 'to', 'hotel', 'rate'].forEach(k => { if (qp.get(k)) S[k] = qp.get(k); });
   ['adults', 'kids', 'rooms', 'ratePrice'].forEach(k => { if (qp.get(k)) S[k] = +qp.get(k); });

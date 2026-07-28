@@ -43,8 +43,10 @@
   .hc-arrow[disabled] { opacity: 0; pointer-events: none; }
 
   /* Hero cu căutarea integrată — „nu ai găsit? caută" pe imaginea hero */
-  .search-hero { position: relative; margin-top: 20px; border-radius: var(--r-l); overflow: hidden; box-shadow: var(--shadow-card); }
-  .search-hero .sh-bg { position: absolute; inset: 0; }
+  /* fără overflow:hidden pe hero — altfel popoverele de căutare (destinație,
+     calendar, oaspeți) sunt tăiate la marginea lui; rotunjirea o duce fundalul */
+  .search-hero { position: relative; margin-top: 20px; border-radius: var(--r-l); box-shadow: var(--shadow-card); }
+  .search-hero .sh-bg { position: absolute; inset: 0; overflow: hidden; border-radius: inherit; }
   .search-hero .sh-bg img { width: 100%; height: 100%; object-fit: cover; }
   .search-hero .sh-bg::after { content: ""; position: absolute; inset: 0;
     background: linear-gradient(100deg, rgba(1,43,85,.92) 0%, rgba(1,43,85,.74) 44%, rgba(1,43,85,.42) 100%); }
@@ -198,7 +200,7 @@
       <div class="search-card">
         <div class="s-field">
           <span class="ic"><svg width="22" height="22"><use href="#i-pin"/></svg></span>
-          <div><div class="s-label">Where to?</div><div class="s-value">Mamaia</div></div>
+          <div><div class="s-label">Where to?</div><div class="s-value">All resorts</div></div>
           <span class="s-clear"><svg width="16" height="16"><use href="#i-x"/></svg></span>
         </div>
         <div class="s-field">
