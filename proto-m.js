@@ -49,6 +49,7 @@
   const roomsTxt = () => plural(S.rooms, t('cameră', 'room'), t('camere', 'rooms'));
   const staysTxt = n => plural(n, t('cazare disponibilă', 'available stay'), t('cazări disponibile', 'available stays'));
 
+  const ALL_TOTAL = 1236;        // '' ca destinație = tot litoralul
   const PAGE_SIZE = 30;          // paginare, nu infinite scroll
 
   const RESORTS = [
@@ -60,7 +61,7 @@
 
   /* ---------- stare (partajată cu prototipul desktop) ---------- */
   const DEF = {
-    dest: 'Mamaia', from: '2026-06-05', to: '2026-06-12',
+    dest: '', from: '2026-06-05', to: '2026-06-12',
     adults: 2, kids: 2, ages: [7, 11], rooms: 2,
     hotel: 'Complex Mediteranean', rate: 'Cameră dublă vedere mare', ratePrice: 4046,
     payMode: 'advance', voucher: 0, promo: null, flex: 'Date exacte'
@@ -72,6 +73,7 @@
   ['adults', 'kids', 'rooms', 'ratePrice'].forEach(k => { if (qp.get(k)) S[k] = +qp.get(k); });
   const save = () => { try { localStorage.setItem('litro', JSON.stringify(S)); } catch (e) { } };
   const nights = () => nightsBetween(S.from, S.to);
+  const destLabel = () => S.dest || t('Tot litoralul', 'All resorts');
   const guestsTxt = () => plural(S.adults, t('adult', 'adult'), t('adulți', 'adults')) +
     (S.kids ? ' + ' + plural(S.kids, t('copil', 'child'), t('copii', 'children')) : '');
 
@@ -169,7 +171,7 @@
      PAINT — orice depinde de destinație / date / oaspeți
      ============================================================ */
   function paint() {
-    $$('[data-bind="dest"]').forEach(n => n.textContent = S.dest || t('Alege stațiunea', 'Pick a resort'));
+    $$('[data-bind="dest"]').forEach(n => n.textContent = destLabel());
     $$('[data-bind="dates"]').forEach(n => n.textContent = fmtRange(S.from, S.to));
     $$('[data-bind="nights"]').forEach(n => n.textContent = nights());
     $$('[data-bind="guests"]').forEach(n => n.textContent = guestsTxt());
@@ -256,10 +258,14 @@
     function render(f) {
       f = (f || '').toLowerCase();
       const rows = RESORTS.filter(r => !f || r[0].toLowerCase().includes(f));
-      list.innerHTML = rows.length
-        ? rows.map(r => '<div class="dest-item' + (r[0] === S.dest ? ' sel' : '') + '" data-d="' + r[0] + '">' +
-          '<svg width="17" height="17" class="ic"><use href="#i-pin"/></svg>' + r[0] + '<span class="c">' + r[1] + t(' cazări', ' stays') + '</span></div>').join('')
-        : '<div class="dest-item">' + t('Nicio stațiune găsită', 'No resort found') + '</div>';
+      const allRow = '<div class="dest-item all' + (S.dest ? '' : ' sel') + '" data-d="">' +
+        '<svg width="17" height="17" class="ic"><use href="#i-search"/></svg>' + t('Tot litoralul', 'All resorts') +
+        '<span class="c">' + money(ALL_TOTAL) + t(' cazări', ' stays') + '</span></div>';
+      list.innerHTML = (f ? '' : allRow + '<div class="grp">' + t('Sau alege o stațiune', 'Or pick one resort') + '</div>') +
+        (rows.length
+          ? rows.map(r => '<div class="dest-item' + (r[0] === S.dest ? ' sel' : '') + '" data-d="' + r[0] + '">' +
+            '<svg width="17" height="17" class="ic"><use href="#i-pin"/></svg>' + r[0] + '<span class="c">' + r[1] + t(' cazări', ' stays') + '</span></div>').join('')
+          : '<div class="dest-item">' + t('Nicio stațiune găsită', 'No resort found') + '</div>');
       $$('[data-d]', list).forEach(it => it.onclick = () => {
         S.dest = it.dataset.d; save(); paint(); closeSheet();
         if (after) after();
@@ -399,7 +405,6 @@
     $('[data-f="date"]', sh).onclick = () => calSheet(paint);
     $('[data-f="guests"]', sh).onclick = () => guestsSheet(paint);
     $('[data-go]', sh).onclick = () => {
-      if (!S.dest) return toast(t('Alege mai întâi o stațiune', 'Pick a resort first'), 'err');
       save(); closeSheet(true);
       if (opt.onSearch) opt.onSearch(); else goto('m-listing.html');
     };
@@ -444,12 +449,48 @@
      Sunt comutatoare de demo, nu UI de produs: de aceea stau într-un
      panou plutitor, nu în pagină.
      ============================================================ */
+  /* Cine intră direct pe pagina hotelului (din Google, dintr-o reclamă) n-a
+     căutat încă nimic — îi arătăm bara de căutare. Cine vine din listing a
+     căutat deja, deci bara ar fi doar zgomot. */
+  function applySession() {
+    if (PAGE() !== 'hotel') return;
+    const nu = document.body.dataset.session === 'new';
+    let box = $('.hotel-search');
+    if (nu && !box) {
+      box = el('section', 'sect tight hotel-search');
+      box.innerHTML = '<div class="sbox" style="box-shadow:none;border:1.5px solid var(--gray-400);padding:6px">' +
+        '<button class="sfield" data-f="dest"><span class="ic"><svg width="20" height="20"><use href="#i-pin"/></svg></span>' +
+        '<span><span class="lbl">' + t('Unde mergi?', 'Where to?') + '</span><br><span class="val" data-bind="dest"></span></span></button>' +
+        '<button class="sfield" data-f="date"><span class="ic"><svg width="20" height="20"><use href="#i-cal"/></svg></span>' +
+        '<span><span class="lbl">' + t('Când călătorești?', 'When?') + '</span><br><span class="val" data-bind="dates"></span></span></button>' +
+        '<button class="sfield" data-f="guests"><span class="ic"><svg width="20" height="20"><use href="#i-users"/></svg></span>' +
+        '<span><span class="lbl">' + t('Oaspeți și camere', 'Guests and rooms') + '</span><br><span class="val"><span data-bind="guests"></span>, <span data-bind="rooms"></span></span></span></button>' +
+        '<button class="btn btn-primary btn-block" data-go>' + t('Caută', 'Search') + ' <svg width="18" height="18"><use href="#i-search"/></svg></button></div>';
+      const gal = $('.gal');
+      if (gal) gal.before(box); else document.body.prepend(box);
+      $$('.sfield', box).forEach(f => f.onclick = () => {
+        const k = f.dataset.f;
+        if (k === 'dest') destSheet(paint); else if (k === 'date') calSheet(paint); else guestsSheet(paint);
+      });
+      $('[data-go]', box).onclick = () => { save(); goto('m-listing.html'); };
+      paint();
+    }
+    if (box) box.style.display = nu ? '' : 'none';
+    const sum = $('.m-sum');
+    if (sum) sum.style.display = nu ? 'none' : '';
+  }
+
   let onInventory = null;   // callback setat de listing
   function initProtoTools() {
     /* Stările de demo se pot fixa și din URL (?auth=in|out, ?density=a|b|c, ?inv=many|some|few),
        ca fiecare variantă să poată fi exportată în Figma fără clic în panou. */
     if (qp.get('auth')) document.body.dataset.auth = qp.get('auth');
     if (qp.get('density')) document.body.dataset.density = qp.get('density');
+    if (qp.get('rooms')) document.body.dataset.rooms = qp.get('rooms');
+    if (qp.get('session')) document.body.dataset.session = qp.get('session');
+    if (!document.body.dataset.rooms) document.body.dataset.rooms = 'on';
+    if (!document.body.dataset.session) document.body.dataset.session = 'site';
+    applySession();
     /* ?nopanel=1 — modul de export în Figma: fără panoul de demo, iar barele fixe
        intră în fluxul paginii (altfel ar cădea la mijlocul ramei, unde e marginea
        de jos a ferestrei în momentul capturii). */
@@ -482,12 +523,20 @@
     html += '<div class="pt-row"><span class="pt-lbl">' + t('Cont', 'Account') + '</span>' +
       seg('pt-auth', [['out', t('Musafir', 'Guest')], ['in', t('Membru', 'Member')]]
         .map(([k, l]) => btn('data-auth="' + k + '"', l, document.body.dataset.auth === k)).join('')) + '</div>';
+    if (PAGE() === 'hotel') {
+      html += '<div class="pt-row"><span class="pt-lbl">' + t('Sesiune', 'Session') + '</span>' +
+        seg('pt-sess', [['new', t('Vizitator nou', 'New visitor')], ['site', t('De pe site', 'From our site')]]
+          .map(([k, l]) => btn('data-sess="' + k + '"', l, document.body.dataset.session === k)).join('')) + '</div>';
+    }
     if (isListing) {
+      html += '<div class="pt-row"><span class="pt-lbl">' + t('Tipuri de cameră', 'Room types') + '</span>' +
+        seg('pt-rooms', [['on', t('Da', 'Yes')], ['off', t('Nu', 'No')]]
+          .map(([k, l]) => btn('data-rooms="' + k + '"', l, document.body.dataset.rooms === k)).join('')) + '</div>';
       html += '<div class="pt-row"><span class="pt-lbl">' + t('Densitate celule', 'Card view') + '</span>' +
         seg('pt-den', [['a', t('Detaliat', 'Detailed')], ['b', t('Compact', 'Compact')], ['c', t('Rezumat', 'Summary')]]
           .map(([k, l]) => btn('data-d="' + k + '" title="' + l + '"', k.toUpperCase(), document.body.dataset.density === k)).join('')) + '</div>';
       html += '<div class="pt-row"><span class="pt-lbl">' + t('Inventar demo', 'Demo inventory') + '</span>' +
-        seg('pt-inv', [['99', '81', t('Mult', 'Many')], ['4', '4', t('Mediu', 'Some')], ['2', '2', t('Puțin', 'Few')], ['0', '0', 'Zero']]
+        seg('pt-inv', [['99', '1236', t('Mult', 'Many')], ['4', '4', t('Mediu', 'Some')], ['2', '2', t('Puțin', 'Few')], ['0', '0', 'Zero']]
           .map(([cap, cnt, l], i) => btn('data-cap="' + cap + '" data-count="' + cnt + '"', l, i === 0)).join('')) + '</div>';
     }
     html += '<span class="pt-min" aria-label="' + t('Restrânge', 'Collapse') + '">–</span>';
@@ -498,6 +547,15 @@
       document.body.dataset.auth = b.dataset.auth;
       try { localStorage.setItem('litroAuth', b.dataset.auth); } catch (e) { }
       $$('.pt-auth .pt-b', box).forEach(x => x.classList.toggle('on', x === b));
+    });
+    $$('.pt-rooms .pt-b', box).forEach(b => b.onclick = () => {
+      document.body.dataset.rooms = b.dataset.rooms;
+      $$('.pt-rooms .pt-b', box).forEach(x => x.classList.toggle('on', x === b));
+    });
+    $$('.pt-sess .pt-b', box).forEach(b => b.onclick = () => {
+      document.body.dataset.session = b.dataset.sess;
+      $$('.pt-sess .pt-b', box).forEach(x => x.classList.toggle('on', x === b));
+      applySession();
     });
     $$('.pt-den .pt-b', box).forEach(b => b.onclick = () => {
       document.body.dataset.density = b.dataset.d;
@@ -548,7 +606,7 @@
       if (k === 'dest') destSheet(paint); else if (k === 'date') calSheet(paint); else guestsSheet(paint);
     });
     const go = $('.sbox .btn');
-    if (go) go.onclick = () => { if (!S.dest) return toast(t('Alege mai întâi o stațiune', 'Pick a resort first'), 'err'); save(); goto('m-listing.html'); };
+    if (go) go.onclick = () => { save(); goto('m-listing.html'); };
 
     $$('.insp-card, .mz, .prev-card, .resort-index a').forEach(c => c.onclick = e => {
       e.preventDefault();
@@ -721,10 +779,10 @@
     const bFil = $('[data-tab="filters"]'), bSort = $('[data-tab="sort"]'), bMap = $('[data-tab="map"]');
     if (bFil) bFil.onclick = filtersSheet;
     if (bSort) bSort.onclick = sortSheet;
-    if (bMap) bMap.onclick = () => openModal(t('Hartă · ', 'Map · ') + S.dest,
+    if (bMap) bMap.onclick = () => openModal(t('Hartă · ', 'Map · ') + destLabel(),
       '<div class="mapbox" style="height:210px"><img src="assets/coastline.jpg" alt=""><span class="lbl">' +
       t('Hartă interactivă — în prototip statică', 'Interactive map — static in this prototype') + '</span></div>' +
-      '<p style="margin-top:12px">' + t('Pe hartă vezi cele <b><span class="mc"></span> cazări</b> din ', 'The map shows the <b><span class="mc"></span> stays</b> in ') + S.dest +
+      '<p style="margin-top:12px">' + t('Pe hartă vezi cele <b><span class="mc"></span> cazări</b> din ', 'The map shows the <b><span class="mc"></span> stays</b> in ') + destLabel() +
       t(' cu prețul pentru ', ' with the price for ') + fmtRange(S.from, S.to) +
       t(', distanța până la plajă și zonele stațiunii.', ', the distance to the beach and the areas of the resort.') + '</p>');
 
@@ -771,8 +829,8 @@
       });
       const displayN = (demoCount != null && !any) ? demoCount : shown;
       const rc = $('.res-strip');
-      if (rc) rc.innerHTML = '<b>' + displayN + '</b> ' + staysTxt(displayN).replace(displayN + ' ', '') +
-        t(' în ', ' in ') + S.dest + ' · 8.7/10 ' + t('din 11 395 recenzii', 'from 11,395 reviews');
+      if (rc) rc.innerHTML = '<b>' + money(displayN) + '</b> ' + staysTxt(displayN).replace(displayN + ' ', '') +
+        (S.dest ? t(' în ', ' in ') + S.dest : t(' pe litoral', ' along the seaside'));
       $$('.mc').forEach(n => n.textContent = displayN);
 
       const band = $('.band-loyal');
@@ -842,8 +900,8 @@
       if (!show) return;
 
       const from = (page - 1) * PAGE_SIZE + 1, to = Math.min(page * PAGE_SIZE, total);
-      range.innerHTML = t('Afișăm <b>' + from + '–' + to + '</b> din <b>' + total + '</b> cazări',
-                          'Showing <b>' + from + '–' + to + '</b> of <b>' + total + '</b> stays');
+      range.innerHTML = t('Afișăm <b>' + from + '–' + to + '</b> din <b>' + money(total) + '</b> cazări',
+                          'Showing <b>' + from + '–' + to + '</b> of <b>' + money(total) + '</b> stays');
 
       const nums = [];
       for (let i = 1; i <= pages; i++) {
@@ -976,7 +1034,7 @@
       applyFilters();
       toast(t('Inventar demo: ', 'Demo inventory: ') + label, 'ok');
     };
-    const INV = { many: [99, 81], some: [4, 4], few: [2, 2], zero: [0, 0] };
+    const INV = { many: [99, 1236], some: [4, 4], few: [2, 2], zero: [0, 0] };
     const inv = INV[qp.get('inv')] || INV.many;   // ?inv=… fixează starea pentru export
     demoCap = inv[0]; demoCount = inv[1];
 
@@ -984,17 +1042,18 @@
 
     $$('.near-card').forEach(c => c.onclick = () => { S.dest = $('.t', c).textContent.trim(); save(); goto('m-listing.html'); });
 
+    applyFiltersFromRerun = applyFilters;
     applyFilters();
   }
 
+  let applyFiltersFromRerun = () => { };
   function rerunSearch() {
     spin.classList.add('on');
     setTimeout(() => {
       spin.classList.remove('on');
       repriceEverything();
-      const rc = $('.res-strip');
-      if (rc) rc.innerHTML = rc.innerHTML.replace(EN() ? / in [^·]+ ·/ : / în [^·]+ ·/, t(' în ', ' in ') + S.dest + ' ·');
-      toast(t('Rezultate pentru ', 'Results for ') + S.dest + ', ' + fmtRange(S.from, S.to), 'ok');
+      applyFiltersFromRerun();
+      toast(t('Rezultate pentru ', 'Results for ') + destLabel() + ', ' + fmtRange(S.from, S.to), 'ok');
     }, 520);
   }
 

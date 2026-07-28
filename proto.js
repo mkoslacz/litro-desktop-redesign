@@ -36,6 +36,11 @@
 
   const PAGE_SIZE = 30;          // paginare, nu infinite scroll
 
+  /* '' = tot litoralul: căutarea implicită merge peste toate stațiunile deodată,
+     nu una câte una — așa vede utilizatorul întâi oferta, apoi alege zona */
+  const ALL_TOTAL = 1236;
+  const destLabel = () => S.dest || (EN() ? 'All resorts' : 'Tot litoralul');
+
   const RESORTS = [
     ['Mamaia', 319], ['Mamaia Nord', 58], ['Eforie Nord', 184], ['Eforie Sud', 76], ['Costinești', 97],
     ['Neptun-Olimp', 112], ['Jupiter', 64], ['Venus', 71], ['Saturn', 49], ['Mangalia', 38],
@@ -45,7 +50,7 @@
 
   /* ---------- state ---------- */
   const DEF = {
-    dest: 'Mamaia', from: '2026-06-05', to: '2026-06-12',
+    dest: '', from: '2026-06-05', to: '2026-06-12',
     adults: 2, kids: 2, ages: [7, 11], rooms: 2,
     hotel: 'Complex Mediteranean', rate: 'Cameră dublă vedere mare', ratePrice: 4046,
     payMode: 'advance', voucher: 0, promo: null, flex: 'exact'
@@ -147,7 +152,7 @@
     /* --- render current state into the fields --- */
     function paint() {
       const setVal = (f, v) => { const n = $('.s-value', f); if (n) n.innerHTML = v; };
-      if (fDest) setVal(fDest, S.dest);
+      if (fDest) setVal(fDest, destLabel());
       if (fDate) setVal(fDate, fmtRange(S.from, S.to));
       if (fGuest) {
         const parts = [S.adults + (EN() ? ' adult' + (S.adults === 1 ? '' : 's') : ' ' + (S.adults === 1 ? 'adult' : 'adulți'))];
@@ -161,7 +166,7 @@
         n.textContent = guestsTxt();
       });
       $$('[data-bind="rooms"]').forEach(n => n.textContent = S.rooms + (EN() ? (S.rooms===1?' room':' rooms') : (S.rooms===1?' cameră':' camere')));
-      $$('[data-bind="dest"]').forEach(n => n.textContent = S.dest);
+      $$('[data-bind="dest"]').forEach(n => n.textContent = destLabel());
     }
 
     /* --- destination popover --- */
@@ -172,7 +177,10 @@
       const list = $('.list', popD);
       const f = (filter || '').toLowerCase();
       const rows = RESORTS.filter(r => !f || r[0].toLowerCase().includes(f));
-      list.innerHTML = '<div class="grp">Stațiuni pe litoral</div>' + rows.map(r =>
+      const allRow = '<div class="dest-item all' + (S.dest ? '' : ' sel') + '" data-d="">' +
+        '<svg width="16" height="16" class="ic"><use href="#i-search"/></svg>' + (EN() ? 'All resorts' : 'Tot litoralul') +
+        '<span class="c">' + money(ALL_TOTAL) + (EN() ? ' stays' : ' cazări') + '</span></div>';
+      list.innerHTML = allRow + '<div class="grp">' + (EN() ? 'Or pick one resort' : 'Sau alege o stațiune') + '</div>' + rows.map(r =>
         '<div class="dest-item' + (r[0] === S.dest ? ' sel' : '') + '" data-d="' + r[0] + '">' +
         '<svg width="16" height="16" class="ic"><use href="#i-pin"/></svg>' + r[0] +
         '<span class="c">' + r[1] + ' cazări</span></div>').join('') +
@@ -331,7 +339,6 @@
     /* --- submit --- */
     const btn = $('.btn-primary', card);
     if (btn) btn.onclick = () => {
-      if (!S.dest) return toast('Alege mai întâi o stațiune', 'err');
       save();
       if (document.body.dataset.page === 'listing') rerunSearch();
       else goto(listingHref() + qs());
@@ -550,11 +557,25 @@
     }
   }
 
+  /* Cine ajunge pe hotel direct din Google n-a căutat încă nimic — are nevoie
+     de bara de căutare. Cine vine din listing a căutat deja; bara ar fi zgomot
+     și l-ar scoate din flux. */
+  function applySession() {
+    const wrap = $('.search-wrap');
+    if (!wrap || document.body.dataset.page !== 'hotel') return;
+    wrap.style.display = document.body.dataset.session === 'new' ? '' : 'none';
+  }
+
   function initProtoTools() {
     /* Stările de demo se pot fixa și din URL — așa exportăm în Figma fiecare variantă
        (?auth=in|out, ?density=a|b|c) fără să dăm clic în panou. */
     if (q.get('auth')) document.body.dataset.auth = q.get('auth');
     if (q.get('density')) document.body.dataset.density = q.get('density');
+    if (q.get('rooms')) document.body.dataset.rooms = q.get('rooms');
+    if (q.get('session')) document.body.dataset.session = q.get('session');
+    if (!document.body.dataset.rooms) document.body.dataset.rooms = 'on';
+    if (!document.body.dataset.session) document.body.dataset.session = 'site';
+    applySession();
     /* ?nopanel=1 — folosit la exportul în Figma, ca panoul de demo să nu ajungă în ramă */
     if (q.get('nopanel')) {
       document.body.dataset.export = '1';
@@ -565,6 +586,7 @@
     const ls = $('.langswitch');
     const langLinks = ls ? $$('a', ls).map(a => ({ t: a.textContent.trim(), href: a.getAttribute('href'), on: a.classList.contains('on') })) : [];
     const hasListing = !!$('.listing-grid');
+    const isHotel = document.body.dataset.page === 'hotel';
     if (!document.body.dataset.auth) { let a; try { a = localStorage.getItem('litroAuth'); } catch (e) { } document.body.dataset.auth = a || 'out'; }   // implicit: nemembru → se văd bannerele „autentifică-te pentru FRIENDS"
     const box = el('div', 'proto-tools');
     let html = '<div class="pt-h">' + (EN() ? 'Prototype · settings' : 'Prototip · setări') + '</div>';
@@ -590,7 +612,15 @@
     const authModes = EN() ? [['out', 'Guest'], ['in', 'Member']] : [['out', 'Musafir'], ['in', 'Membru']];
     html += '<div class="pt-row"><span class="pt-lbl">' + (EN() ? 'Account' : 'Cont') + '</span><div class="pt-seg pt-auth">' +
       authModes.map(([k, label]) => '<span class="pt-b' + (document.body.dataset.auth === k ? ' on' : '') + '" data-auth="' + k + '">' + label + '</span>').join('') + '</div></div>';
+    if (isHotel) {
+      const modes = EN() ? [['new', 'New visitor'], ['site', 'From our site']] : [['new', 'Vizitator nou'], ['site', 'De pe site']];
+      html += '<div class="pt-row"><span class="pt-lbl">' + (EN() ? 'Session' : 'Sesiune') + '</span><div class="pt-seg pt-sess">' +
+        modes.map(([k, label]) => '<span class="pt-b' + (document.body.dataset.session === k ? ' on' : '') + '" data-sess="' + k + '">' + label + '</span>').join('') + '</div></div>';
+    }
     if (hasListing) {
+      const rmodes = EN() ? [['on', 'Yes'], ['off', 'No']] : [['on', 'Da'], ['off', 'Nu']];
+      html += '<div class="pt-row"><span class="pt-lbl">' + (EN() ? 'Room types on card' : 'Tipuri de cameră') + '</span><div class="pt-seg pt-rooms">' +
+        rmodes.map(([k, label]) => '<span class="pt-b' + (document.body.dataset.rooms === k ? ' on' : '') + '" data-rooms="' + k + '">' + label + '</span>').join('') + '</div></div>';
       if (!document.body.dataset.density) document.body.dataset.density = 'a';
       const modes = EN() ? [['a', 'Detailed'], ['b', 'Compact'], ['c', 'Icons']] : [['a', 'Detaliat'], ['b', 'Compact'], ['c', 'Iconițe']];
       html += '<div class="pt-row"><span class="pt-lbl">' + (EN() ? 'Card view' : 'Densitate celule') + '</span><div class="pt-seg pt-den">' +
@@ -601,6 +631,15 @@
     $$('.pt-den .pt-b', box).forEach(btn => btn.onclick = () => {
       document.body.dataset.density = btn.dataset.d;
       $$('.pt-den .pt-b', box).forEach(b => b.classList.toggle('on', b === btn));
+    });
+    $$('.pt-rooms .pt-b', box).forEach(btn => btn.onclick = () => {
+      document.body.dataset.rooms = btn.dataset.rooms;
+      $$('.pt-rooms .pt-b', box).forEach(b => b.classList.toggle('on', b === btn));
+    });
+    $$('.pt-sess .pt-b', box).forEach(btn => btn.onclick = () => {
+      document.body.dataset.session = btn.dataset.sess;
+      $$('.pt-sess .pt-b', box).forEach(b => b.classList.toggle('on', b === btn));
+      applySession();
     });
     $$('.pt-auth .pt-b', box).forEach(btn => btn.onclick = () => {
       applyAuth(btn.dataset.auth);
@@ -624,7 +663,9 @@
 
     /* --- headline binding --- */
     const h1 = $('.listing-head h1');
-    if (h1 && !h1.hasAttribute('data-fixed')) h1.textContent = (EN()?'Stays in ':'Cazare ') + (S.dest || (EN()?'the seaside':'litoral'));
+    if (h1 && !h1.hasAttribute('data-fixed')) h1.textContent = S.dest
+      ? (EN() ? 'Stays in ' : 'Cazare ') + S.dest
+      : (EN() ? 'Stays along the whole seaside' : 'Cazare pe tot litoralul');
 
     /* --- densitate celule: implicit A; comutatorul e în panoul de prototip (initProtoTools) --- */
     if (!document.body.dataset.density) document.body.dataset.density = 'a';
@@ -870,7 +911,8 @@
       });
       const displayN = (demoCount != null && !anyFilter) ? demoCount : shown;
       const rc = $('.res-count');
-      if (rc && !rc.hasAttribute('data-fixed')) rc.innerHTML = displayN + (EN() ? (displayN === 1 ? ' available stay' : ' available stays') + ' · 8.7/10 from 11,395 reviews' : (displayN === 1 ? ' cazare disponibilă' : ' cazări disponibile') + ' · 8.7/10 din 11 395 recenzii');
+      if (rc && !rc.hasAttribute('data-fixed')) rc.innerHTML = money(displayN) +
+        (EN() ? (displayN === 1 ? ' available stay' : ' available stays') : (displayN === 1 ? ' cazare disponibilă' : ' cazări disponibile'));
       const rcn = $('.res-count-n');
       if (rcn) rcn.textContent = document.body.dataset.variant === 'b' ? money(shown * 206) : shown;
       // banda „FRIENDS" apare după al DOILEA card vizibil (repoziționată la fiecare filtrare)
@@ -908,8 +950,8 @@
 
       const from = (page - 1) * PAGE_SIZE + 1, to = Math.min(page * PAGE_SIZE, total);
       $('.pg-range', wrap).innerHTML = EN()
-        ? 'Showing <b>' + from + '–' + to + '</b> of <b>' + total + '</b> stays'
-        : 'Afișăm <b>' + from + '–' + to + '</b> din <b>' + total + '</b> cazări';
+        ? 'Showing <b>' + from + '–' + to + '</b> of <b>' + money(total) + '</b> stays'
+        : 'Afișăm <b>' + from + '–' + to + '</b> din <b>' + money(total) + '</b> cazări';
 
       const nums = [];
       for (let i = 1; i <= pages; i++) {
@@ -947,7 +989,7 @@
         rc.innerHTML = thin
           ? '<b>' + shown + '</b> ' + (EN() ? (shown === 1 ? 'available stay' : 'available stays') : (shown === 1 ? 'cazare disponibilă' : 'cazări disponibile')) +
             ' ' + (EN() ? 'for these dates' : 'pentru aceste date')
-          : rc.dataset.orig;
+          : (rc.dataset.orig || '');
       }
       const fstrip = $('.flexi-strip');
       if (fstrip && (document.body.dataset.listing === 'b' || document.body.dataset.listing === 'c'))

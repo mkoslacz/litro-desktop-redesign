@@ -74,7 +74,19 @@ linked to directly — and so the Figma export can capture each variant without 
 | `?inv=many\|some\|few` | Demo inventory (mobile listing) |
 | `?room=2` | Pre-selects rooms so the booking bar is up (mobile hotel) |
 | `?f=own` | Enter the listing with filters already applied (comma-separated keys; clears the page's presets first) |
+| `?rooms=on\|off` | Show or hide the "see all room types" expander on listing cards |
+| `?session=new\|site` | Hotel page: a visitor arriving cold (search bar on top) vs one who came from a listing |
 | `?nopanel=1` | Export mode: no demo panel, fixed bars join the normal flow |
+
+## Searching the whole coast by default
+
+The search starts on **all resorts at once** rather than making you pick one first, and "Tot litoralul"
+is the first row in the destination picker (it drops out once you start typing a resort name). With
+charter inventory the offer is the product, so the fastest useful screen is the whole coast ranked,
+not an empty state waiting for a resort. An empty `dest` means all resorts throughout the engines.
+
+The listing headline no longer repeats the site-wide review score next to the place name — it carries
+the result count and nothing else.
 
 ## The charter set — "Garantat de noi"
 

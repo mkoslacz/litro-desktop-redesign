@@ -878,3 +878,16 @@ body[data-auth="in"] .login-band { display: none; }
 .pg-range { text-align: center; color: var(--gray-700); font-size: 14px; }
 .pg-range b { color: var(--gray-900); }
 .pagerwrap .pager { padding-top: 10px; }
+
+/* prima opțiune din selectorul de destinație: căutarea peste tot litoralul */
+.dest-item.all { font-weight: 700; color: var(--navy-500); border-bottom: 1px solid var(--gray-300); }
+.dest-item.all .ic { color: var(--navy-500); }
+/* comutatorul „tipuri de cameră" din panoul de prototip */
+body[data-rooms="off"] .more-rooms, body[data-rooms="off"] .extra-rooms, body[data-rooms="off"] .rcarousel { display: none !important; }
+
+/* „De ce să rezervi prin noi" — faptele despre agenție, sub locație */
+.why-us { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.why-us .w { border: 1px solid var(--gray-300); border-radius: var(--r-l); background: #fff; padding: 15px 16px; }
+.why-us .w .n { font-family: var(--font-title); font-size: 25px; font-weight: 800; color: var(--navy-500); line-height: 1.1; }
+.why-us .w .t { font-weight: 700; font-size: 15px; margin-top: 4px; }
+.why-us .w .d { color: var(--gray-700); font-size: 13.5px; line-height: 1.5; margin-top: 4px; }
