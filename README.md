@@ -88,8 +88,9 @@ waiting for the hotel. The prototype makes that set findable and promotable:
 - The listing gets a **"Garantat de noi" filter**, and the default "Recomandate de noi" sort puts the
   charter set first.
 - The hotel page carries the badge under the title (`data-own="1"` on `<body>`).
-- The charter cards get a light navy tint and hairline border on top of the left accent, so the set
-  reads as a group in a scan without shouting.
+- The charter cards get a **navy frame** — a 2px border plus a soft navy halo — and the badge sits in
+  the tag row. Tried and rejected on the way there: a pale tint (read as a selected row, not an offer)
+  and a full-width navy ribbon across the card head (too loud for a list of six).
 - The row's "see all" link opens the listing already filtered: `?f=own` (any filter key works, and it
   clears the page's preset filters first, so the link lands on exactly one intention).
 

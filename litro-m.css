@@ -748,9 +748,9 @@ body[data-export].has-bar { padding-bottom: 0; }
   font-size: 11.5px; font-weight: 700; border-radius: 7px; padding: 3px 8px; white-space: nowrap; }
 .own-badge svg { width: 12px; height: 12px; }
 .own-badge.ghost { background: var(--navy-100); color: var(--navy-500); box-shadow: inset 0 0 0 1px #CBDEF2; }
-.lcard[data-own="1"] { background: #F7FBFF; box-shadow: inset 3px 0 0 var(--navy-500), 0 0 0 1px #D3E4F4, var(--shadow-card); }
-.lcard[data-own="1"] .lc-quote { background: #EEF5FC; }
-.hcard[data-own="1"] { background: #F7FBFF; border-color: #BCD6EE; }
+.lcard[data-own="1"] { border: 2px solid var(--navy-500); box-shadow: 0 0 0 3px rgba(0,75,151,.09), var(--shadow-card); }
+.lcard[data-own="1"] .lc-quote { background: var(--navy-100); }
+.hcard[data-own="1"] { border: 2px solid var(--navy-500); box-shadow: 0 0 0 3px rgba(0,75,151,.09), var(--shadow-card); }
 .own-note { color: var(--gray-700); font-size: 13px; margin: -6px 0 12px; }
 
 /* anti-dead-end: banda de salvare și stațiunile din apropiere devin vizibile
