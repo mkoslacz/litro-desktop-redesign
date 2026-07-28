@@ -804,3 +804,34 @@ table.rates { width: 100%; border-collapse: collapse; font-size: 14px; }
 .vswitch a small { display: block; font-weight: 500; font-size: 11.5px; color: var(--gray-700); margin-top: 1px; }
 .vswitch a.on { background: var(--navy-500); color: #fff; }
 .vswitch a.on small { color: rgba(255,255,255,.8); }
+
+/* ============================================================
+   INVENTAR PROPRIU — setul de hoteluri contractate direct
+   Sunt hotelurile pe care le charterăm: alocare proprie, deci
+   disponibilitate reală, confirmare instantanee și consultanții
+   noștri pot modifica rezervarea. Le marcăm și le promovăm.
+   ============================================================ */
+.own-badge { display: inline-flex; align-items: center; gap: 5px; background: var(--navy-500); color: #fff;
+  font-size: 12px; font-weight: 700; border-radius: 7px; padding: 3px 9px; white-space: nowrap; cursor: pointer; }
+.own-badge svg { width: 13px; height: 13px; }
+.own-badge.ghost { background: var(--navy-100); color: var(--navy-500); box-shadow: inset 0 0 0 1px #CBDEF2; }
+/* accent discret pe cardul din inventarul propriu — se vede în listă fără să țipe */
+.lcard[data-own="1"] { box-shadow: inset 3px 0 0 var(--navy-500), var(--shadow-card); }
+.hcard[data-own="1"] .ph::after { content: ""; position: absolute; inset: 0; box-shadow: inset 0 0 0 2px var(--navy-500); border-radius: inherit; pointer-events: none; }
+
+/* rândul de hoteluri promovate (home + baza listingului) */
+.own-row .hcard { position: relative; }
+.own-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.own-head .own-badge { cursor: default; }
+.own-note { color: var(--gray-700); font-size: 14.5px; margin: 4px 0 14px; max-width: 780px; }
+
+/* ============================================================
+   ANTI-DEAD-END — banda de salvare și stațiunile din apropiere
+   urcă în importanță când rămân puține rezultate
+   ============================================================ */
+.near-band.near-hi { border: 1.5px solid var(--navy-500); background: var(--navy-100); }
+.near-band.near-hi .hd .t { color: var(--navy-900); }
+.rescue.rescue-hi { border-color: var(--orange-500); background: var(--orange-100); }
+.thin-note { display: flex; align-items: center; gap: 8px; background: var(--orange-100); border: 1px solid #F3CFA5;
+  color: #7A3E06; border-radius: var(--r-m); padding: 10px 14px; font-size: 14px; font-weight: 600; margin-bottom: 14px; }
+.thin-note b { font-weight: 800; }

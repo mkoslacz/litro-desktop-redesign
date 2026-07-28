@@ -740,3 +740,22 @@ body[data-export].has-bar { padding-bottom: 0; }
 .proto-tools.mini .pt-h, .proto-tools.mini .pt-row { display: none; }
 .proto-tools.mini { padding: 9px 12px; }
 .proto-tools.mini::after { content: "⚙"; font-size: 15px; }
+
+/* ============================================================
+   INVENTAR PROPRIU — setul de hoteluri contractate direct
+   ============================================================ */
+.own-badge { display: inline-flex; align-items: center; gap: 4px; background: var(--navy-500); color: #fff;
+  font-size: 11.5px; font-weight: 700; border-radius: 7px; padding: 3px 8px; white-space: nowrap; }
+.own-badge svg { width: 12px; height: 12px; }
+.own-badge.ghost { background: var(--navy-100); color: var(--navy-500); box-shadow: inset 0 0 0 1px #CBDEF2; }
+.lcard[data-own="1"] { box-shadow: inset 3px 0 0 var(--navy-500), var(--shadow-card); }
+.hcard[data-own="1"] { border-color: var(--navy-500); }
+.own-note { color: var(--gray-700); font-size: 13px; margin: -6px 0 12px; }
+
+/* anti-dead-end: banda de salvare și stațiunile din apropiere devin vizibile
+   abia când rezultatele se împuținează */
+.band.band-hi { border: 1.5px solid var(--orange-500); background: var(--orange-100); }
+.band.band-hi .t { color: var(--orange-600); }
+.sect.near-hi { box-shadow: inset 0 0 0 1.5px var(--navy-500); border-radius: var(--r-l); }
+.thin-note { display: flex; gap: 8px; background: var(--orange-100); border: 1px solid #F3CFA5; color: #7A3E06;
+  border-radius: var(--r-m); padding: 10px 12px; font-size: 13px; font-weight: 600; margin-bottom: 12px; }

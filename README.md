@@ -75,6 +75,31 @@ linked to directly — and so the Figma export can capture each variant without 
 | `?room=2` | Pre-selects rooms so the booking bar is up (mobile hotel) |
 | `?nopanel=1` | Export mode: no demo panel, fixed bars join the normal flow |
 
+## The charter set — "Garantat de noi"
+
+LITRO contracts allotments directly. Those hotels are a different product from the rest: the availability
+shown is our own stock, confirmation is instant, and our consultants can change the booking without
+waiting for the hotel. The prototype makes that set findable and promotable:
+
+- `data-own="1"` on a card marks a charter hotel. The engines inject a navy **„Garantat de noi"** badge
+  (EN: "Guaranteed by us") and give the card a navy left accent; clicking the badge opens the explainer.
+- Homepage gets a **"Hoteluri garantate de noi"** row, desktop and mobile, in both languages.
+- The listing gets a **"Garantat de noi" filter**, and the default "Recomandate de noi" sort puts the
+  charter set first.
+- The hotel page carries the badge under the title (`data-own="1"` on `<body>`).
+
+## Anti-dead-end behaviour on the listing
+
+With charter inventory a search can honestly return two hotels, so the widgets that prevent a dead end
+are driven by the visible result count rather than being always-on decoration:
+
+| Results | What the page does |
+|---|---|
+| 6 or more | Rescue widgets stay out of the way; "load more" is shown |
+| 5 or fewer | Flexible-date strip, a "look at other options" line and the nearby-resorts band appear; "load more" and the pager disappear; the headline switches to the real count |
+| 2 or fewer | The call-centre band moves directly under the last result, turns orange and names the number left |
+| 0 | Empty state: clear the filters, or hand the search to a consultant |
+
 ## Design decisions that are business rules, not taste
 
 These came out of walking the live site and must not be "cleaned up" by a designer later:

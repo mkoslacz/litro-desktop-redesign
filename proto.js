@@ -785,7 +785,8 @@
         beach: $('[data-f="beach"]')?.classList.contains('on'),
         pool: $('[data-f="pool"]')?.classList.contains('on'),
         breakfast: $('[data-f="breakfast"]')?.classList.contains('on'),
-        friends: $('[data-f="friends"]')?.classList.contains('on')
+        friends: $('[data-f="friends"]')?.classList.contains('on'),
+        own: $('[data-f="own"]')?.classList.contains('on')
       };
       const anyFilter = Object.values(active).some(Boolean);
       let shown = 0;
@@ -797,6 +798,7 @@
         if (active.pool && !f.includes('pool')) ok = false;
         if (active.breakfast && !/mic dejun/i.test(c.dataset.meal || '')) ok = false;
         if (active.friends && c.dataset.friends !== '1') ok = false;
+        if (active.own && c.dataset.own !== '1') ok = false;
         if (ok && shown >= demoCap) ok = false;   // demo: plafon de inventar
         c.classList.toggle('card-hidden', !ok);
         if (ok) shown++;
@@ -813,9 +815,61 @@
         if (vis.length > 1) { vis[1].after(band); band.style.display = ''; } else band.style.display = 'none';
       }
       // listing B: banner de date flexibile doar când sunt puține rezultate
-      const fstrip = $('.flexi-strip');
-      if (fstrip && (document.body.dataset.listing === 'b' || document.body.dataset.listing === 'c')) fstrip.style.display = (shown <= 5) ? '' : 'none';
+      syncRescue(shown);
       if (!shown) showEmptyState(); else hideEmptyState();
+    }
+
+    /* ------------------------------------------------------------
+       Widgeturile anti-dead-end reacționează la câte rezultate rămân.
+       Cu inventar bogat ar fi zgomot; când lista se subțiază, ele sunt
+       singura cale de ieșire — alte date, altă stațiune sau consultantul.
+       ------------------------------------------------------------ */
+    function syncRescue(shown) {
+      const thin = shown <= 5, dead = shown > 0 && shown <= 2;
+
+      /* titlul listei poartă de obicei nota generală („8.7/10 din 11 395 recenzii");
+         când inventarul se subțiază, numărul real e informația care contează */
+      const rc = $('.res-count');
+      if (rc) {
+        if (rc.dataset.orig == null) rc.dataset.orig = rc.innerHTML;
+        rc.innerHTML = thin
+          ? '<b>' + shown + '</b> ' + (EN() ? (shown === 1 ? 'available stay' : 'available stays') : (shown === 1 ? 'cazare disponibilă' : 'cazări disponibile')) +
+            ' ' + (EN() ? 'for these dates' : 'pentru aceste date')
+          : rc.dataset.orig;
+      }
+      const fstrip = $('.flexi-strip');
+      if (fstrip && (document.body.dataset.listing === 'b' || document.body.dataset.listing === 'c'))
+        fstrip.style.display = thin ? '' : 'none';
+
+      const rescue = $('main > .rescue');
+      if (rescue) {
+        rescue.style.display = thin ? '' : 'none';
+        rescue.classList.toggle('rescue-hi', dead);
+        const tt = $('.t', rescue);
+        if (tt) tt.textContent = dead
+          ? (EN() ? 'Only ' + shown + ' stays left for these dates' : 'Au mai rămas doar ' + shown + ' cazări pentru aceste date')
+          : (EN() ? 'Not finding what you want for ' + fmtRange(S.from, S.to) + '?' : 'Nu găsești ce cauți pentru ' + fmtRange(S.from, S.to) + '?');
+      }
+
+      const near = $('.near-band');
+      if (near) near.classList.toggle('near-hi', thin);
+
+      const more = $('.show-more');
+      if (more) more.style.display = thin ? 'none' : '';
+
+      /* explicație scurtă deasupra listei, ca utilizatorul să știe de ce s-a schimbat pagina */
+      let note = $('.thin-note');
+      if (thin && !note) {
+        note = el('div', 'thin-note');
+        const anchor = $('.listing-grid main .fchips') || $('.listing-grid main').firstElementChild;
+        $('.listing-grid main').insertBefore(note, anchor ? anchor.nextSibling : null);
+      }
+      if (note) {
+        note.style.display = thin ? '' : 'none';
+        note.innerHTML = EN()
+          ? '<b>Look at other options.</b> Shift the dates below, jump to a nearby resort, or let a consultant search our whole inventory.'
+          : '<b>Vezi și alte variante.</b> Mută datele mai jos, sari la o stațiune vecină sau lasă un consultant să caute în tot inventarul nostru.';
+      }
     }
     let emptyBox = null;
     function showEmptyState() {
@@ -897,7 +951,9 @@
           if (k === 'pricedesc') return (+b.dataset.total || 0) - (+a.dataset.total || 0);
           if (k === 'score') return (+b.dataset.score || 0) - (+a.dataset.score || 0);
           if (k === 'beach') return (+a.dataset.beach || 0) - (+b.dataset.beach || 0);
-          return (+a.dataset.rank || 0) - (+b.dataset.rank || 0);
+          /* „Recomandate de noi": inventarul propriu urcă — disponibilitatea e reală
+             și confirmarea instantanee, deci e și cea mai bună experiență */
+          return ((+b.dataset.own || 0) - (+a.dataset.own || 0)) || ((+a.dataset.rank || 0) - (+b.dataset.rank || 0));
         });
         const anchor = $('.show-more', main);
         list.forEach(c => main.insertBefore(c, anchor));
@@ -1124,11 +1180,17 @@
     });
 
     /* --- book now: derulează la selecția camerelor (nu direct la checkout) --- */
+    /* Înainte de a alege o cameră nu există „rezervă" — butonul duce la
+       selecția camerelor și o evidențiază, ca să fie clar unde ai ajuns. */
     const bkCta = $('.bk-cta');
     if (bkCta) bkCta.onclick = () => {
       const target = $('.room-card') || $('.meal-chips') || $('.stay-bar');
-      if (target) window.scrollTo({ top: target.getBoundingClientRect().top + window.pageYOffset - 80, behavior: 'smooth' });
-      toast('Alege camera și tariful dorit', 'ok');
+      if (target) {
+        window.scrollTo({ top: target.getBoundingClientRect().top + window.pageYOffset - 80, behavior: 'smooth' });
+        target.classList.add('co-focus');
+        setTimeout(() => target.classList.remove('co-focus'), 1600);
+      }
+      toast(lang('Alege camera și tariful dorit', 'Choose your room and rate'), 'ok');
     };
 
     /* --- modals: campaigns, cancellation, room details --- */
@@ -1556,6 +1618,45 @@
     }
   }
 
+  /* ============================================================
+     INVENTAR PROPRIU — marcarea și promovarea hotelurilor charterate
+     ============================================================ */
+  const SHIELD = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">' +
+    '<path d="M12 3l7 2.6v5.6c0 4.5-3 8-7 9.8-4-1.8-7-5.3-7-9.8V5.6z"/><path d="m9 12 2.2 2.2L15.5 10"/></svg>';
+  const lang = (ro, en) => EN() ? en : ro;
+  const ownLabel = () => lang('Garantat de noi', 'Guaranteed by us');
+  const ownBadge = (cls) => '<span class="own-badge' + (cls ? ' ' + cls : '') + '">' + SHIELD + ownLabel() + '</span>';
+
+  function ownModal() {
+    openModal(ownLabel(), EN()
+      ? '<p>Hotels marked this way are <b>contracted directly by our agency</b>. We hold our own allotment of rooms there, which changes three things for you:</p>' +
+        '<p><b>The availability you see is real</b> — it is our stock, not a live query to the hotel.<br>' +
+        '<b>The booking is confirmed instantly</b>, without waiting for the hotel to reply.<br>' +
+        '<b>Our consultants can change or cancel it</b> without depending on the hotel’s answer.</p>' +
+        '<p>The rest of the stays are booked on request, with confirmation within a few hours.</p>'
+      : '<p>Hotelurile marcate astfel sunt <b>contractate direct de agenția noastră</b>. Avem alocare proprie de camere acolo, ceea ce schimbă trei lucruri pentru tine:</p>' +
+        '<p><b>Disponibilitatea afișată este reală</b> — este stocul nostru, nu o interogare live la hotel.<br>' +
+        '<b>Rezervarea se confirmă instantaneu</b>, fără să așteptăm răspunsul hotelului.<br>' +
+        '<b>Consultanții noștri o pot modifica sau anula</b> fără să depindă de răspunsul hotelului.</p>' +
+        '<p>Restul cazărilor se rezervă la cerere, cu confirmare în câteva ore.</p>');
+  }
+
+  function initOwnInventory() {
+    $$('.lcard[data-own="1"]').forEach(c => {
+      const tags = $('.lc-tags', c) || $('.lc-mid', c);
+      if (tags && !$('.own-badge', c)) tags.insertAdjacentHTML('afterbegin', ownBadge());
+    });
+    $$('.hcard[data-own="1"]').forEach(c => {
+      const body = $('.hcard-body', c);
+      if (body && !$('.own-badge', c)) body.insertAdjacentHTML('afterbegin', '<div style="margin-bottom:7px">' + ownBadge() + '</div>');
+    });
+    if (document.body.dataset.own === '1') {
+      const line = $('.hp-title');
+      if (line && !$('.own-badge', line.parentElement)) line.insertAdjacentHTML('afterend', '<div style="margin-top:8px">' + ownBadge() + '</div>');
+    }
+    $$('.own-badge').forEach(b => b.onclick = e => { e.stopPropagation(); e.preventDefault(); ownModal(); });
+  }
+
   /* ---------- boot ---------- */
   document.addEventListener('DOMContentLoaded', () => {
     initHeader();
@@ -1567,6 +1668,7 @@
     initCheckout();
     initThanks();
     initGeneric();
+    initOwnInventory();
     repriceEverything();
   });
 })();

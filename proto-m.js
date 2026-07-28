@@ -566,12 +566,12 @@
      LISTING
      ============================================================ */
   const FILTERS = () => EN() ? [
-    { g: 'Popular filters', items: [['instant', 'Instant confirmation', 129], ['beach', 'Max. 100 m from the beach', 158], ['pool', 'With a pool', 109], ['breakfast', 'Breakfast included', 108], ['friends', 'Lower FRIENDS price', 200]] },
+    { g: 'Popular filters', items: [['own', 'Guaranteed by us (own inventory)', 46], ['instant', 'Instant confirmation', 129], ['beach', 'Max. 100 m from the beach', 158], ['pool', 'With a pool', 109], ['breakfast', 'Breakfast included', 108], ['friends', 'Lower FRIENDS price', 200]] },
     { g: 'Distance to the beach', items: [['d100', 'Right on the beach (0–100 m)', 158], ['d300', 'Up to 300 m', 241], ['d600', 'Up to 600 m', 302]] },
     { g: 'Board', items: [['mBreak', 'Breakfast', 108], ['mHalf', 'Half board', 74], ['mAll', 'All inclusive', 112]] },
     { g: 'Facilities', items: [['spa', 'Wellness & SPA', 97], ['kids', 'Kids’ facilities', 141], ['park', 'Free parking', 210], ['pets', 'Pets allowed', 18]] }
   ] : [
-    { g: 'Filtre populare', items: [['instant', 'Confirmare instantanee', 129], ['beach', 'La max. 100 m de plajă', 158], ['pool', 'Cu piscină', 109], ['breakfast', 'Mic dejun inclus', 108], ['friends', 'Preț FRIENDS mai mic', 200]] },
+    { g: 'Filtre populare', items: [['own', 'Garantat de noi (inventar propriu)', 46], ['instant', 'Confirmare instantanee', 129], ['beach', 'La max. 100 m de plajă', 158], ['pool', 'Cu piscină', 109], ['breakfast', 'Mic dejun inclus', 108], ['friends', 'Preț FRIENDS mai mic', 200]] },
     { g: 'Distanța față de plajă', items: [['d100', 'Direct pe plajă (0–100 m)', 158], ['d300', 'Până în 300 m', 241], ['d600', 'Până în 600 m', 302]] },
     { g: 'Masă', items: [['mBreak', 'Mic dejun', 108], ['mHalf', 'Demipensiune', 74], ['mAll', 'All inclusive', 112]] },
     { g: 'Facilități', items: [['spa', 'Wellness & SPA', 97], ['kids', 'Facilități pentru copii', 141], ['park', 'Parcare gratuită', 210], ['pets', 'Acceptă animale', 18]] }
@@ -734,6 +734,7 @@
       if (f.kids && !fac.includes('kids')) return false;
       if (f.park && !fac.includes('park')) return false;
       if (f.pets && !fac.includes('pets')) return false;
+      if (f.own && card.dataset.own !== '1') return false;
       return true;
     }
 
@@ -757,10 +758,48 @@
         const vis = cards.filter(c => !c.classList.contains('card-hidden'));
         if (vis.length > 1) { vis[1].after(band); band.style.display = ''; } else band.style.display = 'none';
       }
-      const fx = $('.flexi');
-      if (fx) fx.style.display = shown <= 5 ? '' : 'none';
+      syncRescue(shown);
       if (!shown) showEmpty(); else hideEmpty();
       syncChips(); syncTabs();
+    }
+
+    /* ------------------------------------------------------------
+       Anti-dead-end: bannerul de date flexibile, banda de call-centre și
+       stațiunile din apropiere apar abia când lista se subțiază. Cu 81 de
+       rezultate ar fi zgomot; cu 2 sunt singura cale de ieșire.
+       ------------------------------------------------------------ */
+    function syncRescue(shown) {
+      const thin = shown <= 5, dead = shown > 0 && shown <= 2;
+      const fx = $('.flexi');
+      if (fx) fx.style.display = thin ? '' : 'none';
+
+      const call = $('.band-call');
+      if (call) {
+        call.style.display = thin ? '' : 'none';
+        call.classList.toggle('band-hi', dead);
+        const tt = $('.t', call);
+        if (tt) tt.textContent = dead
+          ? t('Au mai rămas doar ' + shown + ' cazări', 'Only ' + shown + ' stays left')
+          : t('Nu găsești ce cauți?', 'Can’t find what you’re looking for?');
+        /* când sunt puține rezultate, banda urcă imediat sub ultimul card */
+        const vis = cards.filter(c => !c.classList.contains('card-hidden'));
+        if (thin && vis.length) vis[vis.length - 1].after(call);
+      }
+
+      const near = $('.near-sect');
+      if (near) near.classList.toggle('near-hi', thin);
+
+      const pager = $('.pager');
+      if (pager) pager.style.display = thin ? 'none' : '';
+
+      let note = $('.thin-note');
+      if (thin && !note) { note = el('div', 'thin-note'); main.insertBefore(note, main.firstChild); }
+      if (note) {
+        note.style.display = thin ? '' : 'none';
+        note.innerHTML = t(
+          '<span><b>Vezi și alte variante.</b> Mută datele mai jos, sari la o stațiune vecină sau lasă-ne să căutăm în tot inventarul.</span>',
+          '<span><b>Look at other options.</b> Shift the dates below, jump to a nearby resort, or let us search our whole inventory.</span>');
+      }
     }
 
     let emptyBox = null;
@@ -839,7 +878,8 @@
           if (activeSort === 'pricedesc') return (+b.dataset.total || 0) - (+a.dataset.total || 0);
           if (activeSort === 'score') return (+b.dataset.score || 0) - (+a.dataset.score || 0);
           if (activeSort === 'beach') return (+a.dataset.beach || 0) - (+b.dataset.beach || 0);
-          return (+a.dataset.rank || 0) - (+b.dataset.rank || 0);
+          /* „Recomandate de noi": inventarul propriu urcă — disponibilitate reală, confirmare instantanee */
+          return ((+b.dataset.own || 0) - (+a.dataset.own || 0)) || ((+a.dataset.rank || 0) - (+b.dataset.rank || 0));
         });
         const anchor = $('.pager', main);
         list.forEach(c => main.insertBefore(c, anchor));
@@ -1329,6 +1369,44 @@
     });
   }
 
+  /* ============================================================
+     INVENTAR PROPRIU — marcarea hotelurilor charterate de noi
+     ============================================================ */
+  const SHIELD = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">' +
+    '<path d="M12 3l7 2.6v5.6c0 4.5-3 8-7 9.8-4-1.8-7-5.3-7-9.8V5.6z"/><path d="m9 12 2.2 2.2L15.5 10"/></svg>';
+  const ownLabel = () => t('Garantat de noi', 'Guaranteed by us');
+  const ownBadge = cls => '<span class="own-badge' + (cls ? ' ' + cls : '') + '">' + SHIELD + ownLabel() + '</span>';
+
+  function ownModal() {
+    openModal(ownLabel(), t(
+      '<p>Hotelurile marcate astfel sunt <b>contractate direct de agenția noastră</b>. Avem alocare proprie de camere acolo, ceea ce schimbă trei lucruri pentru tine:</p>' +
+      '<p><b>Disponibilitatea afișată este reală</b> — este stocul nostru, nu o interogare live la hotel.<br>' +
+      '<b>Rezervarea se confirmă instantaneu</b>, fără să așteptăm răspunsul hotelului.<br>' +
+      '<b>Consultanții noștri o pot modifica sau anula</b> fără să depindă de răspunsul hotelului.</p>' +
+      '<p>Restul cazărilor se rezervă la cerere, cu confirmare în câteva ore.</p>',
+      '<p>Hotels marked this way are <b>contracted directly by our agency</b>. We hold our own allotment of rooms there, which changes three things for you:</p>' +
+      '<p><b>The availability you see is real</b> — it is our stock, not a live query to the hotel.<br>' +
+      '<b>The booking is confirmed instantly</b>, without waiting for the hotel to reply.<br>' +
+      '<b>Our consultants can change or cancel it</b> without depending on the hotel.</p>' +
+      '<p>The rest of the stays are booked on request, with confirmation within a few hours.</p>'));
+  }
+
+  function initOwnInventory() {
+    $$('.lcard[data-own="1"]').forEach(c => {
+      const perks = $('.lc-perks', c);
+      if (perks && !$('.own-badge', c)) perks.insertAdjacentHTML('afterbegin', ownBadge());
+    });
+    $$('.hcard[data-own="1"]').forEach(c => {
+      const b = $('.b', c);
+      if (b && !$('.own-badge', c)) b.insertAdjacentHTML('afterbegin', '<div style="margin-bottom:6px">' + ownBadge() + '</div>');
+    });
+    if (document.body.dataset.own === '1') {
+      const chips = $('.hp-chips');
+      if (chips && !$('.own-badge', chips)) chips.insertAdjacentHTML('afterbegin', ownBadge());
+    }
+    $$('.own-badge').forEach(b => b.onclick = e => { e.stopPropagation(); e.preventDefault(); ownModal(); });
+  }
+
   /* ---------- boot ---------- */
   document.addEventListener('DOMContentLoaded', () => {
     initHeader();
@@ -1342,6 +1420,7 @@
     initCheckout();
     initThanks();
     initGeneric();
+    initOwnInventory();
     repriceEverything();
   });
 })();
