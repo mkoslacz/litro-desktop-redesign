@@ -1125,6 +1125,88 @@
      HOTEL
      ============================================================ */
   /* ============================================================
+     ZOOM PE TOT ECRANUL — poza aleasă, cu pinch, dublu-tap și panoramare
+     ============================================================ */
+  const ZOOM = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2">' +
+    '<circle cx="11" cy="11" r="6.5"/><path d="M15.8 15.8 21 21M11 8.4v5.2M8.4 11h5.2"/></svg>';
+
+  function zoomView(it) {
+    const z = el('div', 'mzoom');
+    z.innerHTML = '<img src="' + (it.src || it) + '" alt="">' +
+      '<button class="zx" aria-label="' + t('Închide', 'Close') + '"><svg width="20" height="20"><use href="#i-x"/></svg></button>' +
+      '<div class="zctl"><button data-z="out" aria-label="' + t('Micșorează', 'Zoom out') + '">−</button>' +
+      '<span class="zlvl">100%</span>' +
+      '<button data-z="in" aria-label="' + t('Mărește', 'Zoom in') + '">+</button></div>' +
+      '<div class="zcap">' + (it.cap || '') + '<span>' +
+      t('Ciupește sau atinge de două ori ca să mărești', 'Pinch or double-tap to zoom') + '</span></div>';
+    document.body.appendChild(z);
+    document.body.classList.add('noscroll');
+    requestAnimationFrame(() => z.classList.add('open'));
+
+    const img = $('img', z), lvl = $('.zlvl', z);
+    let k = 1, tx = 0, ty = 0;
+    function apply() {
+      /* panoramarea nu are voie să scoată poza din ecran */
+      const w = z.clientWidth, h = z.clientHeight;
+      const mx = Math.max(0, (w * k - w) / 2), my = Math.max(0, (h * k - h) / 2);
+      tx = Math.min(mx, Math.max(-mx, tx)); ty = Math.min(my, Math.max(-my, ty));
+      img.style.transform = 'translate(' + tx + 'px,' + ty + 'px) scale(' + k + ')';
+      lvl.textContent = Math.round(k * 100) + '%';
+      z.classList.toggle('zoomed', k > 1);
+    }
+    function setK(nk) {
+      const prev = k;
+      k = Math.min(4, Math.max(1, Math.round(nk * 100) / 100));
+      if (k === 1) { tx = 0; ty = 0; } else { tx *= k / prev; ty *= k / prev; }
+      apply();
+    }
+    function close() {
+      z.classList.remove('open');
+      document.body.classList.remove('noscroll');
+      document.removeEventListener('keydown', onKey);
+      setTimeout(() => z.remove(), 220);
+    }
+    function onKey(e) {
+      if (e.key === 'Escape') close();
+      if (e.key === '+' || e.key === '=') setK(k + 0.5);
+      if (e.key === '-') setK(k - 0.5);
+    }
+    document.addEventListener('keydown', onKey);
+    $$('[data-z]', z).forEach(b => b.onclick = () => setK(b.dataset.z === 'in' ? k + 0.5 : k - 0.5));
+    $('.zx', z).onclick = close;
+    z.onclick = e => { if (e.target === z) close(); };
+
+    /* dublu-tap (și dublu-clic) comută 100% ↔ 250% */
+    let lastTap = 0;
+    img.onclick = () => {
+      const now = Date.now();
+      if (now - lastTap < 320) { setK(k > 1 ? 1 : 2.5); lastTap = 0; } else lastTap = now;
+    };
+    /* panoramare cu degetul / mouse-ul, doar când poza e mărită */
+    let drag = false, sx = 0, sy = 0, ox = 0, oy = 0;
+    img.addEventListener('pointerdown', e => {
+      if (k <= 1) return;
+      drag = true; sx = e.clientX; sy = e.clientY; ox = tx; oy = ty;
+      try { img.setPointerCapture(e.pointerId); } catch (err) { }
+    });
+    img.addEventListener('pointermove', e => {
+      if (!drag) return;
+      tx = ox + (e.clientX - sx); ty = oy + (e.clientY - sy); apply();
+    });
+    ['pointerup', 'pointercancel'].forEach(ev => img.addEventListener(ev, () => { drag = false; }));
+    /* pinch */
+    const dist = ts => Math.hypot(ts[0].clientX - ts[1].clientX, ts[0].clientY - ts[1].clientY);
+    let d0 = 0, k0 = 1;
+    z.addEventListener('touchstart', e => { if (e.touches.length === 2) { d0 = dist(e.touches); k0 = k; } }, { passive: true });
+    z.addEventListener('touchmove', e => {
+      if (e.touches.length === 2 && d0) { e.preventDefault(); setK(k0 * dist(e.touches) / d0); }
+    }, { passive: false });
+    ['touchend', 'touchcancel'].forEach(ev => z.addEventListener(ev, () => { d0 = 0; }));
+    apply();
+    return z;
+  }
+
+  /* ============================================================
      CONȚINUT DE LA TURIȘTI — încărcare de fotografii, clipuri și recenzii
      ============================================================ */
   const UP_FILES = [
@@ -1305,15 +1387,19 @@
       let gFilter = filter || 'all', view = [], gi = 0;
       const sh = openSheet({
         title: (S.hotel || 'Complex Mediteranean'), full: true, back: true,
-        body: '<div class="mgal step-grid"><div class="mgal-chips"></div><div class="mgal-grid"></div>' +
+        /* poza mare stă DEASUPRA mozaicului: pe telefon o bandă orizontală de miniaturi
+           lasă jumătate de ecran pustă, iar mozaicul umple tot ce e sub fotografie */
+        body: '<div class="mgal step-grid">' +
           '<div class="mgal-one"><div class="mgal-main"><img alt=""><span class="c"></span>' +
-          '<span class="nv prev">‹</span><span class="nv next">›</span><span class="pl">' + PLAY + '</span></div>' +
-          '<div class="mgal-cap"></div><div class="lb-strip"></div></div></div>'
+          '<span class="nv prev">‹</span><span class="nv next">›</span><span class="pl">' + PLAY + '</span>' +
+          '<button class="zbtn">' + ZOOM + t('Mărește', 'Zoom') + '</button></div>' +
+          '<div class="mgal-cap"></div></div>' +
+          '<div class="mgal-chips"></div><div class="mgal-grid"></div></div>'
       });
       sh.classList.add('mgal-sheet');
       const box = $('.mgal', sh), chips = $('.mgal-chips', sh), grid = $('.mgal-grid', sh);
       const img = $('.mgal-main img', sh), cnt = $('.mgal-main .c', sh), pl = $('.mgal-main .pl', sh);
-      const cap = $('.mgal-cap', sh), strip = $('.lb-strip', sh), body = $('.sh-body', sh);
+      const cap = $('.mgal-cap', sh), body = $('.sh-body', sh);
 
       function paintGrid() {
         chips.innerHTML = GCHIPS.filter(c => c[0] === 'all' || GALLERY.some(i => i.cat === c[0]))
@@ -1326,10 +1412,13 @@
           (it.video ? '<span class="pl">' + PLAY + '</span><b class="du">' + it.dur + '</b>' : '') + '</div>').join('');
         $$('.mgal-chip', sh).forEach(c => c.onclick = () => { gFilter = c.dataset.c; paintGrid(); });
         $$('.mgal-cell', sh).forEach(c => c.onclick = () => openOne(+c.dataset.i));
+        if (box.classList.contains('step-one')) markCell();
       }
+      const markCell = () => $$('.mgal-cell', sh).forEach(c => c.classList.toggle('on', +c.dataset.i === gi));
       function paintOne() {
         const it = view[gi];
         img.src = it.src;
+        img.style.objectPosition = it.pos || '';
         cnt.textContent = (gi + 1) + ' / ' + view.length;
         pl.style.display = it.video ? 'flex' : 'none';
         cap.innerHTML = '<div class="t">' + (it.cap || '') + '</div>' +
@@ -1337,11 +1426,7 @@
             ? '<div class="by"><span class="av">' + it.by.charAt(0) + '</span>' + it.by + ' · ' + it.when +
               (it.video ? ' · ' + it.dur : '') + '</div>'
             : '<div class="by">' + t('Fotografie oficială a proprietății', 'Official property photo') + '</div>');
-        strip.innerHTML = view.map((x, i) => '<img src="' + x.src + '" data-i="' + i + '"' +
-          (i === gi ? ' class="on"' : '') + (x.pos ? ' style="object-position:' + x.pos + '"' : '') + '>').join('');
-        $$('.lb-strip img', sh).forEach(x => x.onclick = () => { gi = +x.dataset.i; paintOne(); });
-        const on = $('.lb-strip img.on', sh);
-        if (on) on.scrollIntoView({ block: 'nearest', inline: 'center' });
+        markCell();
       }
       function openOne(i) {
         gi = i;
@@ -1358,9 +1443,13 @@
           sh.classList.remove('gal-one'); body.scrollTop = 0;
         } else closeSheet();
       };
-      pl.onclick = () => toast(t('În prototip clipurile nu rulează', 'Clips do not play in the prototype'));
-      $('.mgal-main .prev', sh).onclick = () => { gi = (gi - 1 + view.length) % view.length; paintOne(); };
-      $('.mgal-main .next', sh).onclick = () => { gi = (gi + 1) % view.length; paintOne(); };
+      pl.onclick = e => { e.stopPropagation(); toast(t('În prototip clipurile nu rulează', 'Clips do not play in the prototype')); };
+      $('.mgal-main .prev', sh).onclick = e => { e.stopPropagation(); gi = (gi - 1 + view.length) % view.length; paintOne(); };
+      $('.mgal-main .next', sh).onclick = e => { e.stopPropagation(); gi = (gi + 1) % view.length; paintOne(); };
+      /* poza mare se deschide pe tot ecranul, cu zoom */
+      const openZoom = e => { if (e) e.stopPropagation(); zoomView(view[gi]); };
+      $('.mgal-main .zbtn', sh).onclick = openZoom;
+      img.onclick = openZoom;
       paintGrid();
       return sh;
     }

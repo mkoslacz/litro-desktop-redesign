@@ -125,13 +125,22 @@ thumbnail strip below it**, arrow-key navigation, a counter and a "‹ All photo
 
 A side rail stays visible through both steps: the review score, two guest quotes, the price and a
 "See the rooms" CTA. A gallery that only shows pictures parks the visitor; this one keeps the reason to
-book in the same view. Mobile runs the same two steps in a full-screen sheet, where the header's back
-arrow goes mosaic-ward first and only closes the gallery from the mosaic.
+book in the same view.
+
+**On mobile the second step keeps the mosaic instead of a thumbnail strip.** A horizontal strip under
+the photo wastes the whole lower half of a phone screen, so the chosen picture sits *above* the same
+mosaic — the selected tile is ringed in orange, tapping another swaps the photo, and the header's back
+arrow drops the big photo and returns to plain browsing (it only closes the gallery from there).
+Tapping the photo, or the **Mărește / Zoom** button on it, opens it **full-screen with real zoom**:
+pinch, double-tap to toggle 100 % ↔ 250 %, ± buttons up to 400 %, drag to pan, and panning is clamped so
+the picture can never be dragged off screen.
 
 ## Photos and clips from guests, and a way to add them
 
 The property's own photos are the marketing version of a hotel. Guest photos are the ones it cannot
-retouch, so they get a named block inside the reviews section rather than a footnote:
+retouch, so they get a named block **under the guest reviews** — the reviews are what a visitor came to
+that section for, and the guest pictures plus the invitation to add your own read as the continuation of
+them rather than as an interruption:
 
 - a strip of portrait tiles with each uploader's name, video tiles with a duration badge, and a "+42" tile;
 - review cards that carry their own photos and clips, with a **verified-stay** line;

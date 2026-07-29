@@ -593,17 +593,15 @@ body.has-bar { padding-bottom: 92px; }
 .modal .pm { border: 1.5px solid var(--gray-400); border-radius: 100px; padding: 7px 12px; font-size: 13px; font-weight: 600; color: var(--gray-900); }
 .modal .pm.hl { border-color: var(--navy-500); color: var(--navy-500); }
 .menu-list a { display: block; padding: 13px 0; border-bottom: 1px solid var(--gray-300); font-size: 16px; font-weight: 700; color: var(--gray-900); }
-.lb-strip { display: flex; gap: 7px; overflow-x: auto; margin-top: 10px; scrollbar-width: none; }
-.lb-strip img { width: 66px; height: 50px; object-fit: cover; border-radius: 8px; opacity: .55; flex: none; }
-.lb-strip img.on { opacity: 1; box-shadow: 0 0 0 2px var(--navy-500); }
-
 /* ============================================================
    GALERIA ÎN DOI PAȘI (mobil)
-   pasul 1 = mozaicul, pasul 2 = imaginea mare + banda de miniaturi
+   pasul 1 = mozaicul, pasul 2 = poza mare DEASUPRA aceluiași mozaic —
+   o bandă orizontală de miniaturi ar lăsa jumătate de ecran goală
    ============================================================ */
 .mgal-sheet .sh-head .back { display: none; }
 .mgal-sheet.gal-one .sh-head .back { display: flex; }
-.mgal.step-grid .mgal-one, .mgal.step-one .mgal-chips, .mgal.step-one .mgal-grid { display: none; }
+.mgal.step-grid .mgal-one { display: none; }
+.mgal-one { margin-bottom: 14px; }
 .mgal-chips { display: flex; gap: 7px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
 .mgal-chip { flex: none; border: 1.5px solid var(--gray-400); border-radius: 100px; padding: 7px 13px;
   font-size: 13px; font-weight: 600; background: #fff; color: var(--gray-700); }
@@ -614,6 +612,8 @@ body.has-bar { padding-bottom: 92px; }
 .mgal-cell { position: relative; border-radius: 10px; overflow: hidden; background: var(--gray-200); }
 .mgal-cell.big { grid-column: span 2; grid-row: span 2; }
 .mgal-cell img { width: 100%; height: 100%; object-fit: cover; }
+.mgal-cell.on { box-shadow: inset 0 0 0 3px var(--orange-500); }
+.mgal-cell.on img { opacity: .82; }
 .mgal-cell .tg { position: absolute; top: 6px; left: 6px; background: rgba(255,255,255,.94); color: var(--navy-500);
   border-radius: 100px; padding: 2px 8px; font-size: 10.5px; font-weight: 700; }
 .mgal-cell .pl { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #fff; }
@@ -629,11 +629,31 @@ body.has-bar { padding-bottom: 92px; }
 .mgal-main .nv.prev { left: 8px; } .mgal-main .nv.next { right: 8px; }
 .mgal-main .pl { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; color: #fff; }
 .mgal-main .pl svg { background: rgba(0,0,0,.55); border-radius: 50%; padding: 16px; width: 56px; height: 56px; }
+.mgal-main .zbtn { position: absolute; left: 10px; bottom: 10px; display: inline-flex; align-items: center; gap: 5px;
+  background: rgba(255,255,255,.92); color: var(--gray-900); border-radius: 100px; padding: 6px 12px; font-size: 12.5px; font-weight: 700; }
 .mgal-cap { margin-top: 10px; }
 .mgal-cap .t { font-weight: 700; font-size: 14.5px; }
 .mgal-cap .by { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--gray-700); margin-top: 3px; }
 .mgal-cap .av { width: 20px; height: 20px; border-radius: 50%; background: var(--navy-100); color: var(--navy-500);
   display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
+
+/* zoom pe tot ecranul, peste coloana de 430 px */
+.mzoom { position: fixed; inset: 0; z-index: 140; background: #000; display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity .2s; touch-action: none; overflow: hidden; }
+.mzoom.open { opacity: 1; }
+/* pe un ecran lat rămâne în coloana telefonului, ca sheet-urile */
+@media (min-width: 460px) { .mzoom { left: 50%; right: auto; width: 430px; transform: translateX(-50%); } }
+.mzoom img { max-width: 100%; max-height: 100%; object-fit: contain; transform-origin: center center; transition: transform .18s ease-out; }
+.mzoom.zoomed img { transition: none; cursor: grab; }
+.mzoom .zx { position: absolute; top: 12px; right: 12px; width: 38px; height: 38px; border-radius: 50%;
+  background: rgba(255,255,255,.92); color: var(--gray-900); display: flex; align-items: center; justify-content: center; }
+.mzoom .zctl { position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(52px + var(--safe-b));
+  display: flex; align-items: center; background: rgba(255,255,255,.94); border-radius: 100px; padding: 4px; }
+.mzoom .zctl button { width: 40px; height: 34px; font-size: 20px; font-weight: 700; color: var(--gray-900); }
+.mzoom .zlvl { min-width: 52px; text-align: center; font-size: 13px; font-weight: 700; color: var(--gray-900); }
+.mzoom .zcap { position: absolute; left: 0; right: 0; bottom: calc(14px + var(--safe-b)); text-align: center;
+  color: #fff; font-size: 12.5px; font-weight: 600; padding: 0 16px; }
+.mzoom .zcap span { display: block; color: rgba(255,255,255,.6); font-weight: 400; font-size: 11.5px; margin-top: 2px; }
 
 /* --- fotografii și clipuri de la turiști --- */
 .ugc-head p { font-size: 12.5px; color: var(--gray-700); margin: -6px 0 10px; }
@@ -654,7 +674,8 @@ body.has-bar { padding-bottom: 92px; }
 .ugc-cta { border: 1px solid var(--gray-300); border-radius: var(--r-m); padding: 12px; margin-top: 11px; }
 .ugc-cta .t { font-weight: 700; font-size: 14px; }
 .ugc-cta .d { font-size: 12.5px; color: var(--gray-700); margin-top: 2px; }
-.ugc-cta .btn { width: 100%; margin-top: 10px; }
+.ugc-cta .acts { display: flex; gap: 8px; margin-top: 10px; }
+.ugc-cta .acts .btn { flex: 1 1 0; min-width: 0; padding: 11px 6px; font-size: 13.5px; }
 .review .rev-ph { display: flex; gap: 6px; margin-top: 9px; }
 .review .rev-ph span { position: relative; width: 64px; height: 50px; border-radius: 8px; overflow: hidden; flex: none; }
 .review .rev-ph img { width: 100%; height: 100%; object-fit: cover; }
