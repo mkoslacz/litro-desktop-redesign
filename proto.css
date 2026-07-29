@@ -453,20 +453,21 @@ body[data-auth="in"] .loyal-band { display: none; }
    deschide exact aceleași popovere (destinație / calendar / oaspeți).
    Comutator separat pentru fiecare tip de pagină, în panoul de prototip.
    ============================================================ */
-.ssearch { position: fixed; left: 0; right: 0; top: 0; z-index: 700; background: #fff;
-  border-bottom: 1px solid var(--gray-300); box-shadow: 0 6px 22px rgba(1,43,85,.13);
-  transform: translateY(-108%); transition: transform .24s ease; }
+/* fundal navy, nu alb: pe pagini albe o bară albă lipită se pierde complet —
+   navy-ul o desprinde de conținut și e aceeași culoare ca bara de aplicație de pe mobil */
+.ssearch { position: fixed; left: 0; right: 0; top: 0; z-index: 700; background: var(--navy-500);
+  box-shadow: 0 6px 22px rgba(1,43,85,.30); transform: translateY(-108%); transition: transform .24s ease; }
 .ssearch.on { transform: none; }
 .ssearch .in { display: flex; align-items: center; gap: 18px; height: 62px; }
-.ssearch .ss-logo { display: flex; align-items: center; gap: 8px; flex: none; }
+.ssearch .ss-logo { display: flex; align-items: center; gap: 8px; flex: none; text-decoration: none; }
 .ssearch .ss-logo .mark { width: 30px; height: 30px; flex: none; }
-.ssearch .ss-logo .l1 { display: block; font-family: var(--font-title); font-size: 15.5px; font-weight: 700; line-height: 1; color: var(--navy-500); letter-spacing: -.2px; }
-.ssearch .ss-logo .l2 { display: block; font-family: var(--font-title); font-size: 10.5px; font-weight: 500; line-height: 1.2; color: var(--gray-700); }
-.ssearch .ss-logo .l2 b { color: var(--orange-500); font-weight: 700; }
+.ssearch .ss-logo .l1 { display: block; font-family: var(--font-title); font-size: 15.5px; font-weight: 700; line-height: 1; color: #fff; letter-spacing: -.2px; }
+.ssearch .ss-logo .l2 { display: block; font-family: var(--font-title); font-size: 10.5px; font-weight: 500; line-height: 1.2; color: rgba(255,255,255,.84); }
+.ssearch .ss-logo .l2 b { color: #FFC48A; font-weight: 700; }
 .ssearch .ss-mid { flex: 1; min-width: 0; display: flex; justify-content: center; }
 /* pastila de căutare — gazda popoverelor, deci position:relative */
 .ssearch .ss-pill { position: relative; display: flex; align-items: stretch;
-  border: 1.5px solid var(--gray-400); border-radius: 100px; background: #fff; padding: 3px 3px 3px 4px; }
+  border: 1.5px solid var(--orange-500); border-radius: 100px; background: #fff; padding: 3px 3px 3px 4px; box-shadow: 0 4px 14px rgba(1,43,85,.24); }
 .ssearch .ss-f { display: flex; align-items: center; gap: 9px; padding: 6px 16px; border-radius: 100px; cursor: pointer; min-width: 0; }
 .ssearch .ss-f:hover { background: var(--gray-200); }
 .ssearch .ss-f.active { background: var(--gray-200); }
@@ -477,12 +478,24 @@ body[data-auth="in"] .loyal-band { display: none; }
 .ssearch .ss-go { flex: none; display: inline-flex; align-items: center; gap: 8px; margin-left: 6px;
   background: var(--orange-500); color: #fff; border-radius: 100px; padding: 0 20px; font-size: 14.5px; font-weight: 700; cursor: pointer; }
 .ssearch .ss-go:hover { background: var(--orange-600, #D26F1F); }
-.ssearch .ss-phone { flex: none; display: flex; align-items: center; gap: 8px; color: var(--navy-500); font-weight: 700; font-size: 14.5px; text-decoration: none; }
-.ssearch .ss-phone .h { display: block; font-size: 11px; font-weight: 600; color: var(--gray-600); }
+/* dreapta: aceleași elemente ca în antet — telefon, cont, meniu */
+.ssearch .ss-right { flex: none; display: flex; align-items: center; gap: 6px; }
+.ssearch .ss-phone { display: flex; align-items: center; gap: 8px; color: #fff; text-decoration: none; padding: 6px 10px; border-radius: 10px; }
+.ssearch .ss-phone:hover, .ssearch .ss-act:hover { background: rgba(255,255,255,.14); }
+.ssearch .ss-phone .n { display: block; font-weight: 700; font-size: 14.5px; line-height: 1.1; }
+.ssearch .ss-phone .h { display: block; font-size: 10.5px; font-weight: 600; color: #9BE8C2; }
+.ssearch .ss-act { display: inline-flex; align-items: center; gap: 7px; color: #fff; font-size: 14px; font-weight: 700;
+  padding: 8px 12px; border-radius: 10px; cursor: pointer; }
+.ssearch .ss-act .avatar { width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,.22);
+  display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; }
+.ssearch .ss-user { border: 1.5px solid rgba(255,255,255,.55); padding: 6px 14px; }
 /* ecran mai îngust decât designul de 1440: bara nu mai trage containerul de 1200 în afara ecranului */
-@media (max-width: 1260px) {
+@media (max-width: 1360px) {
   .ssearch .in { width: auto; padding: 0 16px; }
-  .ssearch .ss-phone, .ssearch .ss-logo span { display: none; }
+  .ssearch .ss-phone .h, .ssearch .ss-user .lbl { display: none; }
+}
+@media (max-width: 1180px) {
+  .ssearch .ss-phone, .ssearch .ss-logo span, .ssearch .ss-burger .lbl { display: none; }
 }
 /* popoverele mutate în bară moștenesc poziționarea din .pop, dar au nevoie de spațiu deasupra tuturor */
 .ssearch .pop { z-index: 810; }

@@ -43,7 +43,8 @@
   const PAGEKIND = () => /^home/.test(FILE) ? 'home' : (document.body.dataset.page || '');
   const STICKY_KEY = { home: 'stickyHome', listing: 'stickyList', hotel: 'stickyHotel' };
   const STICKY_URL = [['sthome', 'stickyHome'], ['stlist', 'stickyList'], ['sthotel', 'stickyHotel']];
-  let stickySync = null;   // setat de bara lipită; comutatoarele din panou îl re-rulează
+  let stickySync = null;      // setat de bara lipită; comutatoarele din panou îl re-rulează
+  let ssUserPaint = null;     // eticheta „musafir / Ana" din bara lipită
 
   /* '' = tot litoralul: căutarea implicită merge peste toate stațiunile deodată,
      nu una câte una — așa vede utilizatorul întâi oferta, apoi alege zona */
@@ -393,7 +394,7 @@
       const bar = el('div', 'ssearch');
       bar.innerHTML = '<div class="container in">' +
         '<a class="ss-logo" href="' + en('home-c.html') + '">' +
-        '<svg class="mark" viewBox="0 0 42 42"><circle cx="19" cy="23" r="13" fill="none" stroke="#004B97" stroke-width="7"/><circle cx="33" cy="8.5" r="5.5" fill="#EB802D"/></svg>' +
+        '<svg class="mark" viewBox="0 0 42 42"><circle cx="19" cy="23" r="13" fill="none" stroke="#fff" stroke-width="7"/><circle cx="33" cy="8.5" r="5.5" fill="#EB802D"/></svg>' +
         '<span><span class="l1">litoralul</span><span class="l2">romanesc<b>.ro</b></span></span></a>' +
         '<div class="ss-mid"><div class="ss-pill">' +
         fld('dest', 'i-pin', lang('Unde', 'Where'), '<span data-bind="dest"></span>') +
@@ -401,11 +402,31 @@
         fld('guests', 'i-users', lang('Oaspeți', 'Guests'), '<span data-bind="guests"></span> · <span data-bind="rooms"></span>') +
         '<span class="ss-go">' + lang('Caută', 'Search') + ' ' + ic('i-search', 18) + '</span>' +
         '</div></div>' +
+        /* aceleași elemente ca în antetul paginii — telefonul call-centerului, contul și meniul —
+           ca bara lipită să fie chiar antetul strâns, nu un al doilea rând de navigație */
+        '<div class="ss-right">' +
         '<a class="ss-phone" href="tel:0241999">' + ic('i-phone', 19) +
-        '<span><span class="h">' + lang('Consultanți 10–18', 'Consultants 10–18') + '</span>0241 999</span></a>' +
-        '</div>';
+        '<span><span class="n">0241 999</span><span class="h">● ' + lang('Zilnic 10:00 – 18:00', 'Daily 10:00 – 18:00') + '</span></span></a>' +
+        '<span class="ss-act ss-user" role="button" tabindex="0"><span class="avatar">A</span>' +
+        '<span class="lbl">' + lang('Autentifică-te', 'Sign in') + '</span></span>' +
+        '<span class="ss-act ss-burger" role="button" tabindex="0" aria-label="' + lang('Meniu', 'Menu') + '">' +
+        ic('i-menu', 21) + '<span class="lbl">' + lang('Meniu', 'Menu') + '</span></span>' +
+        '</div></div>';
       document.body.appendChild(bar);
       const pill = $('.ss-pill', bar);
+      const ssUser = $('.ss-user', bar), ssBurger = $('.ss-burger', bar);
+      ssUser.setAttribute('data-pop-anchor', '');
+      ssBurger.setAttribute('data-pop-anchor', '');
+      ssUser.onclick = e => { e.stopPropagation(); if (openUserMenu) openUserMenu(ssUser); else loginModal(false); };
+      ssBurger.onclick = e => { e.stopPropagation(); if (openNavPanel) openNavPanel(ssBurger); };
+      /* eticheta contului urmează starea musafir/membru din panoul de prototip */
+      const paintUser = () => {
+        const inn = document.body.dataset.auth === 'in';
+        $('.lbl', ssUser).textContent = inn ? 'Ana' : lang('Autentifică-te', 'Sign in');
+        $('.avatar', ssUser).style.display = inn ? '' : 'none';
+      };
+      ssUserPaint = paintUser;
+      paintUser();
       $$('.ss-f', bar).forEach(f => {
         f.setAttribute('data-pop-anchor', '');
         f.onclick = () => {
@@ -588,6 +609,8 @@
   /* ============================================================
      HEADER — user menu, burger, nav
      ============================================================ */
+  /* expuse ca bara lipită de sus să deschidă exact meniurile antetului, nu copii ale lor */
+  let openUserMenu = null, openNavPanel = null;
   function initHeader() {
     const user = $('.h-user');
     if (user) {
@@ -596,15 +619,16 @@
         '<div class="it">Datele mele</div><div class="sep"></div><div class="it">Ieși din cont</div>';
       document.body.appendChild(m);
       user.setAttribute('data-pop-anchor', '');
-      user.onclick = e => {
-        e.stopPropagation();
+      /* ancora e parametru: același meniu se deschide și de sub butonul din bara lipită */
+      openUserMenu = anchor => {
         if (document.body.dataset.auth !== 'in') { closeAllPops(); return loginModal(false); }
         const was = m.classList.contains('open'); closeAllPops(); if (was) return;
-        const r = user.getBoundingClientRect();
+        const r = anchor.getBoundingClientRect();
         m.style.top = (r.bottom + window.scrollY + 8) + 'px';
         m.style.left = (r.right - 240) + 'px';
         m.classList.add('open'); openPop = m;
       };
+      user.onclick = e => { e.stopPropagation(); openUserMenu(user); };
       $$('.it', m).forEach(i => i.onclick = () => { closeAllPops(); toast('În prototip: ' + i.textContent.trim()); });
     }
     const burger = $('.h-burger');
@@ -632,15 +656,15 @@
         };
       });
       burger.setAttribute('data-pop-anchor', '');
-      burger.onclick = e => {
-        e.stopPropagation();
+      openNavPanel = anchor => {
         const was = panel.classList.contains('open'); closeAllPops(); if (was) return;
-        const r = burger.getBoundingClientRect();
+        const r = anchor.getBoundingClientRect();
         panel.style.top = (r.bottom + window.scrollY + 10) + 'px';
         panel.style.left = 'auto';
         panel.style.right = Math.max(12, document.documentElement.clientWidth - r.right) + 'px';
         panel.classList.add('open'); openPop = panel;
       };
+      burger.onclick = e => { e.stopPropagation(); openNavPanel(burger); };
     }
 
     $$('.mainnav a').forEach(a => {
@@ -661,6 +685,7 @@
       if (av) av.style.display = mode === 'in' ? '' : 'none';
       hu.classList.toggle('guest', mode !== 'in');
     }
+    if (ssUserPaint) ssUserPaint();
   }
 
   /* Cine ajunge pe hotel direct din Google n-a căutat încă nimic — are nevoie
