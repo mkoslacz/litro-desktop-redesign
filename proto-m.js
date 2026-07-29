@@ -461,35 +461,17 @@
      Sunt comutatoare de demo, nu UI de produs: de aceea stau într-un
      panou plutitor, nu în pagină.
      ============================================================ */
-  /* Cine intră direct pe pagina hotelului (din Google, dintr-o reclamă) n-a
-     căutat încă nimic — îi arătăm bara de căutare. Cine vine din listing a
-     căutat deja, deci bara ar fi doar zgomot. */
+  /* Cine vine din listingul nostru a căutat deja: sus nu-i mai punem nimic, are
+     tot ecranul pentru hotel — iar datele le schimbă din bara de sejur de la camere.
+     Cine intră direct (Google, reclamă) n-a căutat nimic, deci primește bara compactă
+     de sus, care deschide același sheet de căutare. O casetă mare de căutare pe
+     pagina hotelului ar împinge hotelul sub linia de plutire. */
   function applySession() {
     if (PAGE() !== 'hotel') return;
     const nu = document.body.dataset.session === 'new';
-    let box = $('.hotel-search');
-    if (nu && !box) {
-      box = el('section', 'sect tight hotel-search');
-      box.innerHTML = '<div class="sbox" style="box-shadow:none;border:1.5px solid var(--gray-400);padding:6px">' +
-        '<button class="sfield" data-f="dest"><span class="ic"><svg width="20" height="20"><use href="#i-pin"/></svg></span>' +
-        '<span><span class="lbl">' + t('Unde mergi?', 'Where to?') + '</span><br><span class="val" data-bind="dest"></span></span></button>' +
-        '<button class="sfield" data-f="date"><span class="ic"><svg width="20" height="20"><use href="#i-cal"/></svg></span>' +
-        '<span><span class="lbl">' + t('Când călătorești?', 'When?') + '</span><br><span class="val" data-bind="dates"></span></span></button>' +
-        '<button class="sfield" data-f="guests"><span class="ic"><svg width="20" height="20"><use href="#i-users"/></svg></span>' +
-        '<span><span class="lbl">' + t('Oaspeți și camere', 'Guests and rooms') + '</span><br><span class="val"><span data-bind="guests"></span>, <span data-bind="rooms"></span></span></span></button>' +
-        '<button class="btn btn-primary btn-block" data-go>' + t('Caută', 'Search') + ' <svg width="18" height="18"><use href="#i-search"/></svg></button></div>';
-      const gal = $('.gal');
-      if (gal) gal.before(box); else document.body.prepend(box);
-      $$('.sfield', box).forEach(f => f.onclick = () => {
-        const k = f.dataset.f;
-        if (k === 'dest') destSheet(paint); else if (k === 'date') calSheet(paint); else guestsSheet(paint);
-      });
-      $('[data-go]', box).onclick = () => { save(); goto('m-listing.html'); };
-      paint();
-    }
-    if (box) box.style.display = nu ? '' : 'none';
     const sum = $('.m-sum');
-    if (sum) sum.style.display = nu ? 'none' : '';
+    if (sum) sum.style.display = nu ? '' : 'none';
+    if (stickySync) stickySync();
   }
 
   let onInventory = null;   // callback setat de listing
@@ -657,6 +639,7 @@
       } else {
         host.classList.toggle('mini', want && scrollY > 130);
       }
+      if (roomsStickySync) roomsStickySync();
     };
     stickySync = sync;
     const queue = () => { if (!queued) { queued = true; requestAnimationFrame(sync); } };
@@ -664,6 +647,61 @@
     window.addEventListener('resize', queue);
     sync();
   }
+
+  /* Bara de sejur din secțiunea de camere: cât timp compari camere, datele și
+     oaspeții trebuie să fie la un tap, nu la un scroll înapoi. Pe desktop asta se
+     rezolvă din CSS (`position: sticky` în #camere), aici nu se poate: bara stă
+     într-o secțiune scurtă, iar cardurile de cameră sunt în blocul următor, deci
+     sticky s-ar dezlipi imediat. O fixăm din JS pe toată zona camerelor, cu un
+     spacer care ține locul din flux ca să nu sară pagina. */
+  function initRoomsSticky() {
+    if (PAGE() !== 'hotel') return;
+    const bar = $('.stay-bar');
+    const cards = $$('.room-card');
+    if (!bar || !cards.length) return;
+    const region = cards[cards.length - 1].parentElement;
+    const spacer = el('div', 'stay-spacer');
+    bar.after(spacer);
+    /* Strânsă, bara are ~180 px per câmp: „· 7 nopți" și „· 2 camere" nu mai încap.
+       Le mutăm într-un <span class="xtra"> pe care CSS-ul îl ascunde când e lipită —
+       spanurile cu data-bind rămân în el, deci paint() le ține în continuare la zi. */
+    $$('.f', bar).forEach(f => {
+      const val = $('.val', f);
+      const first = val && $('[data-bind]', val);
+      if (!first || $('.xtra', val)) return;
+      const xtra = el('span', 'xtra');
+      while (first.nextSibling) xtra.appendChild(first.nextSibling);
+      val.appendChild(xtra);
+    });
+    const topOffset = () => {
+      const h = $('.m-head'), sum = $('.m-sum');
+      const hh = h ? h.getBoundingClientRect().height : 56;
+      const sh = sum && sum.style.display !== 'none' ? sum.getBoundingClientRect().height : 0;
+      return hh + sh;
+    };
+    let queued = false;
+    const sync = () => {
+      queued = false;
+      const want = document.body.dataset.stickyHotel !== 'off' && !document.body.dataset.export;
+      const off = topOffset();
+      const on = want && spacer.getBoundingClientRect().top <= off &&
+        region.getBoundingClientRect().bottom > off + 64;
+      if (on) {
+        spacer.style.height = spacer.style.height || bar.offsetHeight + 'px';
+        bar.style.top = off + 'px';
+        bar.classList.add('stuck');
+      } else {
+        bar.classList.remove('stuck');
+        spacer.style.height = '';
+      }
+    };
+    roomsStickySync = sync;
+    const queue = () => { if (!queued) { queued = true; requestAnimationFrame(sync); } };
+    window.addEventListener('scroll', queue, { passive: true });
+    window.addEventListener('resize', queue);
+    sync();
+  }
+  let roomsStickySync = null;
 
   /* ============================================================
      CARD FIXAT PE CARUSELUL DE CAMPANII (mecanism de „pin")
@@ -2035,6 +2073,7 @@
     initFlexi();
     initListing();
     initHotel();
+    initRoomsSticky();
     initAccordions();
     initCheckout();
     initThanks();

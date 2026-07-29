@@ -499,6 +499,14 @@ body[data-auth="in"] .loyal-band { display: none; }
 }
 /* popoverele mutate în bară moștenesc poziționarea din .pop, dar au nevoie de spațiu deasupra tuturor */
 .ssearch .pop { z-index: 810; }
+
+/* Bara de sejur din secțiunea de camere rămâne lipită cât ține secțiunea: cât timp
+   compari camere, datele și oaspeții trebuie să fie la un clic, nu la un scroll înapoi.
+   Nu e nevoie de JS — sticky se dezlipește singur la capătul lui #camere. */
+body[data-page="hotel"] .stay-bar { position: sticky; top: 12px; z-index: 30; }
+/* pentru vizitatorul nou bara de căutare e lipită sus, deci sejurul se așază sub ea */
+body[data-page="hotel"][data-session="new"] .stay-bar { top: 74px; }
+body[data-page="hotel"][data-sticky-hotel="off"] .stay-bar { position: relative; top: auto; }
 /* pagina împinsă în jos cât bara, ca ancora să nu sară când se lipește */
 body[data-export] .ssearch { display: none; }
 

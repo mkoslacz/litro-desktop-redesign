@@ -443,6 +443,20 @@ body[data-auth="in"] .band-loyal { display: none; }
 .stay-bar .f .lbl { font-size: 11.5px; color: var(--gray-700); font-weight: 600; }
 .stay-bar .f .val { font-weight: 700; font-size: 14.5px; }
 .stay-bar .f .chg { margin-left: auto; color: var(--navy-500); font-weight: 700; font-size: 12.5px; }
+/* lipită cât ține zona camerelor: două câmpuri pe un rând, fără etichete —
+   minimă, dar deschide aceleași sheet-uri de dată/oaspeți */
+.stay-spacer { height: 0; }
+.stay-bar.stuck { position: fixed; left: 0; right: 0; z-index: 53; margin: 0; padding: 7px 12px;
+  display: flex; gap: 8px; border-radius: 0; border-width: 0 0 1px; background: #fff;
+  box-shadow: 0 6px 18px rgba(1,43,85,.16); }
+.stay-bar.stuck .f { flex: 1; min-width: 0; min-height: 0; padding: 7px 9px; gap: 8px;
+  border: 1px solid var(--gray-400); border-radius: 10px; background: var(--gray-200); }
+.stay-bar.stuck .f + .f { border-top: 1px solid var(--gray-400); }
+.stay-bar.stuck .f .lbl, .stay-bar.stuck .f br, .stay-bar.stuck .f .chg { display: none; }
+/* fără min-width:0 pe spanul de text, câmpul refuză să se strângă și iese din ecran */
+.stay-bar.stuck .f > span:last-child { flex: 1; min-width: 0; }
+.stay-bar.stuck .f .val { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+.stay-bar.stuck .f .val .xtra { display: none; }   /* „· 7 nopți" / „· 2 camere" — nu încap pe un rând */
 
 .meal-chips { display: flex; gap: 7px; overflow-x: auto; padding-bottom: 3px; scrollbar-width: none; }
 .meal-chips::-webkit-scrollbar { display: none; }

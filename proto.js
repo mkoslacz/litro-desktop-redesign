@@ -1779,7 +1779,9 @@
     /* --- stay-bar: editare inline a datelor/oaspeților CHIAR AICI (fără redirect la search-ul de sus → listing) --- */
     const stayBar = $('.stay-bar');
     if (stayBar) {
-      stayBar.style.position = 'relative';
+      /* popoverele au nevoie de un părinte poziționat — dar nu suprascriem `sticky`,
+         care ține bara lipită cât ține secțiunea de camere */
+      if (getComputedStyle(stayBar).position === 'static') stayBar.style.position = 'relative';
       const sf = $$('.f', stayBar);
       const fdate = sf[0], fguests = sf[1], frooms = sf[2], modif = $('.btn', stayBar);
       const openD = e => { if (e) e.stopPropagation(); if (searchOpenCal) searchOpenCal(fdate || stayBar, stayBar); };
