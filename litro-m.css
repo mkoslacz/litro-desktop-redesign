@@ -84,6 +84,30 @@ svg { flex: none; }
    Sunt învelite într-un singur container sticky, ca să nu depindem de o
    înălțime calculată manual (rezumatul poate ajunge pe două rânduri). */
 .m-stick { position: sticky; top: var(--head-h); z-index: 55; }
+
+/* ============================================================
+   BARĂ DE CĂUTARE LIPITĂ — comutator de prototip, câte unul
+   pentru homepage / listing / pagina hotelului.
+   Pe homepage nu există azi nimic lipit: apare o pastilă strânsă
+   sub antet, după ce caseta mare de căutare iese din ecran.
+   Pe listing și pe hotel suprafața e deja lipită — comutatorul
+   decide dacă rămâne acolo, iar la derulare se strânge pe un rând.
+   ============================================================ */
+.m-ssearch { position: fixed; left: 0; right: 0; top: var(--head-h); z-index: 54;
+  background: var(--navy-500); padding: 0 12px 9px; transform: translateY(-135%); transition: transform .22s ease; }
+.m-ssearch.on { transform: none; }
+.m-ssearch .sumcard { padding: 8px 11px; }
+.m-ssearch .sumcard .t { font-size: 14px; }
+.m-ssearch .sumcard .d { font-size: 12px; }
+/* strâns pe un rând: rămâne funcțional (deschide același sheet), dar ocupă minimul */
+.m-stick.mini .sumcard .d, .m-sum.mini .sumcard .d { display: none; }
+.m-stick.mini .sumcard, .m-sum.mini .sumcard { padding: 7px 11px; }
+.m-stick.mini .m-sum, .m-sum.mini { padding-bottom: 7px; }
+.m-stick.mini .m-tabs { padding-bottom: 8px; }
+/* comutatorul pe „Nu": suprafața se derulează odată cu pagina, ca înainte */
+body[data-sticky-home="off"] .m-ssearch { display: none; }
+body[data-sticky-list="off"] .m-stick { position: static; }
+body[data-sticky-hotel="off"] .m-sum { position: static; }
 /* rezumatul căutării — cardul alb cu chenar portocaliu (din redesignul mobil LITRO) */
 .m-sum { position: sticky; top: var(--head-h); z-index: 55; background: var(--navy-500); padding: 0 12px 10px; }
 .m-stick .m-sum, .m-stick .m-tabs { position: static; }
@@ -173,6 +197,38 @@ h3.m-h3 { font-family: var(--font-title); font-size: 16.5px; font-weight: 700; }
 .hc-badge { position: absolute; right: 12px; top: 10px; z-index: 3; font-family: var(--font-title); font-weight: 800; font-size: 27px; transform: rotate(-6deg); text-shadow: 0 3px 14px rgba(0,0,0,.32); }
 .hc-rate { position: absolute; left: 12px; top: 10px; z-index: 3; background: var(--navy-500); color: #fff; font-weight: 800; font-size: 13px; border-radius: 8px; padding: 3px 8px; }
 .hc-loc { font-family: var(--font-body); font-size: 12px; font-weight: 600; opacity: .92; }
+/* ---- card fixat pe caruselul de campanii (comutator de prototip) ----
+   „Banner" = bandă lată deasupra pistei, scoasă din derulare.
+   „În linie" = primul card din pistă, dar lipit de marginea stângă:
+   celelalte campanii trec pe lângă el, el rămâne mereu primul. */
+.hc-pin { position: relative; display: block; overflow: hidden; color: #fff; border-radius: var(--r-l); box-shadow: var(--shadow-card); background: var(--navy-500); }
+.hc-pin .pin-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 58%; z-index: 0; }
+.hc-pin::after { content: ""; position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(150deg, rgba(233,244,250,.30) 0%, rgba(3,60,116,.46) 46%, rgba(2,48,95,.76) 100%); }
+.hc-pin .pin-art { position: relative; z-index: 2; height: 100%; display: flex; align-items: center; justify-content: center; padding: 30px 14px 10px; }
+.hc-pin .pin-mid { display: flex; flex-direction: column; align-items: center; text-align: center; }
+.hc-pin .pin-lock { display: flex; align-items: baseline; justify-content: center; white-space: nowrap; text-shadow: 0 3px 16px rgba(1,34,68,.5); }
+.hc-pin .pin-lock .w1, .hc-pin .pin-lock .w3 { font-family: var(--font-title); font-size: 25px; font-weight: 800; letter-spacing: -.4px; color: #fff; }
+.hc-pin .pin-lock .w2 { font-family: "Kaushan Script", cursive; font-size: 23px; color: #7FD4F5; margin: 0 -3px; position: relative; top: 3px; }
+.hc-pin .pin-rib { display: inline-block; margin-top: 8px; background: var(--navy-500); color: #fff;
+  font-size: 9.5px; font-weight: 700; letter-spacing: .4px; text-transform: uppercase; padding: 5px 10px; border-radius: 4px; line-height: 1.25; }
+.hc-pin .pin-cta { display: inline-flex; align-items: center; gap: 5px; margin-top: 9px;
+  background: var(--orange-500); color: #fff; font-size: 12px; font-weight: 700; border-radius: 100px; padding: 6px 13px; }
+/* procentul stă în colț, pe un rând, ca să nu intre peste lockup pe lățimea unui telefon */
+.hc-pin .pin-disc { position: absolute; right: 10px; top: 8px; z-index: 3; display: flex; align-items: baseline; gap: 4px; color: #fff;
+  transform: rotate(-5deg); font-family: "Caveat", cursive; text-shadow: 0 2px 10px rgba(1,34,68,.55); }
+.hc-pin .pin-disc .l1 { font-size: 12px; font-weight: 700; }
+.hc-pin .pin-disc .l2 { font-family: var(--font-title); font-size: 22px; font-weight: 800; letter-spacing: -.6px; }
+.hc-pin .pin-disc .l3 { font-size: 12px; font-weight: 700; }
+.hc-pin .pin-badge { position: absolute; left: 10px; top: 8px; z-index: 3; display: inline-flex; align-items: center; gap: 4px;
+  background: rgba(255,255,255,.94); color: var(--navy-500); font-size: 10px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: .5px; border-radius: 100px; padding: 3px 9px 3px 7px; }
+.hc .hc-pin.pin-band { display: block; height: 138px; margin: 0 var(--pad) 12px; }
+/* pe telefon cardul fixat rămâne primul din pistă și evidențiat, dar NU lipit de margine:
+   la 390 px un card lipit ar acoperi pista și restul campaniilor s-ar vedea pe o fâșie */
+.hc-track > .hc-pin.pin-sm { flex: 0 0 78%; height: 178px; scroll-snap-align: center;
+  box-shadow: 0 0 0 2.5px var(--orange-500), 0 6px 20px rgba(1,43,85,.28); }
+
 .hc-dots { display: flex; justify-content: center; gap: 5px; padding: 8px 0 2px; }
 .hc-dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--gray-400); }
 .hc-dots i.on { background: var(--navy-500); width: 16px; border-radius: 100px; }
@@ -864,6 +920,10 @@ body[data-export].has-bar { padding-bottom: 0; }
   font-weight: 700; color: rgba(255,255,255,.8); font-size: 11px; text-decoration: none; }
 .proto-tools .pt-b + .pt-b { border-left: 1px solid rgba(255,255,255,.22); }
 .proto-tools .pt-b.on { background: var(--orange-500); color: #fff; }
+.proto-tools .pt-grp { margin-top: 9px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,.18); font-weight: 800; font-size: 10px; text-transform: uppercase; letter-spacing: .7px; opacity: .6; }
+.proto-tools .pt-sub .pt-lbl { opacity: .9; }
+.proto-tools .pt-sub.here .pt-lbl { opacity: 1; font-weight: 800; color: var(--orange-500); }
+.proto-tools .pt-sub.here .pt-lbl::before { content: "▸ "; }
 .proto-tools .pt-min { position: absolute; top: -9px; right: -9px; width: 24px; height: 24px; border-radius: 50%; background: var(--gray-900); border: 1px solid rgba(255,255,255,.3); display: flex; align-items: center; justify-content: center; font-size: 13px; }
 .proto-tools.mini .pt-h, .proto-tools.mini .pt-row { display: none; }
 .proto-tools.mini { padding: 9px 12px; }

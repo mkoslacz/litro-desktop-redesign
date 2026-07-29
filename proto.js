@@ -36,6 +36,15 @@
 
   const PAGE_SIZE = 30;          // paginare, nu infinite scroll
 
+  /* Tipul de pagină pentru comutatoarele de prototip. Nu e același lucru cu
+     data-page: home-d ARE listingul în pagină (data-page="listing"), dar pentru
+     bara de căutare lipită contează că e homepage. */
+  const FILE = (location.pathname.split('/').pop() || 'index.html').replace('-en.html', '.html');
+  const PAGEKIND = () => /^home/.test(FILE) ? 'home' : (document.body.dataset.page || '');
+  const STICKY_KEY = { home: 'stickyHome', listing: 'stickyList', hotel: 'stickyHotel' };
+  const STICKY_URL = [['sthome', 'stickyHome'], ['stlist', 'stickyList'], ['sthotel', 'stickyHotel']];
+  let stickySync = null;   // setat de bara lipită; comutatoarele din panou îl re-rulează
+
   /* '' = tot litoralul: căutarea implicită merge peste toate stațiunile deodată,
      nu una câte una — așa vede utilizatorul întâi oferta, apoi alege zona */
   const ALL_TOTAL = 1236;
@@ -134,7 +143,8 @@
   document.addEventListener('click', e => {
     if (openPop && !openPop.contains(e.target) && !e.target.closest('[data-pop-anchor]')) closeAllPops();
   });
-  let searchOpenCal = null, searchOpenGuests = null;   // exposed so the hotel stay-bar can open the same editors inline
+  /* expuse ca bara lipită de sus și stay-bar-ul de pe hotel să deschidă exact aceleași editoare */
+  let searchOpenCal = null, searchOpenGuests = null, searchOpenDest = null, searchPaint = null;
   function placePop(pop, anchor, opts, host) {
     const r = anchor.getBoundingClientRect();
     host = host || anchor.closest('.search-card') || document.body;
@@ -197,16 +207,17 @@
         if (document.body.dataset.page === 'listing') { rerunSearch(); }
       });
     }
-    if (fDest) {
-      fDest.setAttribute('data-pop-anchor', '');
-      fDest.onclick = () => {
-        const wasOpen = popD.classList.contains('open');
-        closeAllPops(); if (wasOpen) return;
-        renderDest(''); placePop(popD, fDest); popD.classList.add('open'); fDest.classList.add('active');
-        openPop = popD; const inp = $('.search-in', popD); inp.value = ''; inp.focus();
-        inp.oninput = () => renderDest(inp.value);
-      };
+    function openDest(anchor, host) {
+      const wasOpen = popD.classList.contains('open');
+      closeAllPops(); if (wasOpen) return;
+      host = host || card;
+      if (popD.parentElement !== host) host.appendChild(popD);
+      renderDest(''); placePop(popD, anchor, null, host); popD.classList.add('open'); anchor.classList.add('active');
+      openPop = popD; const inp = $('.search-in', popD); inp.value = ''; inp.focus();
+      inp.oninput = () => renderDest(inp.value);
     }
+    searchOpenDest = openDest;
+    if (fDest) { fDest.setAttribute('data-pop-anchor', ''); fDest.onclick = () => openDest(fDest, card); }
 
     /* --- calendar popover --- */
     const popC = el('div', 'pop pop-cal'); card.appendChild(popC);
@@ -367,6 +378,70 @@
       save(); paint(); repriceEverything();
     });
 
+    /* --- bara de căutare lipită sus -------------------------------------
+       Când caseta mare iese din ecran, aceleași câmpuri se strâng într-o
+       pastilă fixată sus. Nu e o copie moartă: fiecare câmp deschide exact
+       același popover (mutat în pastilă prin parametrul „host"), iar butonul
+       reia handlerul de submit al paginii, ca să nu existe două comportamente.
+       Fiecare tip de pagină are comutatorul lui în panoul de prototip.       */
+    function initSticky() {
+      const kind = PAGEKIND();
+      if (!STICKY_KEY[kind]) return;
+      const ic = (id, s) => '<svg width="' + s + '" height="' + s + '"><use href="#' + id + '"/></svg>';
+      const fld = (k, id, lbl, val) => '<div class="ss-f" data-f="' + k + '">' + ic(id, 19) +
+        '<span style="min-width:0"><span class="lbl">' + lbl + '</span><span class="val">' + val + '</span></span></div>';
+      const bar = el('div', 'ssearch');
+      bar.innerHTML = '<div class="container in">' +
+        '<a class="ss-logo" href="' + en('home-c.html') + '">' +
+        '<svg class="mark" viewBox="0 0 42 42"><circle cx="19" cy="23" r="13" fill="none" stroke="#004B97" stroke-width="7"/><circle cx="33" cy="8.5" r="5.5" fill="#EB802D"/></svg>' +
+        '<span><span class="l1">litoralul</span><span class="l2">romanesc<b>.ro</b></span></span></a>' +
+        '<div class="ss-mid"><div class="ss-pill">' +
+        fld('dest', 'i-pin', lang('Unde', 'Where'), '<span data-bind="dest"></span>') +
+        fld('date', 'i-cal', lang('Când', 'When'), '<span data-bind="dates"></span>') +
+        fld('guests', 'i-users', lang('Oaspeți', 'Guests'), '<span data-bind="guests"></span> · <span data-bind="rooms"></span>') +
+        '<span class="ss-go">' + lang('Caută', 'Search') + ' ' + ic('i-search', 18) + '</span>' +
+        '</div></div>' +
+        '<a class="ss-phone" href="tel:0241999">' + ic('i-phone', 19) +
+        '<span><span class="h">' + lang('Consultanți 10–18', 'Consultants 10–18') + '</span>0241 999</span></a>' +
+        '</div>';
+      document.body.appendChild(bar);
+      const pill = $('.ss-pill', bar);
+      $$('.ss-f', bar).forEach(f => {
+        f.setAttribute('data-pop-anchor', '');
+        f.onclick = () => {
+          const k = f.dataset.f;
+          if (k === 'dest') openDest(f, pill);
+          else if (k === 'date') openCal(f, pill);
+          else openGuests(f, pill);
+        };
+      });
+      $('.ss-go', bar).onclick = () => {
+        closeAllPops();
+        if (btn) btn.onclick(); else goto(listingHref() + qs());
+      };
+
+      let queued = false;
+      const sync = () => {
+        queued = false;
+        let want = document.body.dataset[STICKY_KEY[kind]] !== 'off' && !document.body.dataset.export;
+        /* pe pagina hotelului bara de căutare există doar pentru vizitatorul nou
+           (cine vine din listingul nostru a căutat deja) — bara lipită respectă aceeași regulă */
+        if (kind === 'hotel' && document.body.dataset.session !== 'new') want = false;
+        const r = card.getBoundingClientRect();
+        const anchorVisible = card.offsetParent !== null && r.bottom > 6;
+        const on = want && !anchorVisible;
+        bar.classList.toggle('on', on);
+        if (!on && openPop && bar.contains(openPop)) closeAllPops();
+      };
+      stickySync = sync;
+      const queue = () => { if (!queued) { queued = true; requestAnimationFrame(sync); } };
+      window.addEventListener('scroll', queue, { passive: true });
+      window.addEventListener('resize', queue);
+      sync();
+    }
+    initSticky();
+
+    searchPaint = paint;
     paint();
   }
 
@@ -595,6 +670,67 @@
     const wrap = $('.search-wrap');
     if (!wrap || document.body.dataset.page !== 'hotel') return;
     wrap.style.display = document.body.dataset.session === 'new' ? '' : 'none';
+    if (stickySync) stickySync();
+  }
+
+  /* ============================================================
+     CARD FIXAT PE CARUSELUL DE CAMPANII (mecanism de „pin")
+     Primul loc din carusel poate fi scos din rotație: campania cea mai
+     importantă nu mai depinde de norocul autoplay-ului. Două moduri —
+     „banner" (bandă lată deasupra caruselului, nu se derulează deloc) și
+     „lat" (tot primul card, dar dublu, derulabil cu restul).
+     Creația e compusă din text real (nu un JPG), ca să iasă editabilă în
+     Figma și să existe în ambele limbi.
+     ============================================================ */
+  function pinFonts() {
+    if ($('#pin-fonts')) return;
+    const l = document.createElement('link');
+    l.id = 'pin-fonts'; l.rel = 'stylesheet';
+    l.href = 'https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Kaushan+Script&display=swap';
+    document.head.appendChild(l);
+  }
+  function pinCard() {
+    const a = el('a', 'hc-pin');
+    a.href = listingHref() + qs();
+    a.innerHTML =
+      '<img class="pin-bg" src="assets/coastline.jpg" alt="">' +
+      '<span class="pin-badge"><svg width="12" height="12"><use href="#i-pin"/></svg>' + lang('Fixat sus', 'Pinned') + '</span>' +
+      '<span class="pin-art">' +
+      '<span class="pin-disc"><span class="l1">' + lang('până la', 'up to') + '</span>' +
+      '<span class="l2">40%</span><span class="l3">' + lang('reducere', 'off') + '</span></span>' +
+      '<span class="pin-mid">' +
+      '<span class="pin-lock"><span class="w1">SUPER</span><span class="w2">' + lang('ofertele', 'summer') + '</span>' +
+      '<span class="w3">' + lang('VERII', 'DEALS') + '</span></span>' +
+      '<span class="pin-rib">' + lang('Vacanța perfectă începe pe litoralul românesc',
+        'The perfect holiday starts on the Romanian coast') + '</span>' +
+      '<span class="pin-cta">' + lang('Vezi cele 412 de oferte', 'See all 412 offers') + ' →</span>' +
+      '</span></span>';
+    return a;
+  }
+  let pinApply = null;   // setat mai jos; comutatorul din panou îl apelează
+  function initPinnedTile() {
+    const root = $('.hero-carousel');
+    if (!root) return;
+    const track = $('.hc-track', root);
+    if (!track) return;
+    applyPin(document.body.dataset.pin || 'inline');
+    function applyPin(mode) {
+      document.body.dataset.pin = mode;
+      const old = $('.hc-pin', root); if (old) old.remove();
+      root.classList.toggle('has-pin', mode === 'banner');
+      root.classList.toggle('pin-inline', mode === 'inline');
+      if (mode === 'off') return;
+      pinFonts();
+      const c = pinCard();
+      c.classList.add(mode === 'banner' ? 'pin-band' : 'pin-sm');
+      /* în ambele moduri cardul stă în afara pistei derulabile — asta e „fixarea":
+         restul campaniilor trec pe lângă el, el rămâne mereu primul și vizibil */
+      root.insertBefore(c, track);
+      /* pista are scroll-snap „mandatory": după ce se schimbă lățimea cardurilor,
+         Chrome re-derulează la cardul pe care era fixat — o readucem la început */
+      track.scrollLeft = 0;
+    }
+    pinApply = applyPin;
   }
 
   function initProtoTools() {
@@ -606,6 +742,16 @@
     if (q.get('session')) document.body.dataset.session = q.get('session');
     if (!document.body.dataset.rooms) document.body.dataset.rooms = 'on';
     if (!document.body.dataset.session) document.body.dataset.session = 'site';
+    /* bara lipită: trei comutatoare independente (home / listing / hotel) + cardul fixat
+       pe carusel. Se țin minte între pagini, ca să poți compara aceeași stare peste tot. */
+    STICKY_URL.forEach(([p, key]) => {
+      let v = q.get(p);
+      if (!v) { try { v = localStorage.getItem('litro-' + key); } catch (e) { } }
+      document.body.dataset[key] = v === 'off' ? 'off' : 'on';
+    });
+    let pin = q.get('pin');
+    if (!pin) { try { pin = localStorage.getItem('litro-pin'); } catch (e) { } }
+    document.body.dataset.pin = ['off', 'inline', 'banner'].indexOf(pin) >= 0 ? pin : 'inline';
     applySession();
     /* ?nopanel=1 — folosit la exportul în Figma, ca panoul de demo să nu ajungă în ramă */
     if (q.get('nopanel')) {
@@ -657,8 +803,36 @@
       html += '<div class="pt-row"><span class="pt-lbl">' + (EN() ? 'Card view' : 'Densitate celule') + '</span><div class="pt-seg pt-den">' +
         modes.map(([k, label]) => '<span class="pt-b' + (document.body.dataset.density === k ? ' on' : '') + '" data-d="' + k + '" title="' + label + '">' + k.toUpperCase() + '</span>').join('') + '</div></div>';
     }
+    /* trei comutatoare independente pentru bara de căutare lipită — se văd pe orice
+       pagină (starea se ține minte), dar e evidențiat rândul care schimbă pagina curentă */
+    const yn = EN() ? [['on', 'Yes'], ['off', 'No']] : [['on', 'Da'], ['off', 'Nu']];
+    html += '<div class="pt-grp">' + (EN() ? 'Sticky search bar' : 'Bară de căutare lipită') + '</div>';
+    [['stickyHome', 'Homepage', 'home'], ['stickyList', 'Listing', 'listing'], ['stickyHotel', 'Hotel', 'hotel']].forEach(([key, label, kind]) => {
+      html += '<div class="pt-sub' + (PAGEKIND() === kind ? ' here' : '') + '"><span class="pt-lbl">' + label + '</span>' +
+        '<div class="pt-seg pt-st" data-key="' + key + '">' +
+        yn.map(([k, l]) => '<span class="pt-b' + (document.body.dataset[key] === k ? ' on' : '') + '" data-v="' + k + '">' + l + '</span>').join('') +
+        '</div></div>';
+    });
+    if ($('.hero-carousel')) {
+      const pins = EN()
+        ? [['off', 'No', 'No pinned card'], ['inline', 'Row', 'Pinned as the first card, in the carousel row'], ['banner', 'Banner', 'Pinned as a wide band above the carousel']]
+        : [['off', 'Nu', 'Fără card fixat'], ['inline', 'Linie', 'Fixat ca primul card, în linia caruselului'], ['banner', 'Banner', 'Fixat ca bandă lată deasupra caruselului']];
+      html += '<div class="pt-row"><span class="pt-lbl">' + (EN() ? 'Pinned card' : 'Card fixat') + '</span><div class="pt-seg pt-pin">' +
+        pins.map(([k, l, ti]) => '<span class="pt-b' + (document.body.dataset.pin === k ? ' on' : '') + '" data-pin="' + k + '" title="' + ti + '">' + l + '</span>').join('') + '</div></div>';
+    }
     box.innerHTML = html;
     document.body.appendChild(box);
+    $$('.pt-st', box).forEach(seg => $$('.pt-b', seg).forEach(b => b.onclick = () => {
+      document.body.dataset[seg.dataset.key] = b.dataset.v;
+      try { localStorage.setItem('litro-' + seg.dataset.key, b.dataset.v); } catch (e) { }
+      $$('.pt-b', seg).forEach(x => x.classList.toggle('on', x === b));
+      if (stickySync) stickySync();
+    }));
+    $$('.pt-pin .pt-b', box).forEach(b => b.onclick = () => {
+      try { localStorage.setItem('litro-pin', b.dataset.pin); } catch (e) { }
+      $$('.pt-pin .pt-b', box).forEach(x => x.classList.toggle('on', x === b));
+      if (pinApply) pinApply(b.dataset.pin);
+    });
     $$('.pt-den .pt-b', box).forEach(btn => btn.onclick = () => {
       document.body.dataset.density = btn.dataset.d;
       $$('.pt-den .pt-b', box).forEach(b => b.classList.toggle('on', b === btn));
@@ -2185,6 +2359,7 @@
   document.addEventListener('DOMContentLoaded', () => {
     initHeader();
     initProtoTools();
+    initPinnedTile();
     initSearch();
     initFlexiStrip();
     initListing();

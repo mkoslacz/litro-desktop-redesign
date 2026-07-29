@@ -382,6 +382,15 @@ body[data-export] .stickybar { display: none; }
 .proto-tools .pt-b { display: inline-flex; align-items: center; justify-content: center; min-width: 26px; height: 26px; padding: 0 8px; font-size: 12px; font-weight: 700; color: var(--gray-700); cursor: pointer; text-decoration: none; }
 .proto-tools .pt-b + .pt-b { border-left: 1px solid var(--gray-300); }
 .proto-tools .pt-b.on { background: var(--navy-500); color: #fff; }
+/* grup de comutatoare înrudite (bara lipită: home / listing / hotel) — rânduri strânse pe orizontală */
+.proto-tools .pt-grp { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--gray-600); margin: 12px 0 5px; padding-top: 9px; border-top: 1px solid var(--gray-200); }
+.proto-tools .pt-sub { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.proto-tools .pt-sub + .pt-sub { margin-top: 5px; }
+.proto-tools .pt-sub .pt-lbl { font-size: 11.5px; font-weight: 600; }
+.proto-tools .pt-sub .pt-b { height: 22px; min-width: 22px; font-size: 11px; }
+/* rândul care schimbă chiar pagina deschisă acum */
+.proto-tools .pt-sub.here .pt-lbl { color: var(--navy-500); font-weight: 800; }
+.proto-tools .pt-sub.here .pt-lbl::before { content: "▸ "; }
 
 /* ===== densitate celule listing: A = complet / B = compact (iconițe mari) / C = minimal ===== */
 .lc-icons { display: none; align-items: stretch; gap: 8px; margin-top: 8px; }
@@ -436,3 +445,100 @@ body[data-page="checkout"] .sum-card .sum-body { padding-top: 12px; }
 /* stare de autentificare (comutator de prototip): ascunde bannerele „autentifică-te pentru FRIENDS" când ești membru */
 body[data-auth="in"] .friends-band,
 body[data-auth="in"] .loyal-band { display: none; }
+
+/* ============================================================
+   BARĂ DE CĂUTARE LIPITĂ SUS (home / listing / hotel)
+   Când caseta mare de căutare iese din ecran, aceleași câmpuri
+   se strâng într-o bară fixată sus — minimizată, dar funcțională:
+   deschide exact aceleași popovere (destinație / calendar / oaspeți).
+   Comutator separat pentru fiecare tip de pagină, în panoul de prototip.
+   ============================================================ */
+.ssearch { position: fixed; left: 0; right: 0; top: 0; z-index: 700; background: #fff;
+  border-bottom: 1px solid var(--gray-300); box-shadow: 0 6px 22px rgba(1,43,85,.13);
+  transform: translateY(-108%); transition: transform .24s ease; }
+.ssearch.on { transform: none; }
+.ssearch .in { display: flex; align-items: center; gap: 18px; height: 62px; }
+.ssearch .ss-logo { display: flex; align-items: center; gap: 8px; flex: none; }
+.ssearch .ss-logo .mark { width: 30px; height: 30px; flex: none; }
+.ssearch .ss-logo .l1 { display: block; font-family: var(--font-title); font-size: 15.5px; font-weight: 700; line-height: 1; color: var(--navy-500); letter-spacing: -.2px; }
+.ssearch .ss-logo .l2 { display: block; font-family: var(--font-title); font-size: 10.5px; font-weight: 500; line-height: 1.2; color: var(--gray-700); }
+.ssearch .ss-logo .l2 b { color: var(--orange-500); font-weight: 700; }
+.ssearch .ss-mid { flex: 1; min-width: 0; display: flex; justify-content: center; }
+/* pastila de căutare — gazda popoverelor, deci position:relative */
+.ssearch .ss-pill { position: relative; display: flex; align-items: stretch;
+  border: 1.5px solid var(--gray-400); border-radius: 100px; background: #fff; padding: 3px 3px 3px 4px; }
+.ssearch .ss-f { display: flex; align-items: center; gap: 9px; padding: 6px 16px; border-radius: 100px; cursor: pointer; min-width: 0; }
+.ssearch .ss-f:hover { background: var(--gray-200); }
+.ssearch .ss-f.active { background: var(--gray-200); }
+.ssearch .ss-f + .ss-f { box-shadow: -1px 0 0 var(--gray-300); }
+.ssearch .ss-f svg { color: var(--navy-500); flex: none; }
+.ssearch .ss-f .lbl { display: block; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--gray-600); line-height: 1; margin-bottom: 3px; }
+.ssearch .ss-f .val { display: block; font-size: 14px; font-weight: 700; color: var(--gray-900); line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ssearch .ss-go { flex: none; display: inline-flex; align-items: center; gap: 8px; margin-left: 6px;
+  background: var(--orange-500); color: #fff; border-radius: 100px; padding: 0 20px; font-size: 14.5px; font-weight: 700; cursor: pointer; }
+.ssearch .ss-go:hover { background: var(--orange-600, #D26F1F); }
+.ssearch .ss-phone { flex: none; display: flex; align-items: center; gap: 8px; color: var(--navy-500); font-weight: 700; font-size: 14.5px; text-decoration: none; }
+.ssearch .ss-phone .h { display: block; font-size: 11px; font-weight: 600; color: var(--gray-600); }
+/* ecran mai îngust decât designul de 1440: bara nu mai trage containerul de 1200 în afara ecranului */
+@media (max-width: 1260px) {
+  .ssearch .in { width: auto; padding: 0 16px; }
+  .ssearch .ss-phone, .ssearch .ss-logo span { display: none; }
+}
+/* popoverele mutate în bară moștenesc poziționarea din .pop, dar au nevoie de spațiu deasupra tuturor */
+.ssearch .pop { z-index: 810; }
+/* pagina împinsă în jos cât bara, ca ancora să nu sară când se lipește */
+body[data-export] .ssearch { display: none; }
+
+/* ============================================================
+   CARD FIXAT SUS PE CARUSELUL DE CAMPANII (mecanism de „pin")
+   Primul loc din carusel poate fi scos din rotație și fixat:
+   „Banner" = bandă lată deasupra caruselului, care nu se mai
+   derulează; „Lat" = tot primul card, dar dublu și în bandă.
+   ============================================================ */
+.hc-pin { position: relative; display: block; overflow: hidden; color: #fff; text-decoration: none;
+  border-radius: var(--r-l); box-shadow: var(--shadow-card); background: var(--navy-500); }
+.hc-pin.pin-band { height: 232px; margin-bottom: 14px; }   /* modul „banner": bandă lată deasupra caruselului */
+/* modul „în linie": primul loc din carusel, scos din derulare — cardurile trec pe lângă el */
+.hero-carousel.pin-inline { display: flex; align-items: stretch; gap: 16px; }
+.hero-carousel.pin-inline > .hc-pin { flex: 0 0 37%; height: 210px; }
+.hero-carousel.pin-inline > .hc-track { flex: 1; min-width: 0; }
+.hero-carousel.pin-inline .hc-tile { flex: 0 0 47%; }
+.hero-carousel.pin-inline .hc-arrow.prev { left: calc(37% + 24px); }
+/* cardul fixat e și evidențiat: inel portocaliu, ca să se citească drept „primul, scos în față" */
+.hc-pin.pin-sm { box-shadow: 0 0 0 2.5px var(--orange-500), 0 8px 24px rgba(1,43,85,.22); }
+.hc-pin .pin-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 58%; z-index: 0; }
+/* cu bannerul deasupra, săgețile caruselului trebuie să rămână pe mijlocul benzii de carduri, nu pe mijlocul secțiunii */
+.hero-carousel.has-pin .hc-arrow { top: auto; bottom: 85px; transform: none; }
+/* voal: stânga deschisă (scrisul de mână navy), dreapta mai adâncă (lockup-ul alb) */
+.hc-pin::after { content: ""; position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(100deg, rgba(233,244,250,.80) 0%, rgba(226,241,249,.52) 26%, rgba(3,60,116,.30) 58%, rgba(2,48,95,.62) 100%); }
+.hc-pin .pin-art { position: relative; z-index: 2; height: 100%; display: flex; align-items: center; gap: 26px; padding: 0 46px 0 30px; }
+.hc-pin .pin-disc { flex: none; transform: rotate(-9deg); text-align: center; color: var(--navy-500); font-family: var(--font-script, "Caveat"), cursive; line-height: .96; }
+.hc-pin .pin-disc .l1 { display: block; font-size: 21px; font-weight: 700; }
+.hc-pin .pin-disc .l2 { display: block; font-family: var(--font-title); font-size: 52px; font-weight: 800; letter-spacing: -1.5px; }
+.hc-pin .pin-disc .l3 { display: block; font-size: 23px; font-weight: 700; }
+.hc-pin .pin-mid { min-width: 0; margin-left: auto; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.hc-pin .pin-lock { display: flex; align-items: baseline; justify-content: center; white-space: nowrap; text-shadow: 0 3px 18px rgba(1,34,68,.42); }
+.hc-pin .pin-lock .w1, .hc-pin .pin-lock .w3 { font-family: var(--font-title); font-size: 47px; font-weight: 800; letter-spacing: -.5px; color: #fff; }
+.hc-pin .pin-lock .w2 { font-family: var(--font-brush, "Kaushan Script"), cursive; font-size: 44px; color: #7FD4F5; margin: 0 -6px; position: relative; top: 4px; }
+.hc-pin .pin-rib { display: inline-block; margin-top: 12px; background: var(--navy-500); color: #fff;
+  font-size: 13.5px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; padding: 7px 18px; border-radius: 4px; }
+.hc-pin .pin-badge { position: absolute; left: 15px; top: 13px; z-index: 3; display: inline-flex; align-items: center; gap: 5px;
+  background: rgba(255,255,255,.94); color: var(--navy-500); font-size: 11.5px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: .6px; border-radius: 100px; padding: 4px 10px 4px 8px; box-shadow: 0 2px 8px rgba(0,0,0,.18); }
+.hc-pin .pin-cta { display: inline-flex; align-items: center; gap: 6px; margin-top: 14px;
+  background: var(--orange-500); color: #fff; font-size: 13.5px; font-weight: 700; border-radius: 100px; padding: 9px 18px; box-shadow: 0 4px 14px rgba(0,0,0,.24); }
+.hc-pin:hover .pin-cta { background: #fff; color: var(--navy-700); }
+/* modul „în linie": aceeași creație, dar pe lățimea unui card — procentul urcă în colț,
+   ca lockup-ul să rămână lizibil (altfel cele două s-ar bate pe aceeași lățime) */
+.hc-pin.pin-sm::after { background: linear-gradient(150deg, rgba(233,244,250,.34) 0%, rgba(3,60,116,.42) 46%, rgba(2,48,95,.72) 100%); }
+.hc-pin.pin-sm .pin-art { padding: 0 16px; justify-content: center; }
+.hc-pin.pin-sm .pin-disc { position: absolute; right: 10px; top: 8px; z-index: 3; color: #fff; text-shadow: 0 2px 10px rgba(1,34,68,.5); }
+.hc-pin.pin-sm .pin-disc .l1 { font-size: 13px; }
+.hc-pin.pin-sm .pin-disc .l2 { font-size: 31px; letter-spacing: -1px; }
+.hc-pin.pin-sm .pin-disc .l3 { font-size: 14px; }
+.hc-pin.pin-sm .pin-mid { margin: 0 auto; }
+.hc-pin.pin-sm .pin-lock .w1, .hc-pin.pin-sm .pin-lock .w3 { font-size: 29px; }
+.hc-pin.pin-sm .pin-lock .w2 { font-size: 27px; margin: 0 -4px; top: 3px; }
+.hc-pin.pin-sm .pin-rib { font-size: 10px; letter-spacing: .4px; padding: 5px 10px; margin-top: 9px; white-space: normal; line-height: 1.25; }
+.hc-pin.pin-sm .pin-cta { font-size: 12px; padding: 7px 13px; margin-top: 10px; }
