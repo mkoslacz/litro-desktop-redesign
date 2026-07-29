@@ -707,29 +707,17 @@
      Creația e compusă din text real (nu un JPG), ca să iasă editabilă în
      Figma și să existe în ambele limbi.
      ============================================================ */
-  function pinFonts() {
-    if ($('#pin-fonts')) return;
-    const l = document.createElement('link');
-    l.id = 'pin-fonts'; l.rel = 'stylesheet';
-    l.href = 'https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Kaushan+Script&display=swap';
-    document.head.appendChild(l);
-  }
-  function pinCard() {
+  /* Creația e bannerul de campanie de pe producție (assets/promo-super-oferte*.webp):
+     varianta lată pentru bandă, cea de telefon — mai strânsă — pentru cardul din linie,
+     unde o bandă de 4,4:1 s-ar tăia până la ilizibil. */
+  function pinCard(mode) {
     const a = el('a', 'hc-pin');
     a.href = listingHref() + qs();
     a.innerHTML =
-      '<img class="pin-bg" src="assets/coastline.jpg" alt="">' +
+      '<img class="pin-bg" src="assets/promo-super-oferte' + (mode === 'banner' ? '-desktop' : '') + '.webp" ' +
+      'alt="' + lang('Superofertele verii — până la 40% reducere', 'Summer super deals — up to 40% off') + '">' +
       '<span class="pin-badge"><svg width="12" height="12"><use href="#i-pin"/></svg>' + lang('Fixat sus', 'Pinned') + '</span>' +
-      '<span class="pin-art">' +
-      '<span class="pin-disc"><span class="l1">' + lang('până la', 'up to') + '</span>' +
-      '<span class="l2">40%</span><span class="l3">' + lang('reducere', 'off') + '</span></span>' +
-      '<span class="pin-mid">' +
-      '<span class="pin-lock"><span class="w1">SUPER</span><span class="w2">' + lang('ofertele', 'summer') + '</span>' +
-      '<span class="w3">' + lang('VERII', 'DEALS') + '</span></span>' +
-      '<span class="pin-rib">' + lang('Vacanța perfectă începe pe litoralul românesc',
-        'The perfect holiday starts on the Romanian coast') + '</span>' +
-      '<span class="pin-cta">' + lang('Vezi cele 412 de oferte', 'See all 412 offers') + ' →</span>' +
-      '</span></span>';
+      '<span class="pin-cta">' + lang('Vezi cele 412 de oferte', 'See all 412 offers') + ' →</span>';
     return a;
   }
   let pinApply = null;   // setat mai jos; comutatorul din panou îl apelează
@@ -745,8 +733,7 @@
       root.classList.toggle('has-pin', mode === 'banner');
       root.classList.toggle('pin-inline', mode === 'inline');
       if (mode === 'off') return;
-      pinFonts();
-      const c = pinCard();
+      const c = pinCard(mode);
       c.classList.add(mode === 'banner' ? 'pin-band' : 'pin-sm');
       /* în ambele moduri cardul stă în afara pistei derulabile — asta e „fixarea":
          restul campaniilor trec pe lângă el, el rămâne mereu primul și vizibil */

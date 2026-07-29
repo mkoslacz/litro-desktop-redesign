@@ -503,14 +503,18 @@ body[data-auth="in"] .loyal-band { display: none; }
 body[data-export] .ssearch { display: none; }
 
 /* ============================================================
-   CARD FIXAT SUS PE CARUSELUL DE CAMPANII (mecanism de „pin")
-   Primul loc din carusel poate fi scos din rotație și fixat:
-   „Banner" = bandă lată deasupra caruselului, care nu se mai
-   derulează; „Lat" = tot primul card, dar dublu și în bandă.
+   CARD FIXAT PE CARUSELUL DE CAMPANII (mecanism de „pin")
+   Primul loc din carusel poate fi scos din rotație: „Banner" = bandă
+   lată deasupra caruselului, „În linie" = tot primul card, dar scos
+   din pista derulabilă, deci restul campaniilor trec pe lângă el.
+   Creația e bannerul de campanie de pe producție, așa cum e —
+   peste el punem doar marcajul de fixare și CTA-ul.
    ============================================================ */
 .hc-pin { position: relative; display: block; overflow: hidden; color: #fff; text-decoration: none;
   border-radius: var(--r-l); box-shadow: var(--shadow-card); background: var(--navy-500); }
-.hc-pin.pin-band { height: 232px; margin-bottom: 14px; }   /* modul „banner": bandă lată deasupra caruselului */
+/* bandă: lăsăm bannerul la proporția lui, deci nimic nu se taie */
+.hc-pin.pin-band { margin-bottom: 14px; }
+.hc-pin.pin-band .pin-bg { display: block; width: 100%; height: auto; }
 /* modul „în linie": primul loc din carusel, scos din derulare — cardurile trec pe lângă el */
 .hero-carousel.pin-inline { display: flex; align-items: stretch; gap: 16px; }
 .hero-carousel.pin-inline > .hc-pin { flex: 0 0 37%; height: 210px; }
@@ -519,39 +523,14 @@ body[data-export] .ssearch { display: none; }
 .hero-carousel.pin-inline .hc-arrow.prev { left: calc(37% + 24px); }
 /* cardul fixat e și evidențiat: inel portocaliu, ca să se citească drept „primul, scos în față" */
 .hc-pin.pin-sm { box-shadow: 0 0 0 2.5px var(--orange-500), 0 8px 24px rgba(1,43,85,.22); }
-.hc-pin .pin-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 58%; z-index: 0; }
+/* pe lățimea unui card intră varianta de telefon a creației, decupată spre lockup */
+.hc-pin.pin-sm .pin-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 62% center; }
 /* cu bannerul deasupra, săgețile caruselului trebuie să rămână pe mijlocul benzii de carduri, nu pe mijlocul secțiunii */
 .hero-carousel.has-pin .hc-arrow { top: auto; bottom: 85px; transform: none; }
-/* voal: stânga deschisă (scrisul de mână navy), dreapta mai adâncă (lockup-ul alb) */
-.hc-pin::after { content: ""; position: absolute; inset: 0; z-index: 1;
-  background: linear-gradient(100deg, rgba(233,244,250,.80) 0%, rgba(226,241,249,.52) 26%, rgba(3,60,116,.30) 58%, rgba(2,48,95,.62) 100%); }
-.hc-pin .pin-art { position: relative; z-index: 2; height: 100%; display: flex; align-items: center; gap: 26px; padding: 0 46px 0 30px; }
-.hc-pin .pin-disc { flex: none; transform: rotate(-9deg); text-align: center; color: var(--navy-500); font-family: var(--font-script, "Caveat"), cursive; line-height: .96; }
-.hc-pin .pin-disc .l1 { display: block; font-size: 21px; font-weight: 700; }
-.hc-pin .pin-disc .l2 { display: block; font-family: var(--font-title); font-size: 52px; font-weight: 800; letter-spacing: -1.5px; }
-.hc-pin .pin-disc .l3 { display: block; font-size: 23px; font-weight: 700; }
-.hc-pin .pin-mid { min-width: 0; margin-left: auto; display: flex; flex-direction: column; align-items: center; text-align: center; }
-.hc-pin .pin-lock { display: flex; align-items: baseline; justify-content: center; white-space: nowrap; text-shadow: 0 3px 18px rgba(1,34,68,.42); }
-.hc-pin .pin-lock .w1, .hc-pin .pin-lock .w3 { font-family: var(--font-title); font-size: 47px; font-weight: 800; letter-spacing: -.5px; color: #fff; }
-.hc-pin .pin-lock .w2 { font-family: var(--font-brush, "Kaushan Script"), cursive; font-size: 44px; color: #7FD4F5; margin: 0 -6px; position: relative; top: 4px; }
-.hc-pin .pin-rib { display: inline-block; margin-top: 12px; background: var(--navy-500); color: #fff;
-  font-size: 13.5px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; padding: 7px 18px; border-radius: 4px; }
 .hc-pin .pin-badge { position: absolute; left: 15px; top: 13px; z-index: 3; display: inline-flex; align-items: center; gap: 5px;
   background: rgba(255,255,255,.94); color: var(--navy-500); font-size: 11.5px; font-weight: 800; text-transform: uppercase;
   letter-spacing: .6px; border-radius: 100px; padding: 4px 10px 4px 8px; box-shadow: 0 2px 8px rgba(0,0,0,.18); }
-.hc-pin .pin-cta { display: inline-flex; align-items: center; gap: 6px; margin-top: 14px;
-  background: var(--orange-500); color: #fff; font-size: 13.5px; font-weight: 700; border-radius: 100px; padding: 9px 18px; box-shadow: 0 4px 14px rgba(0,0,0,.24); }
-.hc-pin:hover .pin-cta { background: #fff; color: var(--navy-700); }
-/* modul „în linie": aceeași creație, dar pe lățimea unui card — procentul urcă în colț,
-   ca lockup-ul să rămână lizibil (altfel cele două s-ar bate pe aceeași lățime) */
-.hc-pin.pin-sm::after { background: linear-gradient(150deg, rgba(233,244,250,.34) 0%, rgba(3,60,116,.42) 46%, rgba(2,48,95,.72) 100%); }
-.hc-pin.pin-sm .pin-art { padding: 0 16px; justify-content: center; }
-.hc-pin.pin-sm .pin-disc { position: absolute; right: 10px; top: 8px; z-index: 3; color: #fff; text-shadow: 0 2px 10px rgba(1,34,68,.5); }
-.hc-pin.pin-sm .pin-disc .l1 { font-size: 13px; }
-.hc-pin.pin-sm .pin-disc .l2 { font-size: 31px; letter-spacing: -1px; }
-.hc-pin.pin-sm .pin-disc .l3 { font-size: 14px; }
-.hc-pin.pin-sm .pin-mid { margin: 0 auto; }
-.hc-pin.pin-sm .pin-lock .w1, .hc-pin.pin-sm .pin-lock .w3 { font-size: 29px; }
-.hc-pin.pin-sm .pin-lock .w2 { font-size: 27px; margin: 0 -4px; top: 3px; }
-.hc-pin.pin-sm .pin-rib { font-size: 10px; letter-spacing: .4px; padding: 5px 10px; margin-top: 9px; white-space: normal; line-height: 1.25; }
-.hc-pin.pin-sm .pin-cta { font-size: 12px; padding: 7px 13px; margin-top: 10px; }
+.hc-pin .pin-cta { position: absolute; right: 16px; bottom: 14px; z-index: 3; display: inline-flex; align-items: center; gap: 6px;
+  background: var(--orange-500); color: #fff; font-size: 13.5px; font-weight: 700; border-radius: 100px; padding: 9px 18px; box-shadow: 0 4px 14px rgba(1,43,85,.30); }
+.hc-pin:hover .pin-cta { background: var(--navy-500); }
+.hc-pin.pin-sm .pin-cta { font-size: 12px; padding: 7px 13px; right: 12px; bottom: 12px; }

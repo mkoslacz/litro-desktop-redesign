@@ -672,13 +672,6 @@
      Creația e text real (nu un JPG), deci iese editabilă în Figma și în ambele limbi.
      ============================================================ */
   let pinApply = null;
-  function pinFonts() {
-    if ($('#pin-fonts')) return;
-    const l = document.createElement('link');
-    l.id = 'pin-fonts'; l.rel = 'stylesheet';
-    l.href = 'https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Kaushan+Script&display=swap';
-    document.head.appendChild(l);
-  }
   function initPinnedTile() {
     const root = $('.hc[data-carousel]');
     if (!root) return;
@@ -689,21 +682,14 @@
       document.body.dataset.pin = mode;
       const old = $('.hc-pin', root); if (old) old.remove();
       if (mode !== 'off') {
-        pinFonts();
         const a = el('a', 'hc-pin ' + (mode === 'banner' ? 'pin-band' : 'pin-sm'));
         a.href = enp('m-listing.html') + qs();
+        /* creația de campanie de pe producție, varianta pentru telefon */
         a.innerHTML =
-          '<img class="pin-bg" src="assets/coastline.jpg" alt="">' +
+          '<img class="pin-bg" src="assets/promo-super-oferte.webp" alt="' +
+          t('Superofertele verii — până la 40% reducere', 'Summer super deals — up to 40% off') + '">' +
           '<span class="pin-badge"><svg width="11" height="11"><use href="#i-pin"/></svg>' + t('Fixat', 'Pinned') + '</span>' +
-          '<span class="pin-disc"><span class="l1">' + t('până la', 'up to') + '</span><span class="l2">40%</span>' +
-          '<span class="l3">' + t('reducere', 'off') + '</span></span>' +
-          '<span class="pin-art"><span class="pin-mid">' +
-          '<span class="pin-lock"><span class="w1">SUPER</span><span class="w2">' + t('ofertele', 'summer') + '</span>' +
-          '<span class="w3">' + t('VERII', 'DEALS') + '</span></span>' +
-          '<span class="pin-rib">' + t('Vacanța perfectă începe pe litoralul românesc',
-            'The perfect holiday starts on the Romanian coast') + '</span>' +
-          '<span class="pin-cta">' + t('Vezi cele 412 de oferte', 'See all 412 offers') + ' →</span>' +
-          '</span></span>';
+          '<span class="pin-cta">' + t('Vezi cele 412 de oferte', 'See all 412 offers') + ' →</span>';
         if (mode === 'banner') root.insertBefore(a, track);
         else track.insertBefore(a, track.firstElementChild);
       }
