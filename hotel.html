@@ -25,6 +25,7 @@
     <symbol id="i-pct" viewBox="0 0 24 24"><path d="M19 5 5 19" stroke="currentColor" stroke-width="2.2"/><circle cx="7.5" cy="7.5" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="16.5" cy="16.5" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
     <symbol id="i-gift" viewBox="0 0 24 24"><rect x="3.5" y="8" width="17" height="4" rx="1.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5 12v8.5h14V12M12 8v12.5M12 8s-4.3.3-5.3-1.7C5.9 4.7 8 3 9.5 4.1 11 5.2 12 8 12 8zm0 0s4.3.3 5.3-1.7C18.1 4.7 16 3 14.5 4.1 13 5.2 12 8 12 8z" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
     <symbol id="i-check-g" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.6"/></symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24"><path d="M3.5 8.5h3.2l1.6-2.4h7.4l1.6 2.4h3.2V19h-17z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="13.4" r="3.3" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
     <symbol id="i-share" viewBox="0 0 24 24"><circle cx="6" cy="12" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.5" cy="5.5" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.5" cy="18.5" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/><path d="m8.4 10.8 6.8-4M8.4 13.2l6.8 4" stroke="currentColor" stroke-width="2"/></symbol>
     <symbol id="i-umbrella" viewBox="0 0 24 24"><path d="M12 3a9 9 0 0 1 9 9H3a9 9 0 0 1 9-9zM12 12v7a2 2 0 0 0 4 .5" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
     <symbol id="i-pool" viewBox="0 0 24 24"><path d="M3 17c1.5 1.2 3 1.2 4.5 0s3-1.2 4.5 0 3 1.2 4.5 0 3-1.2 4.5 0M3 21c1.5 1.2 3 1.2 4.5 0s3-1.2 4.5 0 3 1.2 4.5 0 3-1.2 4.5 0" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 14V5.5a2 2 0 0 1 4 0M9 8h4" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
@@ -170,7 +171,7 @@
     </div>
   </section>
 
-  <section class="section">
+  <section class="section" id="camere">
     <div class="sec-head"><h2 class="sec-title">Camere și prețuri</h2></div>
 
     <div class="why">
@@ -371,18 +372,86 @@
         <div class="rbar"><span>Facilități</span><span class="track"><span class="fill" style="width:88%"></span></span><span class="val">8.8</span></div>
       </div>
     </div>
+    <!-- fotografiile turiștilor: dovada care nu poate fi retușată de hotel -->
+    <div class="ugc">
+      <div class="ugc-head">
+        <div>
+          <h3>Fotografii și clipuri de la turiști</h3>
+          <p>48 de fotografii și 6 clipuri, încărcate de oaspeți care au stat aici prin noi. Nu le retușăm și nu le alegem noi.</p>
+        </div>
+        <a class="link-more ugc-more" href="#">Vezi toate cele 48 →</a>
+      </div>
+      <div class="ugc-strip">
+        <span class="ugc-tile"><img src="assets/coastline.jpg" style="object-position:70% 40%" alt=""><i class="play"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg></i><b class="dur">0:24</b><span class="who"><span class="av">A</span>Ana M.</span></span>
+        <span class="ugc-tile"><img src="assets/pool-sunset.jpg" style="object-position:20% 70%" alt=""><span class="who"><span class="av">R</span>Radu P.</span></span>
+        <span class="ugc-tile"><img src="assets/apartment-family.jpg" style="object-position:80% 50%" alt=""><span class="who"><span class="av">I</span>Ioana T.</span></span>
+        <span class="ugc-tile"><img src="assets/aerial-portrait.jpg" style="object-position:50% 25%" alt=""><i class="play"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg></i><b class="dur">0:41</b><span class="who"><span class="av">C</span>Cristian D.</span></span>
+        <span class="ugc-tile"><img src="assets/room-double.jpg" style="object-position:25% 60%" alt=""><span class="who"><span class="av">E</span>Elena B.</span></span>
+        <span class="ugc-tile"><img src="assets/lobby.jpg" style="object-position:75% 60%" alt=""><span class="who"><span class="av">M</span>Mihai V.</span></span>
+        <span class="ugc-tile ugc-rest"><img src="assets/spa-indoor.jpg" alt=""><span class="rest">+42</span></span>
+      </div>
+      <div class="ugc-cta">
+        <span class="ic"><svg width="20" height="20"><use href="#i-camera"/></svg></span>
+        <div>
+          <div class="t">Ai fost la Complex Mediteranean? Adaugă pozele și clipurile tale</div>
+          <div class="d">Până la 10 fotografii și 2 clipuri de maximum 60 de secunde. Le publicăm după verificare, în cel mult 24 de ore.</div>
+        </div>
+        <button class="btn btn-outline-navy" data-ugc-add>Adaugă fotografii sau clipuri</button>
+        <button class="btn btn-outline-navy" data-ugc-review>Scrie o recenzie</button>
+      </div>
+    </div>
+
     <div class="rev-cards">
       <div class="rev-card">
         <div class="hd"><span class="av">M</span><div><div class="nm">Maria</div><div class="dt">București · iunie 2026</div></div><span class="sc rate-badge">9.6</span></div>
         <p>„Plaja e la 2 minute de cameră, micul dejun foarte variat. Șezlongurile incluse au făcut toată diferența — recomand cu drag!”</p>
+        <div class="rev-ph">
+          <span><img src="assets/pool-rooftop.jpg" style="object-position:40% 60%" alt=""></span>
+          <span><img src="assets/coastline.jpg" style="object-position:70% 40%" alt=""></span>
+          <span class="vid"><img src="assets/aerial-portrait.jpg" style="object-position:50% 25%" alt=""><i><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg></i></span>
+        </div>
+        <div class="rev-meta"><span class="vf"><svg width="12" height="12"><use href="#i-check-g"/></svg> Sejur verificat</span> · 7 nopți · <a href="#">Utilă (14)</a></div>
       </div>
       <div class="rev-card">
         <div class="hd"><span class="av">A</span><div><div class="nm">Andrei</div><div class="dt">Cluj-Napoca · august 2026</div></div><span class="sc rate-badge">9.0</span></div>
         <p>„Camera curată, vedere superbă la mare. Seara puțină gălăgie dinspre faleză, dar nimic deranjant. Revenim la anul.”</p>
+        <div class="rev-ph">
+          <span><img src="assets/room-seaview.jpg" style="object-position:30% 50%" alt=""></span>
+          <span><img src="assets/pool-sunset.jpg" style="object-position:20% 70%" alt=""></span>
+        </div>
+        <div class="rev-meta"><span class="vf"><svg width="12" height="12"><use href="#i-check-g"/></svg> Sejur verificat</span> · 5 nopți · <a href="#">Utilă (9)</a></div>
       </div>
       <div class="rev-card">
         <div class="hd"><span class="av">E</span><div><div class="nm">Elena</div><div class="dt">Iași · iulie 2026</div></div><span class="sc rate-badge">9.4</span></div>
         <p>„Personal foarte amabil, piscina încălzită e un plus mare pentru copii. Raport calitate-preț excelent cu reducerea FRIENDS.”</p>
+        <div class="rev-meta"><span class="vf"><svg width="12" height="12"><use href="#i-check-g"/></svg> Sejur verificat</span> · 7 nopți · <a href="#">Utilă (6)</a></div>
+      </div>
+      <div class="rev-card">
+        <div class="hd"><span class="av">I</span><div><div class="nm">Ioana</div><div class="dt">Brașov · august 2026</div></div><span class="sc rate-badge">9.8</span></div>
+        <p>„Am luat apartamentul de familie și a fost alegerea bună — două băi și balcon cu vedere. Am pus și pozele, exact așa arată.”</p>
+        <div class="rev-ph">
+          <span><img src="assets/apartment-family.jpg" style="object-position:80% 50%" alt=""></span>
+          <span><img src="assets/jacuzzi-view.jpg" style="object-position:60% 40%" alt=""></span>
+          <span><img src="assets/spa-indoor.jpg" style="object-position:35% 55%" alt=""></span>
+        </div>
+        <div class="rev-meta"><span class="vf"><svg width="12" height="12"><use href="#i-check-g"/></svg> Sejur verificat</span> · 10 nopți · <a href="#">Utilă (21)</a></div>
+      </div>
+      <div class="rev-card">
+        <div class="hd"><span class="av">C</span><div><div class="nm">Cristian</div><div class="dt">Ploiești · iunie 2026</div></div><span class="sc rate-badge">8.6</span></div>
+        <p>„Am filmat drumul de la recepție până la șezlonguri ca să vedeți cât e de aproape. Minus: liftul are coadă la ora prânzului.”</p>
+        <div class="rev-ph">
+          <span class="vid"><img src="assets/aerial-hotel.jpg" style="object-position:50% 40%" alt=""><i><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg></i></span>
+          <span><img src="assets/lobby.jpg" style="object-position:75% 60%" alt=""></span>
+        </div>
+        <div class="rev-meta"><span class="vf"><svg width="12" height="12"><use href="#i-check-g"/></svg> Sejur verificat</span> · 4 nopți · <a href="#">Utilă (17)</a></div>
+      </div>
+      <div class="rev-card">
+        <div class="hd"><span class="av">D</span><div><div class="nm">Daniela</div><div class="dt">Constanța · septembrie 2026</div></div><span class="sc rate-badge">9.2</span></div>
+        <p>„Extrasezon e alt hotel: liniște, piscina liberă, prețul la jumătate. Micul dejun rămâne la fel de bun.”</p>
+        <div class="rev-ph">
+          <span><img src="assets/room-double.jpg" style="object-position:25% 60%" alt=""></span>
+        </div>
+        <div class="rev-meta"><span class="vf"><svg width="12" height="12"><use href="#i-check-g"/></svg> Sejur verificat</span> · 3 nopți · <a href="#">Utilă (4)</a></div>
       </div>
     </div>
   </section>

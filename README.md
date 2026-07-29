@@ -46,7 +46,8 @@ orange border, the **Filtre · Sortare · Hartă** row, the 3-step checkout step
   model** as `proto.js`, so destination / dates / guests carry across desktop and mobile and both price
   a stay identically. Desktop files are untouched.
 - Mobile-only interaction: search, calendar, guests, filters and sort open as full-screen sheets; the
-  hotel gallery is swipeable; the booking bar slides up from the bottom after the first room is added;
+  hotel gallery is swipeable and opens into the same two-step mosaic; the booking bar slides up from the
+  bottom after the first room is added;
   checkout keeps a fixed bar with the amount due today.
 - The page column is capped at 430px and centred above 460px viewport width, so the screens can be
   reviewed in a desktop browser without a device.
@@ -114,6 +115,43 @@ real button for guests, and a **"Ai deja cont? Autentifică-te"** band on the ho
 for members. All three open the same sign-in / create-account sheet, which explains what an account
 buys — bookings and vouchers in one place, paying the balance online, 2% FRIENDS credits — and
 flipping it to signed-in updates the prototype panel too. Fields are mock placeholders; nothing is sent.
+
+## The gallery opens as a mosaic, not as a slideshow
+
+Clicking any hotel photo — the hero, a thumbnail, the "see all N photos" button — opens **step 1: a mosaic
+of every picture**, with category chips (rooms / pools / beach / spa / the property / from guests) carrying
+counts, and tiles in mixed sizes. Clicking one tile goes to **step 2: the big image with a horizontal
+thumbnail strip below it**, arrow-key navigation, a counter and a "‹ All photos" control back to the mosaic.
+
+A side rail stays visible through both steps: the review score, two guest quotes, the price and a
+"See the rooms" CTA. A gallery that only shows pictures parks the visitor; this one keeps the reason to
+book in the same view. Mobile runs the same two steps in a full-screen sheet, where the header's back
+arrow goes mosaic-ward first and only closes the gallery from the mosaic.
+
+## Photos and clips from guests, and a way to add them
+
+The property's own photos are the marketing version of a hotel. Guest photos are the ones it cannot
+retouch, so they get a named block inside the reviews section rather than a footnote:
+
+- a strip of portrait tiles with each uploader's name, video tiles with a duration badge, and a "+42" tile;
+- review cards that carry their own photos and clips, with a **verified-stay** line;
+- everything opens the same gallery, filtered on *From guests*;
+- **"Add photos or clips"** — a drop zone, a file list you can prune, an optional caption, and an
+  **unticked consent that gates the send button** (same rule as checkout: a pre-ticked box is not consent);
+- **"Write a review"** — a score out of 10, what you liked, what could be better, and files attached
+  inline so nothing typed is lost;
+- both promise moderation within 24 hours, and the first published set earns **+20 FRIENDS credits** —
+  the loyalty scheme that already exists is what makes uploading worth a guest's time.
+
+Uploads are mockups: nothing is sent, and the guest photos reuse the placeholder pool at different crops.
+
+## Documents carry their state
+
+On the confirmation screen every document says whether it exists yet: a **green circle with a tick** for
+what is ready now (voucher, traveller contract, terms), a **gray circle with an hourglass** on a dashed row
+for what is issued later (deposit invoice, final invoice, room assignment), with the action reading
+*Download* or *Coming soon / At check-in*, plus a legend under the grid. After paying, the open question is
+what you already have and what you are still waiting for — one uniform document icon answered neither.
 
 ## Anti-dead-end behaviour on the listing
 

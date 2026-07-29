@@ -1223,31 +1223,192 @@
     const t = $('.hp-title');
     if (t && S.hotel) t.childNodes[0].textContent = S.hotel + ' ';
 
-    /* --- gallery lightbox --- */
-    const photos = $$('.gallery img').map(i => i.src);
-    const extra = ['assets/pool-sunset.jpg', 'assets/coastline.jpg', 'assets/lobby.jpg', 'assets/spa-indoor.jpg', 'assets/apartment-family.jpg'].map(p => new URL(p, location.href).href);
-    const all = photos.concat(extra);
-    let li = 0;
-    function lightbox(start) {
-      li = start || 0;
-      openModal('Galerie foto — ' + (S.hotel || 'Complex Mediteranean'), '<div class="lb-main">' +
-        '<img src="' + all[li] + '"><span class="lb-nav prev">‹</span><span class="lb-nav next">›</span>' +
-        '<span class="lb-count"></span></div><div class="lb-strip">' +
-        all.map((p, i) => '<img src="' + p + '" data-i="' + i + '">').join('') + '</div>', 'lb');
-      const img = $('.lb-main img', modal), cnt = $('.lb-count', modal);
-      const paint = () => {
-        img.src = all[li]; cnt.textContent = (li + 1) + ' / ' + all.length;
-        $$('.lb-strip img', modal).forEach((x, i) => x.classList.toggle('on', i === li));
-        const on = $('.lb-strip img.on', modal); if (on) on.scrollIntoView({ block: 'nearest', inline: 'center' });
-      };
-      $('.prev', modal).onclick = () => { li = (li - 1 + all.length) % all.length; paint(); };
-      $('.next', modal).onclick = () => { li = (li + 1) % all.length; paint(); };
-      $$('.lb-strip img', modal).forEach(x => x.onclick = () => { li = +x.dataset.i; paint(); });
-      paint();
+    /* --- galeria în doi pași: 1. mozaicul cu toate pozele, 2. imaginea mare + banda de miniaturi --- */
+    const photos = $$('.gallery img').map(i => i.getAttribute('src'));
+    const extra = ['assets/pool-sunset.jpg', 'assets/coastline.jpg', 'assets/lobby.jpg', 'assets/spa-indoor.jpg', 'assets/apartment-family.jpg'];
+    const gKey = s => (s.split('/').pop() || '').replace(/\.[a-z0-9]+$/i, '');
+    const GCAT = {
+      'pool-rooftop': 'pool', 'pool-sunset': 'pool', 'jacuzzi-view': 'pool',
+      'coastline': 'beach', 'aerial-hotel': 'hotel', 'aerial-portrait': 'hotel', 'lobby': 'hotel',
+      'room-seaview': 'rooms', 'room-double': 'rooms', 'apartment-family': 'rooms', 'spa-indoor': 'spa'
+    };
+    const GCAP = {
+      'pool-rooftop': ['Piscina de pe terasă', 'The rooftop pool'],
+      'room-seaview': ['Cameră dublă cu vedere la mare', 'Double room, sea view'],
+      'aerial-hotel': ['Complexul văzut de sus', 'The complex from above'],
+      'aerial-portrait': ['Poziția față de plajă', 'Where it sits on the beach'],
+      'jacuzzi-view': ['Jacuzzi cu vedere la mare', 'Jacuzzi with a sea view'],
+      'room-double': ['Cameră dublă standard', 'Standard double room'],
+      'pool-sunset': ['Piscina exterioară la apus', 'The outdoor pool at sunset'],
+      'coastline': ['Plaja Mamaia, la 50 m', 'Mamaia beach, 50 m away'],
+      'lobby': ['Recepția și lobby-ul', 'Reception and lobby'],
+      'spa-indoor': ['Zona de spa și piscina interioară', 'Spa area and indoor pool'],
+      'apartment-family': ['Apartament familial, 4 persoane', 'Family apartment, 4 people']
+    };
+    /* Fotografii și clipuri încărcate de turiști. În prototip refolosesc pozele din assets,
+       cu alt cadraj (object-position), ca să nu pară aceeași imagine pusă de două ori. */
+    const GUEST = [
+      { src: 'assets/coastline.jpg', pos: '70% 40%', by: 'Ana M.', when: ['august 2025', 'August 2025'], video: 1, dur: '0:24', cap: ['Plaja la 8 dimineața, filmat de la balcon', 'The beach at 8am, filmed from our balcony'] },
+      { src: 'assets/pool-sunset.jpg', pos: '20% 70%', by: 'Radu P.', when: ['iulie 2025', 'July 2025'], cap: ['Piscina seara, fără aglomerație', 'The pool in the evening, nice and quiet'] },
+      { src: 'assets/apartment-family.jpg', pos: '80% 50%', by: 'Ioana T.', when: ['august 2025', 'August 2025'], cap: ['Apartamentul nostru, etaj 4', 'Our apartment on the 4th floor'] },
+      { src: 'assets/aerial-portrait.jpg', pos: '50% 25%', by: 'Cristian D.', when: ['iunie 2025', 'June 2025'], video: 1, dur: '0:41', cap: ['Drumul de la hotel până în apă', 'The walk from the hotel down to the water'] },
+      { src: 'assets/room-double.jpg', pos: '25% 60%', by: 'Elena B.', when: ['septembrie 2025', 'September 2025'], cap: ['Camera exact ca în poze', 'The room, exactly like the photos'] },
+      { src: 'assets/lobby.jpg', pos: '75% 60%', by: 'Mihai V.', when: ['iulie 2025', 'July 2025'], cap: ['Check-in în 5 minute', 'Checked in within 5 minutes'] }
+    ];
+    const GCHIPS = [
+      ['all', ['Toate', 'All']], ['rooms', ['Camere', 'Rooms']], ['pool', ['Piscine', 'Pools']],
+      ['beach', ['Plajă', 'Beach']], ['spa', ['Spa & wellness', 'Spa & wellness']], ['hotel', ['Hotel', 'The property']],
+      ['guest', ['De la turiști', 'From guests']]
+    ];
+    const PLAY_SVG = '<svg viewBox="0 0 24 24" width="18" height="18"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg>';
+    const CAM_SVG = '<svg viewBox="0 0 24 24" width="12" height="12"><path d="M4 8h3l1.5-2h7L17 8h3v11H4z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="13" r="3.2" fill="none" stroke="currentColor" stroke-width="2"/></svg>';
+    const VID_SVG = '<svg viewBox="0 0 24 24" width="12" height="12"><rect x="3" y="6" width="12" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 12 5-3v9l-5-3z" fill="none" stroke="currentColor" stroke-width="2"/></svg>';
+
+    const GALLERY = photos.concat(extra).filter((s, i, a) => a.indexOf(s) === i)
+      .map(src => ({ src: src, cat: GCAT[gKey(src)] || 'hotel', cap: (GCAP[gKey(src)] || ['', ''])[EN() ? 1 : 0] }))
+      .concat(GUEST.map(g => ({
+        src: g.src, cat: 'guest', video: g.video, dur: g.dur, by: g.by, pos: g.pos,
+        when: g.when[EN() ? 1 : 0], cap: g.cap[EN() ? 1 : 0]
+      })));
+    GALLERY.forEach(it => { const im = new Image(); im.src = it.src; });
+
+    let gView = [], gi = 0, gFilter = 'all';
+
+    function galleryRail() {
+      const cap = $('.review-cap');
+      const score = cap ? ($('.rate-badge', cap) || {}).textContent : '9.2';
+      const word = cap ? ($('.w .a', cap) || {}).textContent : '';
+      const cnt = cap ? ($('.w .b', cap) || {}).textContent : '';
+      const quotes = $$('.rev-card').slice(0, 2).map(c => ({
+        q: (($('p', c) || {}).textContent || '').trim(),
+        nm: (($('.nm', c) || {}).textContent || '').trim(),
+        sc: (($('.sc', c) || {}).textContent || '').trim()
+      })).filter(x => x.q);
+      const price = ($('.book-card .price') || {}).textContent || '';
+      const note = ($('.book-card .price-note') || {}).textContent || '';
+      return '<div class="lb-score"><span class="rate-badge">' + (score || '9.2') + '</span>' +
+        '<div><b>' + (word || '') + '</b><span>' + (cnt || '') + '</span></div></div>' +
+        (quotes.length ? '<div class="lb-qhead">' + lang('Ce spun oaspeții', 'What guests say') + '</div>' +
+          quotes.map(x => '<div class="lb-quote"><p>' + x.q + '</p><span>' + x.nm + (x.sc ? ' · ' + x.sc : '') + '</span></div>').join('') : '') +
+        '<div class="lb-buy"><div class="p">' + lang('de la ', 'from ') + '<b>' + price.trim() + '</b></div>' +
+        '<div class="n">' + note.trim() + '</div>' +
+        '<button class="btn btn-primary lb-go">' + lang('Vezi camerele', 'See the rooms') + '</button></div>';
     }
+
+    function toRooms() {
+      closeModal();
+      const sec = $('#camere');
+      if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function openGallery(filter) {
+      gFilter = filter || 'all';
+      modal.className = 'modal lb step-grid';
+      modal.innerHTML =
+        '<div class="modal-head">' +
+        '<button class="lb-back">‹ ' + lang('Toate fotografiile', 'All photos') + '</button>' +
+        '<h3></h3>' +
+        '<div class="lb-head-r"><button class="btn btn-primary lb-book">' + lang('Vezi camerele', 'See the rooms') + '</button>' +
+        '<span class="x">✕</span></div></div>' +
+        '<div class="modal-body lb-body"><div class="lb-col">' +
+        '<div class="lb-chips"></div><div class="lb-grid"></div>' +
+        '<div class="lb-single"><div class="lb-main"><img alt="">' +
+        '<span class="lb-nav prev">‹</span><span class="lb-nav next">›</span><span class="lb-count"></span>' +
+        '<span class="lb-play-big">' + PLAY_SVG + '</span></div>' +
+        '<div class="lb-cap"></div><div class="lb-strip"></div></div>' +
+        '</div><aside class="lb-side">' + galleryRail() + '</aside></div>';
+      $('h3', modal).textContent = (S.hotel || 'Complex Mediteranean') + ' — ' +
+        lang(GALLERY.length + ' fotografii', GALLERY.length + ' photos');
+      ov.classList.add('open');
+      $('.x', modal).onclick = closeModal;
+      $('.lb-book', modal).onclick = toRooms;
+      const go = $('.lb-go', modal); if (go) go.onclick = toRooms;
+
+      const chips = $('.lb-chips', modal), grid = $('.lb-grid', modal);
+      const img = $('.lb-main img', modal), cnt = $('.lb-count', modal);
+      const capBox = $('.lb-cap', modal), strip = $('.lb-strip', modal);
+      const bigPlay = $('.lb-play-big', modal);
+
+      const tag = it => it.cat === 'guest'
+        ? '<span class="lb-tag">' + (it.video ? VID_SVG : CAM_SVG) + (EN() ? 'Guest' : 'Turist') + '</span>' : '';
+
+      /* pasul 1 — mozaicul */
+      function paintGrid() {
+        chips.innerHTML = GCHIPS
+          .filter(c => c[0] === 'all' || GALLERY.some(i => i.cat === c[0]))
+          .map(c => '<button class="lb-chip' + (c[0] === gFilter ? ' on' : '') + '" data-c="' + c[0] + '">' +
+            c[1][EN() ? 1 : 0] + ' <b>' + (c[0] === 'all' ? GALLERY.length : GALLERY.filter(i => i.cat === c[0]).length) + '</b></button>').join('');
+        gView = gFilter === 'all' ? GALLERY.slice() : GALLERY.filter(i => i.cat === gFilter);
+        grid.innerHTML = gView.map((it, i) =>
+          '<div class="lb-cell' + (i % 7 === 0 ? ' big' : '') + '" data-i="' + i + '">' +
+          '<img src="' + it.src + '" alt=""' + (it.pos ? ' style="object-position:' + it.pos + '"' : '') + '>' + tag(it) +
+          (it.video ? '<span class="lb-play">' + PLAY_SVG + '<b>' + it.dur + '</b></span>' : '') +
+          (it.cap ? '<span class="cap">' + it.cap + '</span>' : '') + '</div>').join('');
+        $$('.lb-chip', modal).forEach(c => c.onclick = () => { gFilter = c.dataset.c; paintGrid(); });
+        $$('.lb-cell', modal).forEach(c => c.onclick = () => openOne(+c.dataset.i));
+      }
+
+      /* pasul 2 — imaginea mare + banda orizontală */
+      function paintOne() {
+        const it = gView[gi];
+        img.src = it.src;
+        img.style.objectPosition = it.pos || '';
+        cnt.textContent = (gi + 1) + ' / ' + gView.length;
+        bigPlay.style.display = it.video ? 'flex' : 'none';
+        capBox.innerHTML = '<div class="t">' + (it.cap || '') + '</div>' +
+          (it.cat === 'guest'
+            ? '<div class="by"><span class="av">' + it.by.charAt(0) + '</span>' +
+            lang('Încărcat de ', 'Uploaded by ') + '<b>' + it.by + '</b> · ' + it.when +
+            (it.video ? ' · ' + lang('clip ', 'clip ') + it.dur : '') + '</div>'
+            : '<div class="by pro">' + lang('Fotografie oficială a proprietății', 'Official property photo') + '</div>');
+        strip.innerHTML = gView.map((x, i) =>
+          '<span class="lb-th' + (i === gi ? ' on' : '') + '" data-i="' + i + '"><img src="' + x.src + '" alt=""' +
+          (x.pos ? ' style="object-position:' + x.pos + '"' : '') + '>' +
+          (x.video ? '<i>' + PLAY_SVG + '</i>' : '') + '</span>').join('');
+        $$('.lb-th', modal).forEach(x => x.onclick = () => { gi = +x.dataset.i; paintOne(); });
+        const on = $('.lb-th.on', modal);
+        if (on) on.scrollIntoView({ block: 'nearest', inline: 'center' });
+      }
+      function openOne(i) {
+        gi = i;
+        modal.classList.remove('step-grid'); modal.classList.add('step-one');
+        paintOne();
+        modal.scrollTop = 0;
+      }
+      function backToGrid() {
+        modal.classList.remove('step-one'); modal.classList.add('step-grid');
+        modal.scrollTop = 0;
+      }
+      $('.lb-back', modal).onclick = backToGrid;
+      $('.prev', modal).onclick = () => { gi = (gi - 1 + gView.length) % gView.length; paintOne(); };
+      $('.next', modal).onclick = () => { gi = (gi + 1) % gView.length; paintOne(); };
+      bigPlay.onclick = () => toast(lang('În prototip clipurile nu rulează', 'Clips do not play in the prototype'));
+      modal.onkeydown = null;
+      paintGrid();
+    }
+    /* săgeți stânga/dreapta doar în pasul 2 */
+    document.addEventListener('keydown', e => {
+      if (!ov.classList.contains('open') || !modal.classList.contains('step-one')) return;
+      if (e.key === 'ArrowLeft') { const p = $('.lb-nav.prev', modal); if (p) p.click(); }
+      if (e.key === 'ArrowRight') { const n = $('.lb-nav.next', modal); if (n) n.click(); }
+    });
     const hero = $('.gallery .hero');
-    if (hero) hero.onclick = () => lightbox(0);
-    $$('.thumbs .th').forEach((th, i) => th.onclick = () => lightbox(i + 1));
+    if (hero) hero.onclick = () => openGallery();
+    $$('.thumbs .th').forEach(th => th.onclick = () => openGallery());
+    const thMore = $('.thumbs .th-more');
+    if (thMore && !$('.more-lbl', thMore)) {
+      thMore.appendChild(el('span', 'more-lbl', '+' + (GALLERY.length - 5) + ' ' + lang('fotografii', 'photos')));
+    }
+    /* butonul „toate fotografiile" peste imaginea mare */
+    if (hero && !$('.g-all', hero)) {
+      const gAll = el('button', 'g-all', lang('Vezi toate cele ' + GALLERY.length + ' fotografii', 'See all ' + GALLERY.length + ' photos'));
+      gAll.onclick = e => { e.stopPropagation(); openGallery(); };
+      hero.appendChild(gAll);
+    }
+    /* banda de fotografii de la turiști și pozele din recenzii deschid mozaicul filtrat */
+    $$('.ugc-strip .ugc-tile, .ugc-more, .rev-ph span').forEach(x => x.onclick = e => { e.preventDefault(); openGallery('guest'); });
+    $$('[data-ugc-add]').forEach(b => b.onclick = ugcUploadModal);
+    $$('[data-ugc-review]').forEach(b => b.onclick = reviewModal);
     const gShare = $$('.g-actions span')[1];
     if (gShare) gShare.onclick = e => { e.stopPropagation(); navigator.clipboard?.writeText(location.href); toast('Link copiat', 'ok'); };
     const gHeart = $$('.g-actions span')[0];
@@ -1801,6 +1962,135 @@
       $('.x', hint).onclick = () => { hint.remove(); sessionStorage.setItem('litroHint', '1'); };
       setTimeout(() => { if (hint.isConnected) { hint.style.transition = 'opacity .4s'; hint.style.opacity = '0'; setTimeout(() => hint.remove(), 420); } }, 9000);
     }
+  }
+
+  /* ============================================================
+     CONȚINUT DE LA TURIȘTI — încărcarea de fotografii, clipuri și recenzii
+     Dovada vizuală pe care hotelul nu o poate retușa; în plus, e singurul
+     conținut nou care intră gratuit pe pagina hotelului după sejur.
+     ============================================================ */
+  const UP_FILES = [
+    { n: 'IMG_4127.jpg', s: '3,2 MB', src: 'assets/pool-sunset.jpg', pos: '20% 70%' },
+    { n: 'IMG_4131.jpg', s: '2,8 MB', src: 'assets/coastline.jpg', pos: '70% 40%' },
+    { n: 'VID_0042.mp4', s: '18,4 MB', src: 'assets/aerial-portrait.jpg', pos: '50% 25%', vid: '0:24' }
+  ];
+  const PLAY_ICON = '<svg viewBox="0 0 24 24" width="16" height="16"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg>';
+
+  function upFilesHtml() {
+    return UP_FILES.map((f, i) => '<div class="up-file" data-f="' + i + '">' +
+      '<span class="th"><img src="' + f.src + '" style="object-position:' + f.pos + '" alt="">' +
+      (f.vid ? '<i>' + PLAY_ICON + '</i>' : '') + '</span>' +
+      '<div><div class="n">' + f.n + '</div><div class="s">' + f.s + (f.vid ? ' · ' + f.vid : '') + '</div></div>' +
+      '<span class="rm">✕</span></div>').join('');
+  }
+
+  /* Consimțământul rămâne nebifat și blochează butonul — aceeași regulă ca la checkout. */
+  function gateOnConsent(m, onSend) {
+    const cb = $('.consent .cb', m), btn = $('[data-send]', m);
+    if (!cb || !btn) return;
+    btn.classList.add('btn-disabled');
+    cb.onclick = () => {
+      cb.classList.toggle('on'); cb.classList.remove('err');
+      btn.classList.toggle('btn-disabled', !cb.classList.contains('on'));
+    };
+    btn.onclick = () => {
+      if (btn.classList.contains('btn-disabled')) { cb.classList.add('err'); return; }
+      onSend();
+    };
+  }
+
+  /* editabilele din formularele-mockup: placeholder care dispare la focus */
+  function mockInputs(m) {
+    $$('.inp', m).forEach(i => {
+      i.contentEditable = 'true';
+      i.onfocus = () => { if (i.classList.contains('ph')) { i.textContent = ''; i.classList.remove('ph'); } };
+    });
+  }
+
+  function wireFileList(m) {
+    $$('.up-file .rm', m).forEach(x => x.onclick = () => {
+      x.closest('.up-file').remove();
+      const left = $$('.up-file', m).length;
+      const head = $('.up-head', m);
+      if (head) head.textContent = lang('Pregătite de trimis (', 'Ready to send (') + left + ')';
+      if (!left) { const l = $('.up-list', m); if (l) l.remove(); }
+    });
+  }
+
+  function ugcUploadModal() {
+    const m = openModal(lang('Adaugă fotografii și clipuri', 'Add photos and videos'),
+      '<p>' + lang(
+        'Fotografiile turiștilor sunt cea mai citită parte a paginii. Poți încărca <b>până la 10 fotografii</b> și <b>2 clipuri de maximum 60 de secunde</b>. Le verificăm înainte de publicare și nu le retușăm.',
+        'Guest photos are the most-read part of the page. You can upload <b>up to 10 photos</b> and <b>2 clips of up to 60 seconds</b>. We check them before publishing and never retouch them.') + '</p>' +
+      '<div class="up-drop"><span class="ic"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">' +
+      '<path d="M12 16V4M8 8l4-4 4 4M4 16v3.5h16V16"/></svg></span>' +
+      '<b>' + lang('Trage fișierele aici', 'Drag your files here') + '</b>' +
+      '<span>' + lang('sau <a href="#">alege de pe calculator</a>', 'or <a href="#">pick them from your computer</a>') + '</span>' +
+      '<span class="hint">JPG, PNG, HEIC, MP4 · ' + lang('max. 20 MB pentru o fotografie, 200 MB pentru un clip', 'max 20 MB per photo, 200 MB per clip') + '</span></div>' +
+      '<div class="up-list"><div class="up-head">' + lang('Pregătite de trimis (3)', 'Ready to send (3)') + '</div>' + upFilesHtml() + '</div>' +
+      '<div class="fld" style="margin-top:14px"><label>' + lang('Descriere (opțional)', 'Caption (optional)') + '</label>' +
+      '<div class="inp ph">' + lang('Ex: priveliștea de la etajul 4, dimineața', 'e.g. the view from the 4th floor, in the morning') + '</div></div>' +
+      '<div class="consent"><span class="cb"></span><span>' + lang(
+        'Confirm că sunt fotografiile/clipurile mele, că nu apar în ele alte persoane fără acordul lor și că pot fi publicate pe litoralulromanesc.ro.',
+        'I confirm these are my own photos/clips, that no one else appears in them without their consent, and that they may be published on litoralulromanesc.ro.') + '</span></div>' +
+      '<div class="up-perk"><b>+20 ' + lang('credite FRIENDS', 'FRIENDS credits') + '</b> ' + lang(
+        'pentru primul set de fotografii publicat după un sejur. 1 credit = 1 Leu.',
+        'for the first set of photos published after a stay. 1 credit = 1 Leu.') + '</div>' +
+      '<button class="btn btn-primary" style="width:100%;padding:13px 0;margin-top:12px" data-send>' +
+      lang('Trimite spre verificare', 'Send for review') + '</button>');
+    wireFileList(m);
+    mockInputs(m);
+    gateOnConsent(m, () => {
+      closeModal();
+      toast(lang('Am primit fișierele. Le publicăm după verificare, în cel mult 24 de ore.',
+        'Got your files. We publish them after a check, within 24 hours.'), 'ok');
+    });
+  }
+
+  function reviewModal() {
+    let stars = 0;
+    const m = openModal(lang('Scrie o recenzie', 'Write a review'),
+      '<p>' + lang(
+        'Recenziile apar doar de la clienți care au stat prin noi, așa că le legăm de rezervare. Nota generală o publicăm pe 10, la fel ca notele hotelurilor.',
+        'Reviews only come from guests who booked through us, so we tie them to a booking. The overall score is published out of 10, like every hotel score.') + '</p>' +
+      '<div class="rv-stay"><img src="assets/room-seaview.jpg" alt=""><div><div class="t">Complex Mediteranean</div>' +
+      '<div class="d">' + lang('Sejur 5–12 iunie 2026 · Cameră dublă vedere mare', 'Stay 5–12 June 2026 · Double room, sea view') + '</div></div></div>' +
+      '<div class="fld"><label>' + lang('Nota generală', 'Overall score') + '</label>' +
+      '<div class="rv-stars">' + [1, 2, 3, 4, 5].map(i => '<span data-s="' + i + '">★</span>').join('') +
+      '<b class="rv-out"></b></div></div>' +
+      '<div class="fld"><label>' + lang('Ce ți-a plăcut', 'What you liked') + '</label>' +
+      '<div class="inp ph area">' + lang('Ex: șezlongurile incluse și micul dejun', 'e.g. the included sunbeds and the breakfast') + '</div></div>' +
+      '<div class="fld"><label>' + lang('Ce s-ar putea îmbunătăți (opțional)', 'What could be better (optional)') + '</label>' +
+      '<div class="inp ph area">' + lang('Ex: liftul are coadă la prânz', 'e.g. there is a queue for the lift at lunchtime') + '</div></div>' +
+      '<button class="btn btn-outline-navy rv-add" style="width:100%;padding:11px 0">' +
+      lang('Adaugă fotografii sau clipuri la recenzie', 'Attach photos or clips to the review') + '</button>' +
+      '<div class="rv-files" hidden><div class="up-list"><div class="up-head">' +
+      lang('Atașate recenziei (3)', 'Attached to the review (3)') + '</div>' + upFilesHtml() + '</div></div>' +
+      '<div class="consent" style="margin-top:14px"><span class="cb"></span><span>' + lang(
+        'Recenzia mea poate fi publicată cu prenumele și orașul meu. Am citit <a href="#">regulile de publicare</a>.',
+        'My review may be published with my first name and city. I have read the <a href="#">publishing rules</a>.') + '</span></div>' +
+      '<button class="btn btn-primary" style="width:100%;padding:13px 0;margin-top:10px" data-send>' +
+      lang('Trimite recenzia', 'Send the review') + '</button>');
+    $$('.rv-stars span', m).forEach(s => s.onclick = () => {
+      stars = +s.dataset.s;
+      $$('.rv-stars span', m).forEach(x => x.classList.toggle('on', +x.dataset.s <= stars));
+      $('.rv-out', m).textContent = (stars * 2).toFixed(1).replace('.', EN() ? '.' : ',') + ' / 10';
+    });
+    mockInputs(m);
+    wireFileList(m);
+    /* atașarea se face în formular, nu într-o altă fereastră — altfel se pierde textul scris */
+    $('.rv-add', m).onclick = () => {
+      const box = $('.rv-files', m);
+      box.hidden = false;
+      $('.rv-add', m).textContent = lang('3 fișiere atașate', '3 files attached');
+      $('.rv-add', m).classList.add('btn-disabled');
+    };
+    gateOnConsent(m, () => {
+      if (!stars) { toast(lang('Alege întâi nota generală', 'Pick the overall score first')); return; }
+      closeModal();
+      toast(lang('Mulțumim! Publicăm recenzia după verificare, în cel mult 24 de ore.',
+        'Thank you! We publish the review after a check, within 24 hours.'), 'ok');
+    });
   }
 
   /* ============================================================
