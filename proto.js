@@ -540,8 +540,32 @@
         ? [['Romanian Seaside', 'home-c-en.html'], ['Danube Delta', null], ['Seaside deals', null], ['Resorts', null], ['All-inclusive hotels', null], ['Last minute', null], ['Seaside for Everyone', null], ['FRIENDS programme', null], ['Contact', null]]
         : [['Litoral România', 'home-c.html'], ['Delta Dunării', null], ['Oferte litoral', null], ['Stațiuni', null], ['Hoteluri all inclusive', null], ['Last minute', null], ['Litoralul Pentru Toți', null], ['Program FRIENDS', null], ['Contact', null]];
       const items = navLinks.length ? navLinks : fallback;
-      burger.onclick = () => openModal(EN() ? 'Menu' : 'Meniu',
-        items.map(([t, href]) => '<p style="font-size:16px"><a href="' + (href && href !== '#' ? href : '#') + '" style="font-weight:700">' + t + '</a></p>').join(''));
+      /* Panou ancorat sub buton, nu modal: meniul principal e navigație, nu o
+         întrerupere — modalul de 900 px lăsa un câmp de alb în jurul a zece linkuri. */
+      const panel = el('div', 'menu navpanel');
+      panel.innerHTML = '<div class="np-grid">' +
+        items.map(([t, href]) => '<a href="' + (href && href !== '#' ? href : '#') + '">' + t + '</a>').join('') +
+        '</div><div class="sep"></div>' +
+        '<div class="np-foot"><span><b>0241 999</b> · 0241 837 777<br>' +
+        '<span class="hrs">● ' + (EN() ? 'Daily 10:00 – 18:00' : 'Zilnic 10:00 – 18:00') + '</span></span>' +
+        '<a class="btn btn-outline-navy" href="tel:0241999">' + (EN() ? 'Call us' : 'Sună-ne') + '</a></div>';
+      document.body.appendChild(panel);
+      $$('.np-grid a', panel).forEach(a => {
+        if (a.getAttribute('href') === '#') a.onclick = e => {
+          e.preventDefault(); closeAllPops();
+          toast((EN() ? 'In the prototype: ' : 'În prototip: ') + a.textContent.trim());
+        };
+      });
+      burger.setAttribute('data-pop-anchor', '');
+      burger.onclick = e => {
+        e.stopPropagation();
+        const was = panel.classList.contains('open'); closeAllPops(); if (was) return;
+        const r = burger.getBoundingClientRect();
+        panel.style.top = (r.bottom + window.scrollY + 10) + 'px';
+        panel.style.left = 'auto';
+        panel.style.right = Math.max(12, document.documentElement.clientWidth - r.right) + 'px';
+        panel.classList.add('open'); openPop = panel;
+      };
     }
 
     $$('.mainnav a').forEach(a => {

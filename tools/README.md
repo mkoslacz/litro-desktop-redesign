@@ -48,6 +48,20 @@ Single-line texts are exported with `textAutoResize: WIDTH_AND_HEIGHT` so nothin
 **Importing:** drag the `.fig` onto the Figma home screen. The first open right after an import sometimes sticks
 on the loading bar — one reload fixes it.
 
+## Serving the prototype
+
+`node tools/serve.js` puts `desktop-redesign/` on http://localhost:8080 (`PORT=3000 node tools/serve.js` to move it).
+Every response carries `Cache-Control: no-store`, which is the whole point: over `file://` — and behind a caching
+server — the preview pane keeps an old `proto.js`/`proto.css` in memory, so you end up testing the previous build
+and inventing cache-busting tricks. `.claude/launch.json` starts this same server, so the in-app preview uses it too.
+
+## Preview renders for the hub
+
+`node shoot-previews.js [name ...]` refreshes the `preview-*.png` files that `index.html` shows — full-page shots at
+1440px (desktop) and 500px (mobile, so the 430px app frame keeps its outer margin), all in `?nopanel=1` export mode.
+Without an argument it redoes all sixteen; pass names (`node shoot-previews.js hotel m-hotel`) for just a few.
+Run it after any change that touches every screen — a header or footer edit makes the whole set stale at once.
+
 ## Capturing the live site
 
 `node dump-live.js` — renders the production pages (home / search results / hotel with the booking form) and
