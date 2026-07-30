@@ -556,8 +556,10 @@
       const gross = disc ? Math.round(total / (1 - disc / 100)) : 0;
       const p = $('.price', card);
       if (p) p.innerHTML = money(total) + ' <span class="cur">Lei</span>';
+      /* fără reducere nu există preț tăiat — altfel cardul arăta „0 Lei" barat
+         (se vedea pe home-b, unde un card are data-disc="0" dar și .old-price) */
       const op = $('.old-price', card);
-      if (op) op.textContent = money(gross) + ' Lei';
+      if (op) { op.textContent = money(gross) + ' Lei'; op.style.display = gross > total ? '' : 'none'; }
       const note = $('.price-note', card);
       if (note) {
         const mealRo = card.dataset.meal || 'mic dejun';
@@ -922,8 +924,134 @@
   /* ============================================================
      LISTING
      ============================================================ */
+
+  /* Proprietăți reale de pe litoralulromanesc.ro, cu stațiunea și distanța lor,
+     folosite ca să umplem pagina până la cele PAGE_SIZE rezultate despre care
+     vorbește paginarea. Primele sunt din Mamaia, ca lista să rămână credibilă și
+     când cineva caută acolo; restul acoperă litoralul, adică starea implicită
+     („Tot litoralul"). [nume, [stațiune RO, EN], m până la plajă, stele, notă, recenzii, preț/noapte] */
+  const FILL_HOTELS = [
+    ['Hotel Zenith', ['Mamaia, zona Perla', 'Mamaia, Perla area'], 120, 4, 8.8, 512, 690],
+    ['Hotel Savoy', ['Mamaia, zona Cazino', 'Mamaia, Cazino area'], 60, 4, 9.0, 934, 845],
+    ['Hotel Tomis', ['Mamaia, zona Rex', 'Mamaia, Rex area'], 90, 3, 8.2, 388, 402],
+    ['Hotel Dunărea', ['Mamaia, zona Perla', 'Mamaia, Perla area'], 200, 3, 7.9, 267, 355],
+    ['Phoenicia Blue View', ['Mamaia Nord', 'Mamaia Nord'], 250, 4, 8.5, 1420, 720],
+    ['Hotel Mondial', ['Eforie Nord, faleză', 'Eforie Nord, seafront'], 80, 4, 8.7, 421, 560],
+    ['Aqvatonic Resort & SPA', ['Eforie Nord, Steaua de Mare', 'Eforie Nord, Steaua de Mare'], 150, 4, 8.9, 683, 780],
+    ['Vila Belvedere', ['Eforie Nord, zona Belona', 'Eforie Nord, Belona area'], 400, 4, 9.1, 158, 610],
+    ['Hotel Aqua Park', ['Eforie Nord', 'Eforie Nord'], 100, 4, 8.6, 731, 705],
+    ['Hotel Cupidon', ['Eforie Nord', 'Eforie Nord'], 300, 3, 7.7, 219, 298],
+    ['Hotel Arta', ['Eforie Nord', 'Eforie Nord'], 180, 3, 8.1, 344, 330],
+    ['Hotel Delfinul', ['Eforie Nord', 'Eforie Nord'], 120, 3, 8.0, 402, 340],
+    ['Hotel Vera', ['Eforie Nord', 'Eforie Nord'], 220, 3, 8.3, 276, 365],
+    ['Bacolux Koralio', ['Eforie Nord', 'Eforie Nord'], 60, 3, 8.4, 512, 470],
+    ['Hotel Poseidon Resort', ['Jupiter', 'Jupiter'], 50, 4, 8.8, 604, 690],
+    ['Hotel Opal', ['Jupiter', 'Jupiter'], 80, 3, 8.2, 298, 385],
+    ['Hotel Olimpic', ['Jupiter', 'Jupiter'], 150, 3, 7.9, 233, 342],
+    ['Hotel Turquoise', ['Venus', 'Venus'], 70, 4, 9.0, 812, 735],
+    ['Mera Resort', ['Venus', 'Venus'], 90, 4, 8.9, 1180, 760],
+    ['Hotel Del Mar', ['Venus', 'Venus'], 130, 3, 8.1, 289, 395],
+    ['Ibis Styles Venus', ['Venus', 'Venus'], 200, 3, 8.5, 447, 430],
+    ['Hotel Q', ['Neptun', 'Neptun'], 110, 4, 8.7, 356, 640],
+    ['2D Resort and Spa', ['Neptun-Olimp', 'Neptun-Olimp'], 160, 4, 8.6, 528, 615],
+    ['Muntenia Olimp Resort', ['Olimp', 'Olimp'], 60, 3, 8.3, 486, 420]
+  ];
+  const FILL_ROOMS = [
+    [['Cameră dublă standard', 'Standard double room'], ['1 pat dublu · 20 m²', '1 double bed · 20 m²']],
+    [['Cameră dublă vedere mare', 'Double room with sea view'], ['1 pat dublu · balcon', '1 double bed · balcony']],
+    [['Cameră twin', 'Twin room'], ['2 paturi separate', '2 separate beds']],
+    [['Cameră family', 'Family room'], ['2 adulți + 2 copii · 30 m²', '2 adults + 2 children · 30 m²']],
+    [['Studio', 'Studio'], ['chicinetă · terasă proprie', 'kitchenette · own terrace']],
+    [['Apartament 2 camere', '2-room apartment'], ['living separat · 45 m²', 'separate living room · 45 m²']]
+  ];
+  const FILL_QUOTES = [
+    ['Curat, personal amabil, plaja la două minute.', 'Clean, friendly staff, the beach two minutes away.'],
+    ['Mic dejun bun și variat, ne-am întors cu drag.', 'Good, varied breakfast — we came back happily.'],
+    ['Camera exact ca în poze, fără surprize.', 'The room exactly like the photos, no surprises.'],
+    ['Raport calitate-preț foarte bun pentru zonă.', 'Very good value for money for the area.'],
+    ['Piscina e mare, copiii au stat în ea toată ziua.', 'The pool is big, the kids stayed in it all day.'],
+    ['Parcare proprie și liniște seara.', 'Own parking, and quiet in the evening.']
+  ];
+  const FILL_PHOTOS = ['pool-rooftop', 'room-seaview', 'lobby', 'aerial-hotel', 'pool-sunset',
+    'room-double', 'jacuzzi-view', 'spa-indoor', 'apartment-family', 'coastline'];
+
+  function scoreWord(s) {
+    return s >= 9 ? (EN() ? 'Excellent' : 'Excelent')
+      : s >= 8.4 ? (EN() ? 'Very good' : 'Foarte bine')
+        : s >= 7.8 ? (EN() ? 'Good' : 'Bine') : (EN() ? 'Fair' : 'Acceptabil');
+  }
+
+  /* ------------------------------------------------------------
+     O pagină de listing are PAGE_SIZE rezultate, dar în fișier stau
+     doar cardurile scrise de mână. Fără asta, paginarea („Afișăm
+     1–30 din 1 236") minte chiar pe primul ecran. Clonăm cardurile
+     existente — deci se păstrează variantele de card, iar chipurile
+     rămân lipite de atributele lor (masă, confirmare, inventar
+     propriu vin odată cu sursa) — și schimbăm doar ce ține de
+     proprietate: nume, stațiune, notă, preț, poză, tip de cameră.
+     Rulează înaintea restului lui initListing, ca fiecare card nou
+     să primească galerie, filtre și expander ca toate celelalte.
+     ------------------------------------------------------------ */
+  function fillListingPage() {
+    const have = $$('.lcard');
+    if (!have.length || have.length >= PAGE_SIZE) return;
+    let after = have[have.length - 1];
+    for (let i = 0; have.length + i < PAGE_SIZE; i++) {
+      const d = FILL_HOTELS[i % FILL_HOTELS.length];
+      const src = have[i % have.length];
+      const n = src.cloneNode(true);
+      const suffix = i >= FILL_HOTELS.length ? ' ' + (Math.floor(i / FILL_HOTELS.length) + 1) : '';
+
+      n.dataset.beach = d[2];
+      n.dataset.score = d[4];
+      n.dataset.ppn = d[6];
+      n.dataset.rank = have.length + i + 1;
+
+      const nm = $('.hname', n);
+      if (nm && nm.firstChild) nm.firstChild.nodeValue = d[0] + suffix + ' ';
+      const stars = $('.stars', n);
+      if (stars) stars.textContent = '★'.repeat(d[3]);
+
+      const meta = $('.hmeta', n);
+      if (meta) {
+        const txt = Array.prototype.find.call(meta.childNodes, x => x.nodeType === 3 && x.textContent.trim());
+        if (txt) txt.nodeValue = ' ' + d[1][EN() ? 1 : 0] + ' · ' +
+          (d[2] ? d[2] + (EN() ? ' m from the beach · ' : ' m de plajă · ') : (EN() ? 'right on the beach · ' : 'chiar pe plajă · '));
+      }
+
+      const badge = $('.rate-badge', n); if (badge) badge.textContent = d[4].toFixed(1);
+      const word = $('.rate-word', n); if (word) word.textContent = scoreWord(d[4]);
+      const rcnt = $('.rate-count', n); if (rcnt) rcnt.textContent = d[5] + (EN() ? ' reviews' : ' recenzii');
+
+      const img = $('.ph img', n);
+      if (img) img.setAttribute('src', 'assets/' + FILL_PHOTOS[i % FILL_PHOTOS.length] + '.jpg');
+
+      const room = FILL_ROOMS[i % FILL_ROOMS.length];
+      const rt = $('.lc-room .rt', n); if (rt) rt.textContent = room[0][EN() ? 1 : 0];
+      const rd = $('.lc-room .rd', n); if (rd) rd.textContent = room[1][EN() ? 1 : 0];
+
+      const q = $('.quote', n);
+      if (q) {
+        const qt = $('.t', q);
+        if (qt) qt.textContent = (EN() ? '“' : '„') + FILL_QUOTES[i % FILL_QUOTES.length][EN() ? 1 : 0] + '”';
+        const qh = $('.h b', q);
+        if (qh) qh.textContent = (EN() ? 'Score ' : 'Nota ') + Math.round(d[4]) + '/10';
+      }
+      /* oferta care expiră e un semnal, nu decor: dacă e pe fiecare card nu mai spune nimic.
+         La fel „Nou pe litoralulromanesc.ro" — rămâne doar pe cardul scris de mână. */
+      if (i % 4) $$('.expiry', n).forEach(x => x.remove());
+      $$('.pill-new', n).forEach(x => x.remove());
+      const mr = $('.more-rooms .cnt', n);
+      if (mr) mr.textContent = '(' + (3 + (i % 6)) + ')';
+
+      after.after(n);
+      after = n;
+    }
+  }
+
   function initListing() {
     if (document.body.dataset.page !== 'listing') return;
+    fillListingPage();
     const cards = $$('.lcard');
 
     /* --- headline binding --- */
@@ -1662,6 +1790,36 @@
       const gAll = el('button', 'g-all', lang('Vezi toate cele ' + GALLERY.length + ' fotografii', 'See all ' + GALLERY.length + ' photos'));
       gAll.onclick = e => { e.stopPropagation(); openGallery(); };
       hero.appendChild(gAll);
+    }
+    /* Săgeți pe imaginea mare, ca pe cardurile din listing: răsfoiești pozele
+       proprietății fără să deschizi galeria. Clicul pe imagine deschide în
+       continuare mozaicul, deci săgețile opresc propagarea. Pozele turiștilor
+       rămân doar în galerie — aici arătăm ce a fotografiat proprietatea. */
+    if (hero && !$('.hero-nav', hero)) {
+      const hImg = $('img', hero);
+      const own = GALLERY.filter(g => g.cat !== 'guest');
+      if (hImg && own.length > 1) {
+        const cnt = el('span', 'hero-count');
+        let hi = Math.max(0, own.findIndex(g => g.src === hImg.getAttribute('src')));
+        const show = i => {
+          hi = (i + own.length) % own.length;
+          hImg.src = own[hi].src;
+          hImg.style.objectPosition = own[hi].pos || '';
+          cnt.textContent = (hi + 1) + ' / ' + own.length;
+        };
+        const arrow = (cls, glyph, step, label) => {
+          const b = el('button', 'hero-nav ' + cls, glyph);
+          b.type = 'button';
+          b.setAttribute('aria-label', label);
+          b.onclick = e => { e.stopPropagation(); show(hi + step); };
+          return b;
+        };
+        hero.appendChild(arrow('prev', '‹', -1, lang('Poza anterioară', 'Previous photo')));
+        hero.appendChild(arrow('next', '›', 1, lang('Poza următoare', 'Next photo')));
+        hero.appendChild(cnt);
+        show(hi);
+        own.forEach(g => { const im = new Image(); im.src = g.src; });
+      }
     }
     /* banda de fotografii de la turiști și pozele din recenzii deschid mozaicul filtrat */
     $$('.ugc-strip .ugc-tile, .ugc-more, .rev-ph span').forEach(x => x.onclick = e => { e.preventDefault(); openGallery('guest'); });

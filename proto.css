@@ -26,6 +26,20 @@
 .ph-nav.prev { left: 8px; }
 .ph-nav.next { right: 8px; }
 
+/* --- hotel: aceleași săgeți pe imaginea mare din antetul paginii de hotel --- */
+.gallery .hero .hero-nav { position: absolute; top: 50%; transform: translateY(-50%); z-index: 4;
+  width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,.9); border: none;
+  box-shadow: 0 2px 10px rgba(1,43,85,.3); color: var(--navy-700); font-size: 24px; line-height: 1;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  opacity: .7; transition: opacity .15s, background .15s; }
+.gallery .hero:hover .hero-nav { opacity: 1; }
+.gallery .hero .hero-nav:hover { background: #fff; }
+.gallery .hero .hero-nav.prev { left: 12px; }
+.gallery .hero .hero-nav.next { right: 12px; }
+.gallery .hero .hero-count { position: absolute; right: 12px; bottom: 12px; z-index: 4;
+  background: rgba(1,43,85,.62); color: #fff; font-size: 12.5px; font-weight: 600;
+  padding: 4px 10px; border-radius: 100px; letter-spacing: .2px; }
+
 /* --- hotel: rate stepper + sticky booking bar (model Szallas) --- */
 .rate-stepper { display: inline-flex; align-items: center; border: 1.5px solid var(--navy-500); border-radius: 100px; background: #fff; overflow: hidden; }
 .rate-stepper button { width: 38px; height: 40px; border: 0; background: #fff; color: var(--navy-500); font-size: 21px; line-height: 1; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }

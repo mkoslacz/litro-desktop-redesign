@@ -848,8 +848,106 @@
   /* ?f=own,instant… — intrarea în listing cu filtre deja aplicate */
   (qp.get('f') || '').split(',').filter(Boolean).forEach(k => { activeFilters[k] = true; });
 
+  /* Aceleași proprietăți reale ca pe desktop (proto.js FILL_HOTELS), ca lista de pe
+     telefon să aibă chiar cele PAGE_SIZE rezultate despre care vorbește paginarea.
+     [nume, [stațiune RO, EN], m până la plajă, stele, notă, recenzii, preț/noapte] */
+  const FILL_HOTELS = [
+    ['Hotel Zenith', ['Mamaia, zona Perla', 'Mamaia, Perla area'], 120, 4, 8.8, 512, 690],
+    ['Hotel Savoy', ['Mamaia, zona Cazino', 'Mamaia, Cazino area'], 60, 4, 9.0, 934, 845],
+    ['Hotel Tomis', ['Mamaia, zona Rex', 'Mamaia, Rex area'], 90, 3, 8.2, 388, 402],
+    ['Hotel Dunărea', ['Mamaia, zona Perla', 'Mamaia, Perla area'], 200, 3, 7.9, 267, 355],
+    ['Phoenicia Blue View', ['Mamaia Nord', 'Mamaia Nord'], 250, 4, 8.5, 1420, 720],
+    ['Hotel Mondial', ['Eforie Nord, faleză', 'Eforie Nord, seafront'], 80, 4, 8.7, 421, 560],
+    ['Aqvatonic Resort & SPA', ['Eforie Nord, Steaua de Mare', 'Eforie Nord, Steaua de Mare'], 150, 4, 8.9, 683, 780],
+    ['Vila Belvedere', ['Eforie Nord, zona Belona', 'Eforie Nord, Belona area'], 400, 4, 9.1, 158, 610],
+    ['Hotel Aqua Park', ['Eforie Nord', 'Eforie Nord'], 100, 4, 8.6, 731, 705],
+    ['Hotel Cupidon', ['Eforie Nord', 'Eforie Nord'], 300, 3, 7.7, 219, 298],
+    ['Hotel Arta', ['Eforie Nord', 'Eforie Nord'], 180, 3, 8.1, 344, 330],
+    ['Hotel Delfinul', ['Eforie Nord', 'Eforie Nord'], 120, 3, 8.0, 402, 340],
+    ['Hotel Vera', ['Eforie Nord', 'Eforie Nord'], 220, 3, 8.3, 276, 365],
+    ['Bacolux Koralio', ['Eforie Nord', 'Eforie Nord'], 60, 3, 8.4, 512, 470],
+    ['Hotel Poseidon Resort', ['Jupiter', 'Jupiter'], 50, 4, 8.8, 604, 690],
+    ['Hotel Opal', ['Jupiter', 'Jupiter'], 80, 3, 8.2, 298, 385],
+    ['Hotel Olimpic', ['Jupiter', 'Jupiter'], 150, 3, 7.9, 233, 342],
+    ['Hotel Turquoise', ['Venus', 'Venus'], 70, 4, 9.0, 812, 735],
+    ['Mera Resort', ['Venus', 'Venus'], 90, 4, 8.9, 1180, 760],
+    ['Hotel Del Mar', ['Venus', 'Venus'], 130, 3, 8.1, 289, 395],
+    ['Ibis Styles Venus', ['Venus', 'Venus'], 200, 3, 8.5, 447, 430],
+    ['Hotel Q', ['Neptun', 'Neptun'], 110, 4, 8.7, 356, 640],
+    ['2D Resort and Spa', ['Neptun-Olimp', 'Neptun-Olimp'], 160, 4, 8.6, 528, 615],
+    ['Muntenia Olimp Resort', ['Olimp', 'Olimp'], 60, 3, 8.3, 486, 420]
+  ];
+  const FILL_ROOMS = [
+    ['Cameră dublă standard · 20 m²', 'Standard double room · 20 m²'],
+    ['Cameră dublă vedere mare · balcon', 'Sea-view double room · balcony'],
+    ['Cameră twin · 2 paturi separate', 'Twin room · 2 separate beds'],
+    ['Cameră family · 2 adulți + 2 copii', 'Family room · 2 adults + 2 children'],
+    ['Studio · chicinetă și terasă', 'Studio · kitchenette and terrace'],
+    ['Apartament 2 camere · 45 m²', '2-room apartment · 45 m²']
+  ];
+  const FILL_QUOTES = [
+    ['Curat, personal amabil, plaja la două minute.', 'Clean, friendly staff, the beach two minutes away.'],
+    ['Mic dejun bun și variat, ne-am întors cu drag.', 'Good, varied breakfast — we came back happily.'],
+    ['Camera exact ca în poze, fără surprize.', 'The room exactly like the photos, no surprises.'],
+    ['Raport calitate-preț foarte bun pentru zonă.', 'Very good value for money for the area.'],
+    ['Piscina e mare, copiii au stat în ea toată ziua.', 'The pool is big, the kids stayed in it all day.'],
+    ['Parcare proprie și liniște seara.', 'Own parking, and quiet in the evening.']
+  ];
+  const FILL_PHOTOS = ['pool-rooftop', 'room-seaview', 'lobby', 'aerial-hotel', 'pool-sunset',
+    'room-double', 'jacuzzi-view', 'spa-indoor', 'apartment-family', 'coastline'];
+
+  /* ------------------------------------------------------------
+     Vezi comentariul din proto.js: paginarea promite PAGE_SIZE
+     rezultate pe pagină, deci lista chiar trebuie să le aibă.
+     Clonăm cardurile existente și schimbăm doar ce ține de
+     proprietate; chipurile rămân lipite de atributele cardului-sursă.
+     ------------------------------------------------------------ */
+  function fillListingPage() {
+    const have = $$('.lcard');
+    if (!have.length || have.length >= PAGE_SIZE) return;
+    let after = have[have.length - 1];
+    for (let i = 0; have.length + i < PAGE_SIZE; i++) {
+      const d = FILL_HOTELS[i % FILL_HOTELS.length];
+      const n = have[i % have.length].cloneNode(true);
+      const suffix = i >= FILL_HOTELS.length ? ' ' + (Math.floor(i / FILL_HOTELS.length) + 1) : '';
+
+      n.dataset.beach = d[2];
+      n.dataset.score = d[4];
+      n.dataset.ppn = d[6];
+      n.dataset.rank = have.length + i + 1;
+
+      const nm = $('.hname', n);
+      if (nm && nm.firstChild) nm.firstChild.nodeValue = d[0] + suffix + ' ';
+      const stars = $('.stars', n);
+      if (stars) stars.textContent = '★'.repeat(d[3]);
+
+      const metas = $$('.hmeta', n);
+      if (metas[0]) {
+        const txt = Array.prototype.find.call(metas[0].childNodes, x => x.nodeType === 3 && x.textContent.trim());
+        if (txt) txt.nodeValue = ' ' + d[1][EN() ? 1 : 0] + ' · ' +
+          (d[2] ? d[2] + t(' m de plajă', ' m from the beach') : t('chiar pe plajă', 'right on the beach'));
+      }
+      if (metas[1]) {                                   // rândul cu patul: tipul de cameră
+        const txt = Array.prototype.find.call(metas[1].childNodes, x => x.nodeType === 3 && x.textContent.trim());
+        if (txt) txt.nodeValue = ' ' + FILL_ROOMS[i % FILL_ROOMS.length][EN() ? 1 : 0];
+      }
+
+      const badge = $('.rate-badge', n); if (badge) badge.textContent = d[4].toFixed(1);
+      const img = $('.ph img', n);
+      if (img) img.setAttribute('src', 'assets/' + FILL_PHOTOS[i % FILL_PHOTOS.length] + '.jpg');
+
+      const q = $('.lc-quote', n);
+      if (q) q.innerHTML = '<b>' + t('Ce apreciază turiștii · Nota ', 'What guests praise · Score ') +
+        Math.round(d[4]) + '/10</b><br>' + t('„', '“') + FILL_QUOTES[i % FILL_QUOTES.length][EN() ? 1 : 0] + '”';
+
+      after.after(n);
+      after = n;
+    }
+  }
+
   function initListing() {
     if (PAGE() !== 'listing') return;
+    fillListingPage();
     const cards = $$('.lcard');
     const main = $('.list');
 

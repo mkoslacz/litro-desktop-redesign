@@ -177,6 +177,10 @@ of every picture**, with category chips (rooms / pools / beach / spa / the prope
 counts, and tiles in mixed sizes. Clicking one tile goes to **step 2: the big image with a horizontal
 thumbnail strip below it**, arrow-key navigation, a counter and a "‹ All photos" control back to the mosaic.
 
+The big photo in the page header also carries **the same arrows as a listing card**, with a counter,
+so the property's own photos can be leafed through in place without opening anything; guest photos
+stay behind the gallery. Clicking the photo itself still opens the mosaic.
+
 A side rail stays visible through both steps: the review score, two guest quotes, the price and a
 "See the rooms" CTA. A gallery that only shows pictures parks the visitor; this one keeps the reason to
 book in the same view.
@@ -227,6 +231,26 @@ are driven by the visible result count rather than being always-on decoration:
 | 5 or fewer | Flexible-date strip, a "look at other options" line and the nearby-resorts band appear; "load more" and the pager disappear; the headline switches to the real count |
 | 2 or fewer | The call-centre band moves directly under the last result, turns orange and names the number left |
 | 0 | Empty state: clear the filters, or hand the search to a consultant |
+
+## A page of results is really a page of results
+
+The pager says "Afișăm **1–30** din **1 236** cazări", so the list has to actually hold 30 cards —
+otherwise the very first screen contradicts itself. Only a handful of cards are written by hand in
+each `listing*.html` / `home-b|d.html`; `fillListingPage()` in `proto.js` (and its twin in
+`proto-m.js`) clones them up to `PAGE_SIZE` before anything else in `initListing()` runs, so every
+new card gets the same photo gallery, filters and room expander as the hand-written ones.
+
+Clones vary what belongs to a property — name, resort, distance to the beach, stars, score, review
+count, price per night, photo, room type, guest quote — and **inherit everything else from the card
+they were cloned from**, so the chips never drift from the data attributes behind them (board,
+confirmation type, own inventory). The names are real properties from litoralulromanesc.ro, Mamaia
+first so the list stays believable when someone searches there, then along the coast, which is what
+the default "Tot litoralul" search means. In production-photo mode each of them pulls its own
+photos, so a full page also shows how much the real photo base varies from property to property.
+
+The demo inventory switch still caps what is visible (Many → the full page, Some → 4, Few → 2,
+Zero → the empty state), and a filter that is on by default — `listing.html` and `home-b.html` ship
+with **Piscină** applied — legitimately shows fewer than 30.
 
 ## Pagination, not infinite scroll
 
