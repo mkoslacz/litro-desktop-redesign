@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<title>LITRO — assets de producție</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'DM Sans',sans-serif; color:#1E1E1E; background:#F7F5F3; padding:50px 20px; }
+  .wrap { max-width:1080px; margin:0 auto; }
+  h1 { font-family:'Outfit',sans-serif; font-size:36px; margin-bottom:6px; }
+  h1 b { color:#004B97; } h1 span { color:#EB802D; }
+  .sub { color:#57585A; font-size:16px; margin-bottom:26px; max-width:780px; line-height:1.55; }
+  h2 { font-family:'Outfit',sans-serif; font-size:23px; margin:36px 0 6px; }
+  h2 small { font-family:'DM Sans',sans-serif; font-weight:400; font-size:14px; color:#57585A; margin-left:8px; }
+  .lead { color:#57585A; font-size:14.5px; line-height:1.55; margin-bottom:16px; max-width:820px; }
+  .note { background:#EEF4FB; border:1px solid #CBDEF2; border-radius:14px; padding:16px 20px; color:#012B55; font-size:14.5px; line-height:1.55; margin-bottom:24px; }
+  .note b { font-weight:700; }
+  a { color:#004B97; }
+  code { background:#fff; border:1px solid #EFEDED; border-radius:6px; padding:1px 6px; font-size:13px; }
+  .grid { display:grid; gap:14px; }
+  .g4 { grid-template-columns:repeat(4,1fr); } .g3 { grid-template-columns:repeat(3,1fr); }
+  .g6 { grid-template-columns:repeat(6,1fr); }
+  .card { background:#fff; border:1px solid #EFEDED; border-radius:12px; overflow:hidden; box-shadow:0 2px 8px rgba(30,30,30,.05); }
+  .card img { width:100%; display:block; background:#ECEAE8; }
+  .ph img { height:130px; object-fit:cover; }
+  .bn img { height:auto; max-height:200px; object-fit:contain; padding:8px; }
+  .card .cap { padding:8px 10px; font-size:12.5px; line-height:1.35; color:#3A3B3D; }
+  .card .cap b { display:block; color:#1E1E1E; font-size:12.5px; }
+  .tag { display:inline-block; background:#EAF7F0; color:#0B5E38; border:1px solid #BFE5D2; border-radius:20px;
+         padding:1px 8px; font-size:11px; font-weight:700; margin-top:4px; }
+  .tag.off { background:#F4F2F0; color:#6A6B6D; border-color:#E4E1DE; }
+  .hotel { margin-top:22px; }
+  .hotel h3 { font-family:'Outfit',sans-serif; font-size:17px; margin-bottom:8px; }
+  .hotel h3 small { font-weight:400; font-size:13px; color:#57585A; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1><b>Assets de producție</b> <span>— ce vede prototipul când comuți pe „Producție”</span></h1>
+  <p class="sub">Fotografii și creații luate de pe <b>litoralulromanesc.ro</b>, ca să vedem macheta nouă pe baza de imagini
+    pe care o avem azi, nu pe poze de stoc. Comutatorul stă în panoul de prototip, rândul <b>„Fotografii — Prototip / Producție”</b>,
+    și se poate fixa din adresă cu <code>?assets=prod</code>. Textele, prețurile și mecanica rămân neschimbate — se schimbă doar pozele.</p>
+
+  <div class="note">
+    <b>Unde nimerește fiecare poză.</b> Cardul de hotel și pagina hotelului primesc fotografiile <b>acelui</b> hotel
+    (numele e citit din card, deci „Complex Mediteranean” arată Complex Mediteranean). Banda „în apropiere”, kafelele de
+    destinație și căutările recente primesc <b>poza stațiunii</b>. Restul suprafețelor — hero, carusel, inspirație —
+    iau setul implicit de mai jos.<br><br>
+    <b>Ce nu se schimbă.</b> Caruselul de campanii din prototip e „poză + text propriu”, nu o creație gata făcută, deci
+    kafelele lui primesc fotografii, nu bannere. <b>Cardul fixat</b> rămâne pe „Super ofertele verii” în ambele moduri —
+    e deja creația de pe producție. Restul creațiilor de mai jos sunt în pachet, gata de folosit, dar încă nu au un loc
+    în machetă: spune unde le vrei și le punem.
+  </div>
+
+  <p><a href="index.html">← înapoi la prezentare</a> &nbsp;·&nbsp;
+     <a href="home-c.html?assets=prod">deschide homepage-ul cu poze de producție →</a> &nbsp;·&nbsp;
+     <a href="hotel.html?assets=prod">pagina hotelului →</a> &nbsp;·&nbsp;
+     <a href="listing-c.html?assets=prod">listingul →</a></p>
+
+  <div id="out"></div>
+
+  <div class="note" style="margin-top:34px">
+    Pachetul se reface cu <code>python3 tools/scrape-prod-assets.py --out /tmp/litro-raw</code> apoi
+    <code>python3 tools/build-prod-assets.py --raw /tmp/litro-raw</code>. Maparea poză → slot e o clasificare făcută
+    cu ochiul (vezi <code>SLOTMAP</code> în build-prod-assets.py); dacă galeriile de pe producție se schimbă, indexurile
+    trebuie verificate din nou.
+  </div>
+</div>
+
+<script src="assets/prod/manifest.js"></script>
+<script>
+(function () {
+  var M = window.LITRO_PROD_MANIFEST, out = document.getElementById('out');
+  if (!M) { out.innerHTML = '<p class="lead">Lipsește <code>assets/prod/manifest.js</code>.</p>'; return; }
+  var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]; }); };
+  var h = '';
+
+  h += '<h2>Creații de campanie <small>' + M.banners.length + ' fișiere</small></h2>';
+  h += '<p class="lead">Bannerele și creațiile de pe site-ul viu. Cele marcate „în machetă” sunt deja folosite de prototip; restul așteaptă un loc.</p>';
+  h += '<div class="grid g3">' + M.banners.map(function (b) {
+    var used = Object.keys(M.mirror).some(function (k) { return M.mirror[k].from === b.source; });
+    return '<div class="card bn"><img src="assets/prod/' + b.file + '" alt="" loading="lazy">' +
+      '<div class="cap"><b>' + esc(b.caption) + '</b>' + esc(b.source) +
+      '<br><span class="tag' + (used ? '' : ' off') + '">' + (used ? 'în machetă' : 'în pachet') + '</span></div></div>';
+  }).join('') + '</div>';
+
+  var slots = M.slots;
+  h += '<h2>Setul implicit <small>' + slots.length + ' sloturi</small></h2>';
+  h += '<p class="lead">Folosit oriunde macheta nu spune despre ce hotel e vorba. Numele slotului e chiar numele fișierului din prototip: <code>assets/room-double.jpg</code> → <code>assets/prod/room-double.webp</code>.</p>';
+  h += '<div class="grid g4">' + slots.map(function (s) {
+    var m = M.mirror[s]; if (!m) return '';
+    return '<div class="card ph"><img src="assets/prod/' + m.file + '" alt="" loading="lazy">' +
+      '<div class="cap"><b>' + s + '</b>' + esc(m.from) + '</div></div>';
+  }).join('') + '</div>';
+
+  h += '<h2>Stațiuni <small>' + Object.keys(M.resorts).length + ' fotografii</small></h2>';
+  h += '<p class="lead">Din galeria de destinații a site-ului — aceleași poze pe care le vede acum un turist.</p>';
+  h += '<div class="grid g6">' + Object.keys(M.resorts).map(function (r) {
+    return '<div class="card ph"><img src="assets/prod/' + M.resorts[r] + '" alt="" loading="lazy">' +
+      '<div class="cap"><b>' + r + '</b></div></div>';
+  }).join('') + '</div>';
+
+  var hotels = Object.keys(M.hotels);
+  h += '<h2>Hoteluri <small>' + hotels.length + ' proprietăți × ' + slots.length + ' sloturi</small></h2>';
+  h += '<p class="lead">Fiecare hotel pe care îl numește prototipul are galeria lui reală, împărțită pe aceleași sloturi. Se vede și ce lipsește pe producție: hoteluri fără poză de spa, fără piscină sau fără o poză de plajă primesc cea mai apropiată poză proprie.</p>';
+  h += hotels.map(function (slug) {
+    return '<div class="hotel"><h3>' + slug + ' <small>assets/prod/h/' + slug + '/</small></h3><div class="grid g6">' +
+      M.hotels[slug].map(function (s) {
+        return '<div class="card ph"><img src="assets/prod/h/' + slug + '/' + s + '.webp" alt="" loading="lazy">' +
+          '<div class="cap"><b>' + s + '</b></div></div>';
+      }).join('') + '</div></div>';
+  }).join('');
+
+  out.innerHTML = h;
+})();
+</script>
+</body>
+</html>

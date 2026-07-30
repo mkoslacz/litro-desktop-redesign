@@ -68,6 +68,26 @@ Run it after any change that touches every screen — a header or footer edit ma
 saves `innerText` plus full-page screenshots into `research/live-dumps/`. `extract.py` does the same for raw
 curl'd HTML when JS isn't needed.
 
+## The production photo pack
+
+`python3 scrape-prod-assets.py --out /tmp/litro-raw` pulls the real photos off the live site: the `big/`
+(1600px) gallery rendition for each of the 13 properties the prototype names, the destination photos from
+`galerie imagini/original/`, and the campaign creatives under `dist/images/`. Downloads are skipped when the
+file is already there, so re-running is cheap. Needs `curl` — the stock python here has no CA bundle.
+
+`python3 build-prod-assets.py --raw /tmp/litro-raw` converts them into `../assets/prod/` (webp, ≤1100px)
+and writes `assets/prod/manifest.js`, which `prod-assets.js` reads at runtime. The pack mirrors the
+prototype's own file names — `assets/room-double.jpg` → `assets/prod/room-double.webp` — so the swap is a
+pure path substitution and the gallery's category map (keyed by file name) keeps working.
+
+`SLOTMAP` at the top of the build script maps each property's gallery **by index** onto the eleven photo
+slots, and it is a by-eye classification — production file names are just `<hotel id>__<name>_<timestamp>`
+and the alt text is the same sentence on every frame, so nothing but looking at them works. Regenerate the
+numbered sheets with `python3 contact-sheets.py --raw /tmp/litro-raw --out /tmp/litro-sheets`: the number on
+each tile is the index `SLOTMAP` uses. A fresh scrape can reshuffle those indexes, so re-check before
+trusting the map. The raw dump is deliberately kept outside the repo; only the converted 13 MB pack is
+committed.
+
 ## Frame ids worth knowing
 
 - **Szallas "Redesign sandbox":** Home `1:4509`, Listing `1:20929`, Accommodation `1:29364`;

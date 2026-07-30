@@ -23,6 +23,9 @@ inside that sandbox.
 | `preview-*.png` | Full-page renders of each screen |
 | `litro-desktop-redesign.fig` | Native Figma file with all five screens as editable frames |
 | `assets/` | Photos used in the mockups (placeholders taken from the Szallas sandbox) |
+| `assets/prod/` | The **production** photo pack scraped off the live site + `manifest.js` (generated) |
+| `prod-assets.js` | Runtime that swaps the prototype's photos for the production ones (panel row *Photos*) |
+| `prod-assets.html` | Catalogue of the production pack — creatives, default set, resorts, per-hotel sets |
 | `tools/` | The pipeline that made all this possible — see `tools/README.md` |
 | `research/live-dumps/` | Captures of the live production site (18–19 Jul 2026) that the audit is based on |
 | `research/audit-data/` | Raw gap findings, adversarial verdicts and the live feature inventory |
@@ -69,6 +72,7 @@ when it would sit over the page. Both the collapsed state and every switch survi
 | Card view *(listing)* | A detailed · B compact with the date/board/room icon row · C horizontal summary |
 | Filter column *(listing)* | Sticky — from the map down the filters stay in view and scroll on their own, separately from the results — or flowing with the page |
 | Demo inventory *(listing)* | Many / Some / Few results — drives the count, the empty state and the flexible-date banner |
+| Photos | Prototype ↔ **Production** — every photo swaps to the real one from the live site (see below) |
 | Sticky search bar | Three independent switches (homepage / listing / hotel); the row for the page you are on is marked |
 | Pinned card *(carousels)* | No pinned card · pinned as the first card in the row · pinned as a wide band above |
 
@@ -87,7 +91,47 @@ linked to directly — and so the Figma export can capture each variant without 
 | `?sthome=`, `?stlist=`, `?sthotel=` `on\|off` | Sticky search bar, per page type |
 | `?pin=off\|inline\|banner` | The pinned campaign card on a carousel |
 | `?stf=on\|off` | Sticky filter column, scrolled separately from the results |
+| `?assets=prod\|proto` | Production photos vs the prototype's own (remembered, so it survives the next click) |
 | `?nopanel=1` | Export mode: no demo panel, fixed bars join the normal flow, filter column back in the page flow |
+
+## Production photos — the "Fotografii: Producție" switch
+
+The prototype ships with clean stock photography, which flatters the layout. The **Photos** row in the
+demo panel swaps every image on the page for the real one from **litoralulromanesc.ro**, so the design
+can be judged on the photo base we actually have — inconsistent crops, portrait phone shots, campaign
+badges burned into the JPEG, hotels with no spa photo at all. Nothing else changes: same copy, same
+prices, same behaviour. `prod-assets.html` is the catalogue of everything in the pack.
+
+Where each photo lands:
+
+- **a hotel card or the hotel page** → that property's own production photos. The name is read from the
+  card (`.lcard`, `.hcard`, `.pick`, `.hc-hotel`) or from `.hp-title`, so "Complex Mediteranean" shows
+  Complex Mediteranean. All 13 properties the prototype names by hand exist in production.
+- **a destination card** (`.near-card`, `.mz`, `.prev-card`) → that resort's photo from the site's own
+  destination gallery.
+- **everything else** — hero, carousel, inspiration tiles → a default set picked across properties.
+- **the pinned campaign card is left alone**: "Super ofertele verii" is already a production creative.
+  The current campaign banner and the other creatives (6 rate, vouchere de vacanță, FRIENDS, storno,
+  Adela, newsletter background, logos) sit in `assets/prod/banners/` unused — the layout has no slot
+  for them yet.
+
+How it works — `prod-assets.js` sets **`srcset`**, it never rewrites `src`. Everything in `proto.js` /
+`proto-m.js` that reads or writes `src` (card galleries, the lightbox, the gallery category map keyed
+by file name) keeps working on the prototype's own file names, and the browser renders the production
+candidate. A `MutationObserver` catches images injected later and any `src` change. `?assets=` is read
+at **script parse time**, not at `DOMContentLoaded` — the prototype rewrites its own URL from the search
+state before then, which would drop the parameter. `tools/dump-dom.js` already reads `currentSrc`, so
+production photos flow into a `.fig` export unchanged.
+
+Rebuilding the pack (raw dump stays outside the repo, only the converted pack is committed):
+
+```
+python3 tools/scrape-prod-assets.py --out /tmp/litro-raw
+python3 tools/build-prod-assets.py  --raw /tmp/litro-raw
+```
+
+`SLOTMAP` in `build-prod-assets.py` is a by-eye classification of each gallery (index → slot). Re-scraping
+can reshuffle those indexes, so re-check the contact sheets before trusting it after a fresh pull.
 
 ## Searching the whole coast by default
 

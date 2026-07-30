@@ -524,6 +524,13 @@
       seg('pt-lang', lnk(roFile, 'RO', !EN()) + lnk(enFile, 'EN', EN())) + '</div>';
     html += '<div class="pt-row"><span class="pt-lbl">' + t('Vedere', 'View') + '</span>' +
       seg('pt-view', btn('data-view="m"', t('Mobil', 'Mobile'), true) + lnk(desktopHref, 'Desktop', false)) + '</div>';
+    /* pozele: cele din prototip sau fotografiile reale de pe litoralulromanesc.ro
+       (vezi prod-assets.js — schimbă doar imaginile, nu și textele sau prețurile) */
+    if (window.LITRO_ASSETS && LITRO_ASSETS.available) {
+      html += '<div class="pt-row"><span class="pt-lbl">' + t('Fotografii', 'Photos') + '</span>' +
+        seg('pt-assets', [['proto', t('Prototip', 'Prototype')], ['prod', t('Producție', 'Production')]]
+          .map(([k, l]) => btn('data-a="' + k + '"', l, LITRO_ASSETS.get() === k)).join('')) + '</div>';
+    }
     html += '<div class="pt-row"><span class="pt-lbl">' + t('Cont', 'Account') + '</span>' +
       seg('pt-auth', [['out', t('Musafir', 'Guest')], ['in', t('Membru', 'Member')]]
         .map(([k, l]) => btn('data-auth="' + k + '"', l, document.body.dataset.auth === k)).join('')) + '</div>';
@@ -577,6 +584,10 @@
       document.body.dataset.auth = b.dataset.auth;
       try { localStorage.setItem('litroAuth', b.dataset.auth); } catch (e) { }
       $$('.pt-auth .pt-b', box).forEach(x => x.classList.toggle('on', x === b));
+    });
+    $$('.pt-assets .pt-b', box).forEach(b => b.onclick = () => {
+      LITRO_ASSETS.set(b.dataset.a);
+      $$('.pt-assets .pt-b', box).forEach(x => x.classList.toggle('on', x === b));
     });
     $$('.pt-rooms .pt-b', box).forEach(b => b.onclick = () => {
       document.body.dataset.rooms = b.dataset.rooms;
@@ -2081,5 +2092,8 @@
     initOwnInventory();
     initLogin();
     repriceEverything();
+    /* titlul hotelului și o parte din carduri se scriu abia acum, iar ele decid
+       din ce hotel vin pozele de producție — deci repictăm la finalul boot-ului */
+    if (window.LITRO_ASSETS) LITRO_ASSETS.repaint();
   });
 })();

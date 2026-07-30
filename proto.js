@@ -802,6 +802,15 @@
         '<span class="pt-b on">Desktop</span>' +
         '<a class="pt-b" href="' + mHref + '">' + (EN() ? 'Mobile' : 'Mobil') + '</a></div></div>';
     }
+    /* pozele: cele din prototip sau fotografiile reale de pe litoralulromanesc.ro
+       (vezi prod-assets.js — schimbă doar imaginile, nu și textele sau prețurile) */
+    if (window.LITRO_ASSETS && LITRO_ASSETS.available) {
+      const aModes = EN() ? [['proto', 'Prototype'], ['prod', 'Production']] : [['proto', 'Prototip'], ['prod', 'Producție']];
+      const aTitle = EN() ? 'Swap every photo for the real one from litoralulromanesc.ro — same layout, the photo base we actually have'
+        : 'Schimbă toate pozele cu cele reale de pe litoralulromanesc.ro — aceeași machetă, baza de poze pe care o avem';
+      html += '<div class="pt-row"><span class="pt-lbl">' + (EN() ? 'Photos' : 'Fotografii') + '</span><div class="pt-seg pt-assets" title="' + aTitle + '">' +
+        aModes.map(([k, label]) => '<span class="pt-b' + (LITRO_ASSETS.get() === k ? ' on' : '') + '" data-a="' + k + '">' + label + '</span>').join('') + '</div></div>';
+    }
     const authModes = EN() ? [['out', 'Guest'], ['in', 'Member']] : [['out', 'Musafir'], ['in', 'Membru']];
     html += '<div class="pt-row"><span class="pt-lbl">' + (EN() ? 'Account' : 'Cont') + '</span><div class="pt-seg pt-auth">' +
       authModes.map(([k, label]) => '<span class="pt-b' + (document.body.dataset.auth === k ? ' on' : '') + '" data-auth="' + k + '">' + label + '</span>').join('') + '</div></div>';
@@ -875,6 +884,10 @@
     $$('.pt-auth .pt-b', box).forEach(btn => btn.onclick = () => {
       applyAuth(btn.dataset.auth);
       $$('.pt-auth .pt-b', box).forEach(b => b.classList.toggle('on', b === btn));
+    });
+    $$('.pt-assets .pt-b', box).forEach(btn => btn.onclick = () => {
+      LITRO_ASSETS.set(btn.dataset.a);
+      $$('.pt-assets .pt-b', box).forEach(b => b.classList.toggle('on', b === btn));
     });
     applyAuth(document.body.dataset.auth);
     /* Comenzile de demo stau într-un jgheab în stânga, împreună cu caseta „inventar
@@ -2412,5 +2425,8 @@
     initOwnInventory();
     initLogin();
     repriceEverything();
+    /* titlul hotelului și o parte din carduri se scriu abia acum, iar ele decid
+       din ce hotel vin pozele de producție — deci repictăm la finalul boot-ului */
+    if (window.LITRO_ASSETS) LITRO_ASSETS.repaint();
   });
 })();
