@@ -50,7 +50,12 @@
   const staysTxt = n => plural(n, t('cazare disponibilă', 'available stay'), t('cazări disponibile', 'available stays'));
 
   const ALL_TOTAL = 1236;        // '' ca destinație = tot litoralul
-  const PAGE_SIZE = 30;          // paginare, nu infinite scroll
+  /* Vezi proto.js: câte rezultate intră pe o pagină se schimbă din panoul de
+     prototip (10/20/30). Lista are întotdeauna MAX_PAGE carduri în DOM. */
+  const PAGE_SIZES = [10, 20, 30];
+  const MAX_PAGE = 30;
+  let PAGE_SIZE = 30;
+  let listingRepaint = null;     // = applyFilters, setat de initListing
 
   /* Tipul de pagină pentru comutatoarele de prototip (aceleași chei ca pe desktop,
      ca starea să treacă dintr-o vedere în alta). */
@@ -494,6 +499,10 @@
     let pin = qp.get('pin');
     if (!pin) { try { pin = localStorage.getItem('litro-pin'); } catch (e) { } }
     document.body.dataset.pin = ['off', 'inline', 'banner'].indexOf(pin) >= 0 ? pin : 'inline';
+    /* rezultate pe pagină (?per=10|20|30), citit înainte de ieșirea pentru export */
+    let per = qp.get('per');
+    if (!per) { try { per = localStorage.getItem('litro-perPage'); } catch (e) { } }
+    if (PAGE_SIZES.indexOf(+per) >= 0) PAGE_SIZE = +per;
     applySession();
     /* ?nopanel=1 — modul de export în Figma: fără panoul de demo, iar barele fixe
        intră în fluxul paginii (altfel ar cădea la mijlocul ramei, unde e marginea
@@ -546,6 +555,8 @@
       html += '<div class="pt-row"><span class="pt-lbl">' + t('Densitate celule', 'Card view') + '</span>' +
         seg('pt-den', [['a', t('Detaliat', 'Detailed')], ['b', t('Compact', 'Compact')], ['c', t('Rezumat', 'Summary')]]
           .map(([k, l]) => btn('data-d="' + k + '" title="' + l + '"', k.toUpperCase(), document.body.dataset.density === k)).join('')) + '</div>';
+      html += '<div class="pt-row"><span class="pt-lbl">' + t('Rezultate pe pagină', 'Results per page') + '</span>' +
+        seg('pt-per', PAGE_SIZES.map(v => btn('data-per="' + v + '"', v, PAGE_SIZE === v)).join('')) + '</div>';
       html += '<div class="pt-row"><span class="pt-lbl">' + t('Inventar demo', 'Demo inventory') + '</span>' +
         seg('pt-inv', [['99', '1236', t('Mult', 'Many')], ['4', '4', t('Mediu', 'Some')], ['2', '2', t('Puțin', 'Few')], ['0', '0', 'Zero']]
           .map(([cap, cnt, l], i) => btn('data-cap="' + cap + '" data-count="' + cnt + '"', l, i === 0)).join('')) + '</div>';
@@ -588,6 +599,12 @@
     $$('.pt-assets .pt-b', box).forEach(b => b.onclick = () => {
       LITRO_ASSETS.set(b.dataset.a);
       $$('.pt-assets .pt-b', box).forEach(x => x.classList.toggle('on', x === b));
+    });
+    $$('.pt-per .pt-b', box).forEach(b => b.onclick = () => {
+      PAGE_SIZE = +b.dataset.per;
+      try { localStorage.setItem('litro-perPage', b.dataset.per); } catch (e) { }
+      $$('.pt-per .pt-b', box).forEach(x => x.classList.toggle('on', x === b));
+      if (listingRepaint) listingRepaint();
     });
     $$('.pt-rooms .pt-b', box).forEach(b => b.onclick = () => {
       document.body.dataset.rooms = b.dataset.rooms;
@@ -904,9 +921,9 @@
      ------------------------------------------------------------ */
   function fillListingPage() {
     const have = $$('.lcard');
-    if (!have.length || have.length >= PAGE_SIZE) return;
+    if (!have.length || have.length >= MAX_PAGE) return;
     let after = have[have.length - 1];
-    for (let i = 0; have.length + i < PAGE_SIZE; i++) {
+    for (let i = 0; have.length + i < MAX_PAGE; i++) {
       const d = FILL_HOTELS[i % FILL_HOTELS.length];
       const n = have[i % have.length].cloneNode(true);
       const suffix = i >= FILL_HOTELS.length ? ' ' + (Math.floor(i / FILL_HOTELS.length) + 1) : '';
@@ -1108,7 +1125,8 @@
       let shown = 0;
       cards.forEach(c => {
         let ok = matches(c, activeFilters);
-        if (ok && shown >= demoCap) ok = false;
+        /* plafon: inventarul demo sau pur și simplu cât încape pe o pagină */
+        if (ok && shown >= Math.min(demoCap, PAGE_SIZE)) ok = false;
         c.classList.toggle('card-hidden', !ok);
         if (ok) shown++;
       });
@@ -1128,6 +1146,7 @@
       if (!shown) showEmpty(); else hideEmpty();
       syncChips(); syncTabs();
     }
+    listingRepaint = applyFilters;   // comutatorul „rezultate pe pagină" din panou repictează lista
 
     /* ------------------------------------------------------------
        Anti-dead-end: bannerul de date flexibile, banda de call-centre și

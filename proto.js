@@ -34,7 +34,14 @@
   const fmtShort = s => { const d = parse(s); return d.getDate() + ' ' + monN(d.getMonth()); };
   const fmtRange = (a, b) => fmtShort(a) + ' – ' + fmtShort(b);
 
-  const PAGE_SIZE = 30;          // paginare, nu infinite scroll
+  /* Câte rezultate intră pe o pagină. Se schimbă din panoul de prototip (10/20/30),
+     pentru că e o decizie de produs, nu o constantă: pagina scurtă aduce paginarea
+     în primul ecran, cea lungă amână decizia. Lista are întotdeauna MAX_PAGE carduri
+     în DOM (vezi fillListingPage), iar PAGE_SIZE decide doar câte se văd. */
+  const PAGE_SIZES = [10, 20, 30];
+  const MAX_PAGE = 30;
+  let PAGE_SIZE = 30;
+  let listingRepaint = null;     // = applyFilters, setat de initListing
 
   /* Tipul de pagină pentru comutatoarele de prototip. Nu e același lucru cu
      data-page: home-d ARE listingul în pagină (data-page="listing"), dar pentru
@@ -770,6 +777,11 @@
     let stf = q.get('stf');
     if (!stf) { try { stf = localStorage.getItem('litro-stickyFilters'); } catch (e) { } }
     document.body.dataset.stickyFilters = stf === 'off' ? 'off' : 'on';
+    /* rezultate pe pagină (?per=10|20|30) — citit înainte de ieșirea pentru export,
+       ca o ramă de Figma să poată fi capturată cu orice lungime de pagină */
+    let per = q.get('per');
+    if (!per) { try { per = localStorage.getItem('litro-perPage'); } catch (e) { } }
+    if (PAGE_SIZES.indexOf(+per) >= 0) PAGE_SIZE = +per;
     applySession();
     /* ?nopanel=1 — folosit la exportul în Figma, ca panoul de demo să nu ajungă în ramă */
     if (q.get('nopanel')) {
@@ -829,6 +841,13 @@
       const modes = EN() ? [['a', 'Detailed'], ['b', 'Compact'], ['c', 'Icons']] : [['a', 'Detaliat'], ['b', 'Compact'], ['c', 'Iconițe']];
       html += '<div class="pt-row"><span class="pt-lbl">' + (EN() ? 'Card view' : 'Densitate celule') + '</span><div class="pt-seg pt-den">' +
         modes.map(([k, label]) => '<span class="pt-b' + (document.body.dataset.density === k ? ' on' : '') + '" data-d="' + k + '" title="' + label + '">' + k.toUpperCase() + '</span>').join('') + '</div></div>';
+      /* câte rezultate intră pe o pagină — schimbă și lista, și paginarea */
+      const perTitle = EN() ? 'How many results fit on one page, before the pager'
+        : 'Câte rezultate intră pe o pagină, până la paginare';
+      html += '<div class="pt-row"><span class="pt-lbl">' + (EN() ? 'Results per page' : 'Rezultate pe pagină') + '</span>' +
+        '<div class="pt-seg pt-per" title="' + perTitle + '">' +
+        PAGE_SIZES.map(v => '<span class="pt-b' + (PAGE_SIZE === v ? ' on' : '') + '" data-per="' + v + '">' + v + '</span>').join('') +
+        '</div></div>';
       /* coloana de filtre: lipită și derulată separat de listing, sau curgând cu pagina */
       const stfTitle = EN() ? 'Filters stay in view and scroll on their own, separately from the results'
         : 'Filtrele rămân pe ecran și se derulează singure, separat de rezultate';
@@ -869,6 +888,12 @@
       document.body.dataset.stickyFilters = b.dataset.v;
       try { localStorage.setItem('litro-stickyFilters', b.dataset.v); } catch (e) { }
       $$('.pt-filt .pt-b', box).forEach(x => x.classList.toggle('on', x === b));
+    });
+    $$('.pt-per .pt-b', box).forEach(b => b.onclick = () => {
+      PAGE_SIZE = +b.dataset.per;
+      try { localStorage.setItem('litro-perPage', b.dataset.per); } catch (e) { }
+      $$('.pt-per .pt-b', box).forEach(x => x.classList.toggle('on', x === b));
+      if (listingRepaint) listingRepaint();
     });
     $$('.pt-den .pt-b', box).forEach(btn => btn.onclick = () => {
       document.body.dataset.density = btn.dataset.d;
@@ -994,9 +1019,9 @@
      ------------------------------------------------------------ */
   function fillListingPage() {
     const have = $$('.lcard');
-    if (!have.length || have.length >= PAGE_SIZE) return;
+    if (!have.length || have.length >= MAX_PAGE) return;
     let after = have[have.length - 1];
-    for (let i = 0; have.length + i < PAGE_SIZE; i++) {
+    for (let i = 0; have.length + i < MAX_PAGE; i++) {
       const d = FILL_HOTELS[i % FILL_HOTELS.length];
       const src = have[i % have.length];
       const n = src.cloneNode(true);
@@ -1298,7 +1323,8 @@
         if (active.breakfast && !/mic dejun/i.test(c.dataset.meal || '')) ok = false;
         if (active.friends && c.dataset.friends !== '1') ok = false;
         if (active.own && c.dataset.own !== '1') ok = false;
-        if (ok && shown >= demoCap) ok = false;   // demo: plafon de inventar
+        /* plafon: inventarul demo sau pur și simplu cât încape pe o pagină */
+        if (ok && shown >= Math.min(demoCap, PAGE_SIZE)) ok = false;
         c.classList.toggle('card-hidden', !ok);
         if (ok) shown++;
       });
@@ -1319,6 +1345,7 @@
       syncPager(displayN);
       if (!shown) showEmptyState(); else hideEmptyState();
     }
+    listingRepaint = applyFilters;   // comutatorul „rezultate pe pagină" din panou repictează lista
 
     /* ------------------------------------------------------------
        Paginare de 30 de rezultate. „Afișează mai multe" ascundea câte

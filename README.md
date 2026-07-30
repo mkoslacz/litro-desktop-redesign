@@ -70,6 +70,7 @@ when it would sit over the page. Both the collapsed state and every switch survi
 | Account | Guest ↔ Member (hides the "sign in for FRIENDS" bands) |
 | Session *(hotel)* | A visitor arriving cold vs one who came from our own listing |
 | Card view *(listing)* | A detailed · B compact with the date/board/room icon row · C horizontal summary |
+| Results per page *(listing)* | 10 / 20 / 30 — changes both how many cards the list shows and the pager under it |
 | Filter column *(listing)* | Sticky — from the map down the filters stay in view and scroll on their own, separately from the results — or flowing with the page |
 | Demo inventory *(listing)* | Many / Some / Few results — drives the count, the empty state and the flexible-date banner |
 | Photos | Prototype ↔ **Production** — every photo swaps to the real one from the live site (see below) |
@@ -92,6 +93,7 @@ linked to directly — and so the Figma export can capture each variant without 
 | `?pin=off\|inline\|banner` | The pinned campaign card on a carousel |
 | `?stf=on\|off` | Sticky filter column, scrolled separately from the results |
 | `?assets=prod\|proto` | Production photos vs the prototype's own (remembered, so it survives the next click) |
+| `?per=10\|20\|30` | Results per page — the list and the pager follow it together |
 | `?nopanel=1` | Export mode: no demo panel, fixed bars join the normal flow, filter column back in the page flow |
 
 ## Production photos — the "Fotografii: Producție" switch
@@ -251,6 +253,12 @@ photos, so a full page also shows how much the real photo base varies from prope
 The demo inventory switch still caps what is visible (Many → the full page, Some → 4, Few → 2,
 Zero → the empty state), and a filter that is on by default — `listing.html` and `home-b.html` ship
 with **Piscină** applied — legitimately shows fewer than 30.
+
+**How long a page should be is itself a question**, so it is a switch: the panel row *Results per
+page* (10 / 20 / 30, `?per=`) moves the list and the pager together. Thirty cards is a long scroll
+before anyone reaches the pager; ten brings pagination into the first screen and puts more weight on
+sorting. The DOM always holds the full thirty — `PAGE_SIZE` only decides how many of them are shown,
+so switching is instant and nothing has to be re-rendered.
 
 ## Pagination, not infinite scroll
 
