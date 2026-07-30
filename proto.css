@@ -3,14 +3,6 @@
    (kept out of litro.css so the design-token file stays clean)
    ============================================================ */
 
-/* --- prototype hint bar --- */
-.proto-hint { position: fixed; left: 16px; bottom: 16px; z-index: 900; display: flex; align-items: center; gap: 12px;
-  background: var(--gray-900); color: #fff; border-radius: var(--r-l); padding: 12px 14px 12px 16px; font-size: 13.5px;
-  box-shadow: 0 10px 30px rgba(0,0,0,.28); max-width: 460px; }
-.proto-hint b { color: #FFC48A; }
-.proto-hint .x { margin-left: 4px; opacity: .6; cursor: pointer; font-size: 16px; line-height: 1; }
-.proto-hint .x:hover { opacity: 1; }
-
 /* --- generic interactive affordances --- */
 [data-click], .clickable, .lcard, .hcard, .insp-card, .mz, .prev-card, .near-card, .doc, .offer-card,
 .fx-cell, .mchip, .pfilter, .fchip, .frow, .nav-btn, .heart, .more-rooms, .thumbs .th, .gallery .hero,
@@ -366,14 +358,34 @@ body[data-listing="b"] .lcard .ph img, body[data-listing="c"] .lcard .ph img { m
    marginea ferestrei de captură (1200 px), adică la mijlocul unei rame înalte. */
 body[data-export] .invdemo,
 body[data-export] .vswitch,
-body[data-export] .proto-hint,
+body[data-export] .proto-rail,
 body[data-export] .booking-bar,
 body[data-export] .stickybar { display: none; }
 
 /* ===== controale de prototip: panou plutitor (ca „inventar demo") — limbă + densitate celule ===== */
 .header .langswitch { display: none; }   /* comutatorul RO/EN e un control de prototip, mutat în panoul plutitor (specificitate mai mare ca stilul inline din home-c/home-d) */
-.proto-tools { position: fixed; left: 18px; bottom: 18px; z-index: 891; width: 190px;
-  background: #fff; border: 1px solid var(--gray-300); border-radius: var(--r-l); box-shadow: var(--shadow-pop); padding: 11px; }
+
+/* Jgheabul din stânga: ține caseta „inventar demo" și panoul de setări una sub
+   alta, într-o singură coloană care se derulează pe dinăuntru. Așa panoul nu mai
+   iese din ecran când adăugăm comutatoare, iar butonul „–" îl strânge de tot. */
+.proto-rail { position: fixed; left: 18px; top: 50%; transform: translateY(-50%); z-index: 891;
+  width: 202px; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+.proto-rail .pr-body { width: 100%; display: flex; flex-direction: column; gap: 10px;
+  max-height: calc(100vh - 68px); overflow-y: auto; overscroll-behavior: contain; padding: 2px 6px 2px 2px; }
+.proto-rail .pr-min { flex: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  min-width: 26px; height: 26px; padding: 0 8px; border-radius: 100px; background: var(--gray-900); color: #fff;
+  font-size: 13px; font-weight: 700; line-height: 1; cursor: pointer; box-shadow: 0 4px 14px rgba(0,0,0,.22); user-select: none; }
+.proto-rail .pr-min:hover { background: #000; }
+/* strâns, jgheabul coboară în colțul din stânga jos — locul obișnuit al unei
+   comenzi de demo, și nu mai stă peste o casetă de filtre din mijlocul ecranului */
+.proto-rail.mini { top: auto; bottom: 18px; transform: none; align-items: flex-start; }
+.proto-rail.mini .pr-body { display: none; }
+/* caseta „inventar demo" e fixată de ecran în fiecare pagină; în jgheab curge în coloană */
+.proto-rail .invdemo { position: static; top: auto; left: auto; bottom: auto; transform: none; width: 100%; }
+.proto-rail .pr-body::-webkit-scrollbar { width: 6px; }
+.proto-rail .pr-body::-webkit-scrollbar-thumb { background: var(--gray-400); border-radius: 3px; }
+/* panoul însuși nu-și mai poziționează: geometria e a jgheabului */
+.proto-tools { background: #fff; border: 1px solid var(--gray-300); border-radius: var(--r-l); box-shadow: var(--shadow-pop); padding: 11px; }
 .proto-tools .pt-h { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--gray-600); margin-bottom: 9px; }
 .proto-tools .pt-row { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; }
 .proto-tools .pt-row + .pt-row { margin-top: 9px; }
@@ -391,6 +403,21 @@ body[data-export] .stickybar { display: none; }
 /* rândul care schimbă chiar pagina deschisă acum */
 .proto-tools .pt-sub.here .pt-lbl { color: var(--navy-500); font-weight: 800; }
 .proto-tools .pt-sub.here .pt-lbl::before { content: "▸ "; }
+
+/* ===== coloana de filtre lipită, derulată separat de rezultate =====
+   Comutatorul „Coloana de filtre" din panou. De la hartă în jos, coloana rămâne
+   pe ecran cât derulezi lista; când filtrele sunt mai înalte decât ecranul, se
+   derulează pe dinăuntru, fără să miște listingul. În modul de export (?nopanel=1)
+   e dezactivată — altfel captura de pagină întreagă ar tăia coloana la un ecran. */
+body[data-sticky-filters="on"]:not([data-export]) .listing-grid > aside {
+  position: sticky; top: 12px; align-self: start;
+  max-height: calc(100vh - 24px); overflow-y: auto; overscroll-behavior: contain;
+  padding-right: 6px; scrollbar-width: thin; }
+/* când bara de căutare lipită e coborâtă (62px), coloana începe sub ea */
+body[data-sticky-filters="on"]:not([data-export]):has(.ssearch.on) .listing-grid > aside {
+  top: 74px; max-height: calc(100vh - 86px); }
+body[data-sticky-filters="on"] .listing-grid > aside::-webkit-scrollbar { width: 6px; }
+body[data-sticky-filters="on"] .listing-grid > aside::-webkit-scrollbar-thumb { background: var(--gray-400); border-radius: 3px; }
 
 /* ===== densitate celule listing: A = complet / B = compact (iconițe mari) / C = minimal ===== */
 .lc-icons { display: none; align-items: stretch; gap: 8px; margin-top: 8px; }

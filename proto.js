@@ -764,6 +764,10 @@
     let pin = q.get('pin');
     if (!pin) { try { pin = localStorage.getItem('litro-pin'); } catch (e) { } }
     document.body.dataset.pin = ['off', 'inline', 'banner'].indexOf(pin) >= 0 ? pin : 'inline';
+    /* coloana de filtre lipită, derulată separat de listing (?stf=on|off) */
+    let stf = q.get('stf');
+    if (!stf) { try { stf = localStorage.getItem('litro-stickyFilters'); } catch (e) { } }
+    document.body.dataset.stickyFilters = stf === 'off' ? 'off' : 'on';
     applySession();
     /* ?nopanel=1 — folosit la exportul în Figma, ca panoul de demo să nu ajungă în ramă */
     if (q.get('nopanel')) {
@@ -806,18 +810,23 @@
       html += '<div class="pt-row"><span class="pt-lbl">' + (EN() ? 'Session' : 'Sesiune') + '</span><div class="pt-seg pt-sess">' +
         modes.map(([k, label]) => '<span class="pt-b' + (document.body.dataset.session === k ? ' on' : '') + '" data-sess="' + k + '">' + label + '</span>').join('') + '</div></div>';
     }
+    const yn = EN() ? [['on', 'Yes'], ['off', 'No']] : [['on', 'Da'], ['off', 'Nu']];
     if (hasListing) {
-      const rmodes = EN() ? [['on', 'Yes'], ['off', 'No']] : [['on', 'Da'], ['off', 'Nu']];
       html += '<div class="pt-row"><span class="pt-lbl">' + (EN() ? 'Room types on card' : 'Tipuri de cameră') + '</span><div class="pt-seg pt-rooms">' +
-        rmodes.map(([k, label]) => '<span class="pt-b' + (document.body.dataset.rooms === k ? ' on' : '') + '" data-rooms="' + k + '">' + label + '</span>').join('') + '</div></div>';
+        yn.map(([k, label]) => '<span class="pt-b' + (document.body.dataset.rooms === k ? ' on' : '') + '" data-rooms="' + k + '">' + label + '</span>').join('') + '</div></div>';
       if (!document.body.dataset.density) document.body.dataset.density = 'a';
       const modes = EN() ? [['a', 'Detailed'], ['b', 'Compact'], ['c', 'Icons']] : [['a', 'Detaliat'], ['b', 'Compact'], ['c', 'Iconițe']];
       html += '<div class="pt-row"><span class="pt-lbl">' + (EN() ? 'Card view' : 'Densitate celule') + '</span><div class="pt-seg pt-den">' +
         modes.map(([k, label]) => '<span class="pt-b' + (document.body.dataset.density === k ? ' on' : '') + '" data-d="' + k + '" title="' + label + '">' + k.toUpperCase() + '</span>').join('') + '</div></div>';
+      /* coloana de filtre: lipită și derulată separat de listing, sau curgând cu pagina */
+      const stfTitle = EN() ? 'Filters stay in view and scroll on their own, separately from the results'
+        : 'Filtrele rămân pe ecran și se derulează singure, separat de rezultate';
+      html += '<div class="pt-row"><span class="pt-lbl">' + (EN() ? 'Filter column' : 'Coloana de filtre') + '</span><div class="pt-seg pt-filt" title="' + stfTitle + '">' +
+        yn.map(([k, label]) => '<span class="pt-b' + (document.body.dataset.stickyFilters === k ? ' on' : '') + '" data-v="' + k + '">' +
+          (k === 'on' ? (EN() ? 'Sticky' : 'Lipită') : (EN() ? 'Flows' : 'Curge')) + '</span>').join('') + '</div></div>';
     }
     /* trei comutatoare independente pentru bara de căutare lipită — se văd pe orice
        pagină (starea se ține minte), dar e evidențiat rândul care schimbă pagina curentă */
-    const yn = EN() ? [['on', 'Yes'], ['off', 'No']] : [['on', 'Da'], ['off', 'Nu']];
     html += '<div class="pt-grp">' + (EN() ? 'Sticky search bar' : 'Bară de căutare lipită') + '</div>';
     [['stickyHome', 'Homepage', 'home'], ['stickyList', 'Listing', 'listing'], ['stickyHotel', 'Hotel', 'hotel']].forEach(([key, label, kind]) => {
       html += '<div class="pt-sub' + (PAGEKIND() === kind ? ' here' : '') + '"><span class="pt-lbl">' + label + '</span>' +
@@ -845,6 +854,11 @@
       $$('.pt-pin .pt-b', box).forEach(x => x.classList.toggle('on', x === b));
       if (pinApply) pinApply(b.dataset.pin);
     });
+    $$('.pt-filt .pt-b', box).forEach(b => b.onclick = () => {
+      document.body.dataset.stickyFilters = b.dataset.v;
+      try { localStorage.setItem('litro-stickyFilters', b.dataset.v); } catch (e) { }
+      $$('.pt-filt .pt-b', box).forEach(x => x.classList.toggle('on', x === b));
+    });
     $$('.pt-den .pt-b', box).forEach(btn => btn.onclick = () => {
       document.body.dataset.density = btn.dataset.d;
       $$('.pt-den .pt-b', box).forEach(b => b.classList.toggle('on', b === btn));
@@ -863,12 +877,33 @@
       $$('.pt-auth .pt-b', box).forEach(b => b.classList.toggle('on', b === btn));
     });
     applyAuth(document.body.dataset.auth);
-    // așează panoul chiar sub caseta „inventar demo", dacă există
+    /* Comenzile de demo stau într-un jgheab în stânga, împreună cu caseta „inventar
+       demo": o singură coloană care se derulează pe dinăuntru, deci nu mai poate fi
+       tăiată de marginea de jos a ecranului, oricâte comutatoare adăugăm. (Înainte
+       panoul era așezat cu getBoundingClientRect sub casetă și ieșea din ecran.)
+       Se strânge la o pastilă „⚙", ca să nu acopere coloana de filtre.            */
+    const rail = el('div', 'proto-rail');
+    const tgl = el('span', 'pr-min');
+    const rbody = el('div', 'pr-body');
+    rail.append(tgl, rbody);
     const inv = $('.invdemo');
-    if (inv) {
-      const place = () => { const r = inv.getBoundingClientRect(); box.style.top = (r.bottom + 10) + 'px'; box.style.left = r.left + 'px'; box.style.width = r.width + 'px'; box.style.bottom = 'auto'; };
-      place(); window.addEventListener('resize', place);
-    }
+    if (inv) rbody.appendChild(inv);
+    rbody.appendChild(box);
+    document.body.appendChild(rail);
+    let mini = false;
+    try { mini = localStorage.getItem('litro-panel') === 'mini'; } catch (e) { }
+    const paintRail = () => {
+      rail.classList.toggle('mini', mini);
+      tgl.textContent = mini ? '⚙ ' + (EN() ? 'Prototype · settings' : 'Prototip · setări') : '–';
+      tgl.title = mini ? (EN() ? 'Show the prototype controls' : 'Arată comenzile de prototip')
+        : (EN() ? 'Collapse' : 'Restrânge');
+    };
+    tgl.onclick = () => {
+      mini = !mini;
+      try { localStorage.setItem('litro-panel', mini ? 'mini' : 'open'); } catch (e) { }
+      paintRail();
+    };
+    paintRail();
   }
 
   /* ============================================================
@@ -2165,15 +2200,8 @@
       'nota din recenziile clienților noștri, raportul preț–calitate față de restul stațiunii și dacă hotelul are confirmare instantă.</p>' +
       '<p>Hotelurile nu pot plăti pentru o poziție mai bună în listă. Ofertele marcate „Doar la noi” sunt contractate exclusiv de agenția noastră.</p>' +
       '<p>Poți schimba oricând criteriul din meniul de sortare: preț, notă sau distanță față de plajă.</p>');
-
-    /* hint bar */
-    if (!sessionStorage.getItem('litroHint') && !navigator.webdriver) {
-      const hint = el('div', 'proto-hint');
-      hint.innerHTML = '<span><b>Prototip interactiv.</b> Caută, schimbă datele în calendar, filtrează, deschide galeria, alege o cameră și finalizează rezervarea — totul funcționează.</span><span class="x">✕</span>';
-      document.body.appendChild(hint);
-      $('.x', hint).onclick = () => { hint.remove(); sessionStorage.setItem('litroHint', '1'); };
-      setTimeout(() => { if (hint.isConnected) { hint.style.transition = 'opacity .4s'; hint.style.opacity = '0'; setTimeout(() => hint.remove(), 420); } }, 9000);
-    }
+    /* Aici stătea bara „Prototip interactiv" — scoasă: acoperea colțul din stânga jos,
+       adică exact comenzile de prototip. Ce se poate face pe ecran se vede din panou. */
   }
 
   /* ============================================================

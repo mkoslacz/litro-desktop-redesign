@@ -55,15 +55,22 @@ orange border, the **Filtre · Sortare · Hartă** row, the 3-step checkout step
 ### The floating "Prototype · settings" panel
 
 Demo switches never belong in the product UI, so they live in one floating panel — bottom right on
-mobile, bottom left on desktop:
+mobile, and on desktop in a left-hand rail that also holds the "Demo inventory" box. The rail is one
+column with its own internal scroll, so the panel can never be clipped by the bottom of the window
+however many switches it grows, and the `–` button collapses it to a `⚙ Prototip` pill in the corner
+when it would sit over the page. Both the collapsed state and every switch survive a page change.
 
 | Row | What it does |
 |---|---|
 | Language | RO ↔ EN, carrying destination and dates in the URL |
 | View | Desktop ↔ Mobile — the only way to reach the phone screens from a full-size browser window, and back |
 | Account | Guest ↔ Member (hides the "sign in for FRIENDS" bands) |
+| Session *(hotel)* | A visitor arriving cold vs one who came from our own listing |
 | Card view *(listing)* | A detailed · B compact with the date/board/room icon row · C horizontal summary |
+| Filter column *(listing)* | Sticky — from the map down the filters stay in view and scroll on their own, separately from the results — or flowing with the page |
 | Demo inventory *(listing)* | Many / Some / Few results — drives the count, the empty state and the flexible-date banner |
+| Sticky search bar | Three independent switches (homepage / listing / hotel); the row for the page you are on is marked |
+| Pinned card *(carousels)* | No pinned card · pinned as the first card in the row · pinned as a wide band above |
 
 Every one of these is also settable from the URL, on both desktop and mobile, so any state can be
 linked to directly — and so the Figma export can capture each variant without a click:
@@ -77,7 +84,10 @@ linked to directly — and so the Figma export can capture each variant without 
 | `?f=own` | Enter the listing with filters already applied (comma-separated keys; clears the page's presets first) |
 | `?rooms=on\|off` | Show or hide the "see all room types" expander on listing cards |
 | `?session=new\|site` | Hotel page: a visitor arriving cold (search bar on top) vs one who came from a listing |
-| `?nopanel=1` | Export mode: no demo panel, fixed bars join the normal flow |
+| `?sthome=`, `?stlist=`, `?sthotel=` `on\|off` | Sticky search bar, per page type |
+| `?pin=off\|inline\|banner` | The pinned campaign card on a carousel |
+| `?stf=on\|off` | Sticky filter column, scrolled separately from the results |
+| `?nopanel=1` | Export mode: no demo panel, fixed bars join the normal flow, filter column back in the page flow |
 
 ## Searching the whole coast by default
 
