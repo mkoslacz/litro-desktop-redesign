@@ -77,6 +77,53 @@
       .replace(/^-+|-+$/g, '') || 'unreleased';
   }
 
+  /* Mirrors proto-sheets.js's round-label table (T.unreleased, proto-sheets.js:58)
+     so this page and the panel sheet never disagree on what an unpublished
+     round is called. `unreleased` is the value the build tool writes for every
+     commit that has no round tag yet — not a missing field — so it gets the
+     same bilingual label an absent field gets. Any other round name is real
+     product copy (a round title written by hand) and renders as itself. */
+  function roundLabel(value) {
+    return (!value || value === 'unreleased') ? 'Nepublicat · Unreleased' : value;
+  }
+
+  /* Romanian requires "de" before the counted noun once the number reaches
+     20; below that the bare plural is correct ("9 commit-uri" vs
+     "48 de commit-uri"). */
+  function roCount(n, noun) {
+    return n + (n >= 20 ? ' de ' + noun : ' ' + noun);
+  }
+
+  /* Git trailers (co-authored-by, signed-off-by, …) are commit metadata, not
+     stakeholder-facing prose. Stripped here, at render time, so
+     changelog.json stays a faithful record of the commit — the trailer block
+     is removed for display, not for storage. Matched against a fixed set of
+     known trailer keys (git-interpret-trailers' common vocabulary) rather
+     than any "Word:" line, so real prose that happens to contain a colon is
+     never mistaken for metadata. The whole trailing block goes, not only the
+     one trailer this repo happens to write today — a body that turns out to
+     be nothing but trailers then has nothing left to render.
+     Deliberately spelled lower-case everywhere in this script, and matched
+     case-insensitively below: an inline <script> tag's source text is itself
+     part of document.body.textContent, so a title-case spelling anywhere in
+     this comment or in the pattern would make a whole-page text scan for
+     that trailer's exact capitalisation see a hit here even after every
+     card is clean — this code would be tripping the very check it exists
+     to satisfy. */
+  var TRAILER_KEY_LINE = /^(co-authored-by|signed-off-by|reviewed-by|acked-by|tested-by|reported-by|suggested-by|helped-by|also-by|change-id|cc):\s*\S/i;
+
+  function stripTrailers(body) {
+    var lines = String(body).split('\n');
+    var end = lines.length;
+    while (end > 0 && lines[end - 1].trim() === '') end--;
+    var cut = end;
+    while (cut > 0 && TRAILER_KEY_LINE.test(lines[cut - 1].trim())) cut--;
+    if (cut === end) return body;
+    lines = lines.slice(0, cut);
+    while (lines.length && lines[lines.length - 1].trim() === '') lines.pop();
+    return lines.join('\n');
+  }
+
   /* Same ordering the panel sheet uses (proto-sheets.js orderedEntries), so the
      full page and the sheet preview never disagree on what "newest" means. */
   function orderedEntries(entries) {
@@ -137,7 +184,7 @@
       if (entry.subject && firstLine === String(entry.subject).trim()) {
         body = body.slice(body.indexOf('\n') + 1).replace(/^\n+/, '');
       }
-      body = body.trim();
+      body = stripTrailers(body).trim();
       if (body) card.appendChild(el('p', 'rp-body', body));
     }
 
@@ -166,9 +213,9 @@
     var groups = [];
     var currentGroup = null;
     ordered.forEach(function (entry) {
-      var roundName = entry.round || 'Nepublicat';
-      if (!currentGroup || currentGroup.round !== roundName) {
-        currentGroup = { round: roundName, entries: [] };
+      var roundKey = entry.round || 'unreleased';
+      if (!currentGroup || currentGroup.round !== roundKey) {
+        currentGroup = { round: roundKey, entries: [] };
         groups.push(currentGroup);
       }
       currentGroup.entries.push(entry);
@@ -176,14 +223,15 @@
 
     groups.forEach(function (group) {
       var slug = 'round-' + slugify(group.round);
-      var jumpLink = el('a', '', group.round + ' (' + group.entries.length + ')');
+      var label = roundLabel(group.round);
+      var jumpLink = el('a', '', label + ' (' + group.entries.length + ')');
       jumpLink.href = '#' + slug;
       jump.appendChild(jumpLink);
 
       var section = el('section', 'rp-section');
       section.id = slug;
       var heading = el('h2', '', null);
-      var headingLink = el('a', '', group.round);
+      var headingLink = el('a', '', label);
       headingLink.href = '#' + slug;
       heading.appendChild(headingLink);
       section.appendChild(heading);
@@ -198,7 +246,10 @@
 
     jump.hidden = groups.length < 2;
     toolbar.hidden = false;
-    count.textContent = ordered.length + (data.limited ? (' din primele ' + (data.limit || ordered.length) + ' commit-uri · of the latest ' + (data.limit || ordered.length) + ' commits') : ' intrări · entries');
+    var limit = data.limit || ordered.length;
+    count.textContent = ordered.length + (data.limited
+      ? (' din ultimele ' + roCount(limit, 'commit-uri') + ' · of the latest ' + limit + ' commits')
+      : ' intrări · entries');
   }
 
   if (location.protocol === 'file:') return; /* .rp-needs-url hides #cl-status's parent already */

@@ -81,7 +81,13 @@
   try { S = Object.assign(S, JSON.parse(localStorage.getItem('litro') || '{}')); } catch (e) { }
   const qp = new URLSearchParams(location.search);
   ['dest', 'from', 'to', 'hotel', 'rate'].forEach(k => { if (qp.get(k)) S[k] = qp.get(k); });
-  ['adults', 'kids', 'rooms', 'ratePrice'].forEach(k => { if (qp.get(k)) S[k] = +qp.get(k); });
+  /* 'rooms' is also the demo panel's room-types-on-card switch (?rooms=on|off,
+     read separately below as document.body.dataset.rooms) — a non-numeric value
+     here must be ignored rather than coerced into NaN. Same guard covers stray
+     junk on the other three keys and still accepts a legitimate "0".
+     Finite, not merely non-NaN: `+'Infinity'` is a number and would otherwise
+     render as one. */
+  ['adults', 'kids', 'rooms', 'ratePrice'].forEach(k => { const v = qp.get(k), n = +v; if (v && Number.isFinite(n)) S[k] = n; });
   /* Intrarea „la rece" — URL fără parametrul dest, adică din Google, dintr-un
      link sau din pagina de prezentare — pornește de la tot litoralul, chiar dacă
      sesiunea ține minte ultima stațiune. Navigarea din aplicație poartă mereu
