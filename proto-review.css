@@ -135,6 +135,13 @@
 /* The nav strip is the only thing that makes the three pages one family from
    inside; the back-link is what makes them one family with the hub. */
 .rp-nav { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+/* `display` at class specificity beats the UA sheet's `[hidden] { display: none }`,
+   so a container that sets one renders while hidden — measured at 36.9 px of nav
+   on the changelog page and 34.9 px of live filter chips on the signed-out
+   comments page. Both are toggled through `hidden` by their page's script. Give
+   any further `display`-setting class its own entry here rather than weakening
+   the rule that made it visible. */
+.rp-nav[hidden], .rp-toolbar[hidden] { display: none; }
 .rp-nav a {
   padding: 7px 14px; border: 1px solid var(--rp-line); border-radius: 999px;
   background: var(--rp-surface); box-shadow: var(--rp-shadow);
@@ -232,13 +239,14 @@
 /* The primary affordance is the hub's orange button, so a review page and the
    hub offer the same-looking way out to a screen. */
 /* Typed as a.rp-btn so it also wins inside a card, where `.rp-card a` would
-   otherwise repaint the label navy on orange. */
-a.rp-btn {
-  display: inline-block; padding: 9px 18px; border-radius: 10px;
+   otherwise repaint the label navy on orange. Also typed as button.rp-btn
+   so a button element renders as designed rather than as a UA default. */
+a.rp-btn, button.rp-btn {
+  display: inline-block; padding: 9px 18px; border: 0; border-radius: 10px;
   background: var(--rp-orange); color: #fff;
-  font-size: 14px; font-weight: 700; text-decoration: none;
+  font: inherit; font-size: 14px; font-weight: 700; text-decoration: none; cursor: pointer;
 }
-a.rp-btn:hover { filter: brightness(.95); }
+a.rp-btn:hover, button.rp-btn:hover { filter: brightness(.95); }
 a.rp-btn-alt { background: var(--rp-surface); color: var(--rp-orange); box-shadow: inset 0 0 0 1.5px var(--rp-orange); }
 .rp-btn + .rp-btn { margin-left: 6px; }
 
