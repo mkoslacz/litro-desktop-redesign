@@ -63,6 +63,16 @@ jobs:
         run: |
           generated=()
           add_if_present() {
+            # An ignored path is not "absent" — it exists on the runner and the
+            # regenerator still writes it. `git add` refuses it and, under
+            # `bash -e`, takes the whole job down with it. docs/ is ignored on
+            # purpose: this repository is public and Pages serves it from the
+            # branch, so the review apparatus stays untracked. Ask git what it
+            # will accept rather than maintaining a second list of what is
+            # ignored, so the next ignore rule does not redden this job again.
+            if git check-ignore -q -- "$1" 2>/dev/null; then
+              return
+            fi
             if [[ -e "$1" ]] || git ls-files --error-unmatch -- "$1" >/dev/null 2>&1; then
               generated+=("$1")
             fi
