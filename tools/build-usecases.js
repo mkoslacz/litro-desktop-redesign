@@ -291,9 +291,10 @@ function writeAtomic(file, contents) {
   }
 }
 
-function chromePath() {
-  return process.env.CHROME_PATH || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
-}
+/* Kept as a local name because the capture path injects it as a dependency;
+   the resolution itself is shared with the other browser tools, which used to
+   hardcode the macOS path and therefore died on the CI runner. */
+const chromePath = require('./chrome-path');
 
 function timeout(promise, ms, description) {
   let timer;

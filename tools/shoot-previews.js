@@ -3,8 +3,9 @@
 //   node tools/shoot-previews.js [nazwa ...]
 const puppeteer = require('puppeteer-core');
 const path = require('path');
+const chromePath = require('./chrome-path');
 
-const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+const CHROME = chromePath();
 const ROOT = path.resolve(__dirname, '..');
 
 const PAGES = [

@@ -1,8 +1,9 @@
 const puppeteer = require('puppeteer-core');
 const fs = require('fs');
+const chromePath = require('./chrome-path');
 (async () => {
   const browser = await puppeteer.launch({
-    executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+    executablePath: chromePath(),
     headless: 'new', args: ['--hide-scrollbars'],
   });
   const pages = [
