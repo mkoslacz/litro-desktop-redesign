@@ -1,9 +1,19 @@
 {
-  "generatedAt": "2026-08-06T13:17:38.164Z",
+  "generatedAt": "2026-08-06T14:26:32.068Z",
   "repository": "https://github.com/mkoslacz/litro-desktop-redesign",
   "limited": true,
   "limit": 50,
   "entries": [
+    {
+      "sha": "b412c311349c997ba9b760ae1c2ac592eec9e129",
+      "short": "b412c31",
+      "date": "2026-08-06",
+      "subject": "build: stop Pages running a static prototype through Jekyll",
+      "body": "This site is plain static HTML — there is no _config.yml, no front matter in\nany page, and nothing here wants Liquid. Pages was building it with Jekyll\nanyway, because that is the default for a branch source without .nojekyll.\n\nTwo consequences, one silent and one loud. Silent: Jekyll drops paths starting\nwith an underscore, so _seed.html was never published. Loud: it walks and\ncopies all 327 files, including ~70 MB of preview PNGs and .fig binaries, and\nevery deployment since this push has entered in_progress and been killed at\nthe ten-minute timeout.\n\n.nojekyll makes Pages upload the tree as it stands.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/b412c311349c997ba9b760ae1c2ac592eec9e129"
+    },
     {
       "sha": "ca98209ccfc885c7fe1f5403ee80e7eecd31e26e",
       "short": "ca98209",
@@ -747,20 +757,6 @@
       ],
       "round": "unreleased",
       "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/35b595f7bc46652ec3551fc9243e51dbe90bc1a3"
-    },
-    {
-      "sha": "7432576c7d460644acaed544cc641b35b714af62",
-      "short": "7432576",
-      "date": "2026-07-19",
-      "subject": "Add homepage variant B — the homepage IS the listing",
-      "body": "Parallel concept modelled on travelist.pl/hotele, in the LITRO design system:\nfull-bleed hero with the search overlaid + proof numbers, theme tiles for the\noffer programmes, results bar with sort and 'how we rank' modal, filter rail,\nwide deal cards (campaign badges, review quote, perk chips, hotel price vs our\nprice with savings, credits), 'picked for you' strip, FRIENDS band, call-centre\nrescue block, pagination, tabbed see-also index, newsletter, trust band.\n\nFully wired into the prototype (filters, sort, calendar, cards all work) and a\nfloating A/B switcher on both homepages.\n\nCo-Authored-By: Claude Fable 5 <noreply@anthropic.com>",
-      "screens": [
-        "home-b.html",
-        "home.html",
-        "index.html"
-      ],
-      "round": "unreleased",
-      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/7432576c7d460644acaed544cc641b35b714af62"
     }
   ]
 }
