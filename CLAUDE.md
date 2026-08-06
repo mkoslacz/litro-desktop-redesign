@@ -8,6 +8,42 @@ Local preview: `node tools/serve.js` (port 8080, `Cache-Control: no-store` on ev
 is what stops the preview pane testing a stale `proto.js`/`proto.css`). **`no-store` also disables
 Chrome's bfcache**, so any back-navigation bug that depends on a restored page is invisible on this
 server and shows up only on GH Pages — to reproduce one, serve the folder with cacheable headers.
+The port is overridable — `PORT=8090 node tools/serve.js` — and on this machine 8080 is sometimes
+held by an unrelated dev server that answers **200 to every path** with an SPA fallback. A
+measurement taken against it looks plausible and is worthless, so confirm the server you reached is
+this one before believing a number.
+
+## The comment layer — rules a later card must read before touching it
+
+Round 2 of the operator-findings loop existed almost entirely because the rules below lived in code
+comments and nowhere a planner would look. Three of its fourteen findings were defects *created by
+the round that fixed the previous fourteen*. Write the rule here, not only beside the function.
+
+- **Two link kinds, and they must not share a base.** `pageBase()` / `deepLink()` resolve against
+  the origin the reviewer is actually on and are the ONLY correct builders for anything clicked
+  in-page. `shareBase()` / `shareLink()` resolve against `config.prototypeUrl` and exist solely for
+  a link meant to be pasted somewhere else — a copy-link affordance. Used at an in-page call site,
+  `shareLink` walks the reviewer off their own copy onto the published site, and a `replaceState`
+  built from it throws `SecurityError`. This has now been the root cause twice (`OP-01`, then
+  `IV-01` at a call site the `OP-01` fix created).
+- **A page that owns no anchors passes `overview: true`.** It suppresses pins, the tray and the
+  orphan write at the source. Hiding that chrome with CSS is not suppressing it: `renderThreads()`
+  still runs and still writes `orphaned` to Firestore from a page that calls itself read-only.
+- **Page identity is the whole normalised path, never the basename.** `docs/listing-c.html` and
+  `/listing-c.html` are different pages. `belongsToThisPage()`, `needsRestore()` and
+  `safePagePath()` must agree — when the navigate decision and the render decision disagree, a pin
+  renders where its deep link will not go.
+- **A thread with no `anchor.page` renders but is never written about.** The permissive render is
+  load-bearing for threads stored before the field existed; the layer simply cannot establish
+  orphanhood for a thread it cannot locate to a page, so it must not claim to.
+- **`protoComments.init({store})` is NOT a seam for counting store writes.** `privateOrphanUpdate`
+  resolves the store through a `STORE_PRIVATE` WeakMap that only `createFirebaseClient` populates,
+  so an injected plain store makes every orphan write a silent no-op and any `updateDoc` count a
+  vacuous zero. A DoD that says "counted on an injected store" must inject `createFirebaseClient`
+  plus `loadModule` instead.
+- **Reading live threads requires an allowlisted Google sign-in** (`comments.rules`, named
+  allowlist, no domain rule, no open mode). Any verification without those credentials is a
+  behavioural check through the injected seam, and must say so rather than claim the live path.
 
 ## Known Issues
 
@@ -70,6 +106,15 @@ surfaces** (desktop/mobile × RO/EN), because that is exactly where v2's finding
 10. Every demo-panel state stays URL-addressable (`?density= ?per= ?stf= ?sthome/stlist/sthotel=
     ?pin= ?session= ?auth= ?assets= ?inv=`) — it is the workshop review surface and the future
     experiment-flag register.
+    **A parameter in this register can also be a search-state key, and then both readers must
+    keep working.** `?rooms=` is the worked example: the panel reads `on`/`off`, the search state
+    reads a number, and the numeric reader coerced unconditionally — so `?rooms=on` rendered
+    "NaN camere" on four of the twenty-two use-case deep links, i.e. on the page built to
+    demonstrate the prototype's states (`IV-06`). **Never rename the axis to break the tie** — the
+    key is in this register, `usecases.json` documents it and live deep links carry it, so a rename
+    trades a rendering bug for a broken-link bug across the whole review surface. Narrow the
+    reader instead: a query value enters numeric search state only when it parses as a **finite**
+    number, and a legitimate `0` still counts.
 
 **Violated today — a fix must satisfy these:**
 
