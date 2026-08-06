@@ -44,6 +44,14 @@ the round that fixed the previous fourteen*. Write the rule here, not only besid
 - **Reading live threads requires an allowlisted Google sign-in** (`comments.rules`, named
   allowlist, no domain rule, no open mode). Any verification without those credentials is a
   behavioural check through the injected seam, and must say so rather than claim the live path.
+- **This prototype and the `design-prototype` template currently disagree in two places, and the
+  prototype is the one that is right.** Decided by the operator on 2026-08-06; the template moves
+  when someone next touches it. A thread with no `anchor.page` keeps the permissive render and skips
+  only the orphan write (the template returns "belongs to no page"); and the template's contract
+  test bans `shareLink(` outright, which now forbids the copy-link affordance that is that
+  function's one legitimate use — the ban narrows to the row's `href`. Do not "fix" the prototype
+  towards the template. Both are open findings — `IV-16` and `IV-17` in
+  `docs/impl-guides/…-verify-report-20260806-1016.md`.
 
 ## Known Issues
 
