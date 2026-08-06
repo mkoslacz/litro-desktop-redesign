@@ -8,15 +8,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="proto-review.css">
 <script>if (location.protocol === 'file:') document.documentElement.dataset.origin = 'file';</script>
-<style>
-  /* This page borrows proto-comments.js's store, not its on-screen UI: the
-     pin toolbar, detached tray and popover it builds are addressed to a
-     screen with anchors to pin against, which comments.html is not. Keep
-     them out of the flow entirely rather than fighting their positioning —
-     their hidden attribute is toggled by the layer itself, so display:none
-     has to win regardless of that toggle. */
-  .proto-comments-tools, .proto-comments-tray, .proto-comments-popover { display: none !important; }
-</style>
 </head>
 <body class="rp-page">
 <div class="rp-wrap">
@@ -128,7 +119,55 @@
     return page || 'Pagină necunoscută · Unknown page';
   }
 
-  function safeLink(layer, thread) {
+  // The file a page reference names, with any query or hash stripped and the
+  // directory form normalised to the index file — the same equivalence
+  // proto-comments.js's own fileNameOf encodes.
+  function fileNameOf(page) {
+    var path = String(page == null ? '' : page).split('#')[0].split('?')[0];
+    return path.split('/').pop() || 'index.html';
+  }
+
+  /* Two link kinds live on this card and they must not be confused.
+     deepLink() resolves against the origin the reviewer is actually on;
+     shareLink() resolves against the configured prototypeUrl and belongs only
+     to a link handed to somebody else. The row below is clicked, not pasted:
+     built from shareLink it walked a reviewer reading their own copy straight
+     onto the published site — the same defect the pins carried, at the one
+     surface whose whole job is linking to other pages.
+
+     The no-link case is decided here, not caught. deepLink never throws: an
+     anchor it cannot resolve falls back to the page being viewed, which on this
+     page is the overview itself, so a catch block waits for an exception that
+     never arrives while a thread with a hostile or broken anchor gets a
+     confident, live-looking link back to this very page. Compare the file the
+     produced URL actually names against the file anchor.page claimed, and a
+     fallback is visible as the mismatch it is. Comparing file names rather than
+     whole hrefs is deliberate: deepLink legitimately adds the carried query
+     string and the #c= hash.
+
+     The second test is the overview's own page. A thread anchored to
+     comments.html is not a mismatch — the claim and the result agree — but
+     since IMPL-13 the overview draws no pins, so a link there opens nothing.
+     A row pointing back at the page the reviewer is already reading is the
+     "link to nowhere" this guard exists to remove, so it gets the sentence too.
+     The try/catch stays — it is still the right guard for a thread with no
+     anchor at all. */
+  function pinLink(layer, thread) {
+    var anchor = (thread && thread.anchor) || {};
+    if (!anchor.page) return null;
+    try {
+      var url = layer.deepLink(thread);
+      if (fileNameOf(url.pathname) !== fileNameOf(anchor.page)) return null;
+      return url.pathname === layer.pageBase().pathname ? null : url.href;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  // The one place prototypeUrl belongs: an absolute URL the reviewer copies and
+  // hands to somebody else. shareBase() falls back to pageBase() when no
+  // prototypeUrl is configured, so this stays usable rather than throwing.
+  function shareHref(layer, thread) {
     try {
       return layer.shareLink(thread).href;
     } catch (error) {
@@ -182,7 +221,8 @@
     var messages = Array.isArray(thread.messages) ? thread.messages : null;
     var first = messages && messages[0];
     var replies = messages ? messages.slice(1) : [];
-    var link = safeLink(layer, thread);
+    var link = pinLink(layer, thread);
+    var share = shareHref(layer, thread);
 
     var card = document.createElement('article');
     card.className = 'rp-card';
@@ -243,6 +283,35 @@
       span.textContent = 'Legătura nu se poate construi (pagina ancorei lipsește sau e invalidă). · Link could not be built (the anchor page is missing or invalid).';
       links.appendChild(span);
     }
+    /* The absolute form of the SAME link, for handing to somebody who is not on
+       this origin. Gated on the row link existing: shareLink runs through the
+       same deepLink fallback, so on a thread whose anchor does not resolve it
+       produces a confident absolute URL to the overview itself — offering
+       "copy link" beside "the link could not be built" would hand out exactly
+       the link-to-nowhere the row above just refused to render.
+       The URL is carried in the DOM so the copy still has something to offer
+       where the async clipboard API is unavailable (a non-secure origin, a
+       denied permission), rather than failing silently. */
+    if (share && link) {
+      var copy = document.createElement('button');
+      copy.type = 'button';
+      copy.className = 'rp-chip cm-copy';
+      copy.dataset.share = share;
+      copy.textContent = 'Copiază linkul · Copy link';
+      copy.onclick = function () {
+        var done = function (ok) { copy.textContent = ok ? 'Copiat · Copied' : share; };
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(share).then(function () { done(true); }, function () { done(false); });
+          } else {
+            done(false);
+          }
+        } catch (error) {
+          done(false);
+        }
+      };
+      links.appendChild(copy);
+    }
     card.appendChild(links);
 
     return card;
@@ -265,23 +334,56 @@
   // routed through the layer's own concurrency limiter) is untouched, so this
   // is still the one store this page reads from, never a second client.
   var hydrating = {};
+  var hydrateDepth = 0;
+  var savedNeedsRestore = null;
+  var savedReplaceState = null;
+
   function hydrate(layer, threads) {
     var pending = threads.filter(function (thread) {
       return !Array.isArray(thread.messages) && !hydrating[thread.id];
     });
     if (!pending.length) return;
     pending.forEach(function (thread) { hydrating[thread.id] = true; });
-    var originalNeedsRestore = layer.needsRestore;
-    var originalReplaceState = history.replaceState;
-    layer.needsRestore = function () { return false; };
-    history.replaceState = function () {};
+    /* Patch on 0 → 1 and restore on 1 → 0, never once per batch. Batches
+       overlap here — the initial list() delivery and the first subscribe()
+       update arrive together, which is the ordinary path — and a save/restore
+       pair per batch makes the second batch capture the *stub* as its
+       "original". Restoring that installs the stub permanently, and the page
+       has lost history.replaceState for the rest of its life. A counter also
+       survives a third batch starting while two are in flight, which a boolean
+       would not. */
+    if (hydrateDepth === 0) {
+      savedNeedsRestore = layer.needsRestore;
+      savedReplaceState = history.replaceState;
+      layer.needsRestore = function () { return false; };
+      history.replaceState = function () {};
+    }
+    hydrateDepth += 1;
     Promise.all(pending.map(function (thread) {
-      return layer.openThread(thread).catch(function (error) {
+      // Release the in-flight marker, or a thread whose detail fetch failed
+      // once is never retried and its card stays on "Se încarcă textul…" even
+      // on a later delivery that would have succeeded. Left set on success,
+      // where the messages array is the guard.
+      var failed = function (error) {
+        delete hydrating[thread.id];
         if (window.console && console.error) console.error('[comments.html] thread detail failed:', thread.id, error);
-      });
+      };
+      // A throw *before* the promise exists is caught here too: uncaught it
+      // would skip Promise.all entirely and strand the counter above 0, which
+      // is the one way a counter still loses replaceState for good.
+      try {
+        return Promise.resolve(layer.openThread(thread)).catch(failed);
+      } catch (error) {
+        failed(error);
+        return Promise.resolve();
+      }
     })).finally(function () {
-      layer.needsRestore = originalNeedsRestore;
-      history.replaceState = originalReplaceState;
+      hydrateDepth -= 1;
+      if (hydrateDepth > 0) return;
+      layer.needsRestore = savedNeedsRestore;
+      history.replaceState = savedReplaceState;
+      savedNeedsRestore = null;
+      savedReplaceState = null;
     });
   }
 
@@ -330,7 +432,21 @@
     // state (already signed in from a previous visit, or already loaded) is
     // reflected too, not just future changes.
     signedOutEl.hidden = Boolean(layer.user);
-    if (Array.isArray(layer.threads) && layer.threads.length) render(layer);
+    /* Unconditional on a delivery having happened, and render *and* hydrate.
+       Guarding on `layer.threads.length` read an empty store and a store that
+       has not answered yet as the same state: an empty prototype sat on
+       "Se încarcă firele de discuție…" for ever instead of showing the empty
+       state. threadsDelivered is the flag that tells the two apart. Hydrating
+       here as well as rendering matters because a delivery that landed before
+       wire() replaced setThreads would otherwise leave every card on
+       "Se încarcă textul…" — render alone reflects half of it. Re-rendering a
+       delivery the patched setThreads already handled is harmless:
+       replaceChildren makes render idempotent and the hydrating map makes
+       hydrate idempotent. */
+    if (layer.threadsDelivered) {
+      render(layer);
+      hydrate(layer, layer.threads);
+    }
   }
 
   if (!window.protoComments) {
@@ -339,7 +455,15 @@
     return;
   }
 
-  protoComments.init().then(function (layer) {
+  /* `overview: true` is what keeps this page read-only, and it is the only
+     mechanism that does. Without it the layer draws pins against a page that
+     owns no anchors, every thread misses, and each miss is written back to the
+     store as `orphaned: true` — a backend write issued by opening a page whose
+     own copy says it only reads. The `display:none` rule this page used to
+     carry hid the layer's chrome without stopping any of that, and a second
+     mechanism that has to agree with the first one for ever is worse than
+     none. */
+  protoComments.init({ overview: true }).then(function (layer) {
     if (!layer) {
       loadingEl.hidden = true;
       unconfiguredEl.hidden = false;
