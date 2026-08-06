@@ -1,11 +1,12 @@
 /* ============================================================
-   PANEL CONTENT SHEETS — changelog + product use cases
+   PANEL CONTENT SHEETS — changelog, product use cases, comments
    ============================================================
 
-   Two read-only sheets that hang off the demo panel: what changed between
-   workshop rounds, and what each demo state actually means as a product
-   situation. They are content, not state axes, so nothing here writes to
-   body.dataset and nothing is fetched until a reviewer opens the sheet.
+   Three read-only sheets that hang off the demo panel: what changed between
+   workshop rounds, what each demo state actually means as a product
+   situation, and what the comments overview page is. They are content, not
+   state axes, so nothing here writes to body.dataset, and the two fetched
+   sheets fetch nothing until a reviewer opens them.
 
    One module serves both engines. The desktop panel (proto.js) and the mobile
    panel (proto-m.js) build different rows, but a sheet is the same object in
@@ -15,20 +16,22 @@
 
      protoSheets.mount(box, { en: EN(), carry: qs() });
 
-   Both files are generated:
+   Two files are generated:
      changelog.json      ← node tools/build-changelog.js   (after the commit)
      usecases.built.json ← node tools/build-usecases.js    (from usecases.json)
 
    fetch() cannot read a sibling file over file://, so from a local copy the
-   sheets say so instead of failing silently. Serve the folder (node
-   tools/serve.js) or use the published URL to read them.
+   two fetched sheets say so instead of failing silently. Serve the folder
+   (node tools/serve.js) or use the published URL to read them. The comments
+   sheet has no file to fetch — see addStaticSheet.
 
    A sheet is a preview, not the whole surface: the panel column is ~280 px
    wide and the changelog sheet is capped at CHANGELOG_LIMIT entries. Each
    sheet therefore carries a link to its full review page (changelog.html,
-   usecases.html — see proto-review.css for the shared shell), and the link is
-   built outside the fetched content so it survives every failure path,
-   including file://, where the sheet itself has nothing to show.        */
+   usecases.html, comments.html — see proto-review.css for the shared shell),
+   and the link is built outside the fetched content so it survives every
+   failure path, including file://, where the sheet itself has nothing to
+   show.                                                                  */
 
 (function (global) {
   'use strict';
@@ -38,6 +41,7 @@
   const USECASES_DOCS = 'docs/usecases.md';
   const CHANGELOG_PAGE = 'changelog.html';
   const USECASES_PAGE = 'usecases.html';
+  const COMMENTS_PAGE = 'comments.html';
   const CHANGELOG_LIMIT = 25;
 
   /* Sheet chrome is prototype scaffolding, so it is labelled in both languages
@@ -46,6 +50,11 @@
   const T = {
     changelog: ['Jurnal de modificări', 'Changelog'],
     usecases: ['Situații de utilizare', 'Use cases'],
+    comments: ['Comentarii pe prototip', 'Prototype comments'],
+    commentsBody: [
+      'Toate firele de discuție, grupate pe ecran, cu răspunsuri și stare. Cere autentificare, ca și pinurile de pe ecrane.',
+      'Every comment thread, grouped by screen, with replies and status. Requires sign-in, like the pins on the screens.',
+    ],
     needsUrl: ['Foaia se citește doar de pe adresa publicată.', 'This sheet needs the published URL.'],
     noFetch: ['Browserul nu poate încărca această foaie.', 'This browser cannot load this sheet.'],
     loading: ['Se încarcă…', 'Loading…'],
@@ -185,6 +194,42 @@
             catch (error) { sheetMessage(sheet, t('unreadable')); }
           })
           .catch(() => sheetMessage(sheet, t('unloadable')));
+      };
+    }
+
+    /* The comments overview has no changelog-like data for this sheet to
+       fetch and list — the layer's own toolbar (proto-comments.js) is where
+       a live count belongs. So this sheet skips the fetch-and-render path
+       addContentSheet drives and just states what the page is, built once at
+       mount rather than lazily on toggle. The page link still sits beside
+       the sheet, not inside it, for the exact reason addContentSheet's does:
+       the way out must survive every draw and every failure path, including
+       file://, where there is nothing to fetch here anyway. */
+    function addStaticSheet(options) {
+      const sheetRow = makeEl('div', 'pt-row pt-sheet-row');
+      const toggle = makeEl('button', 'pt-sheet-toggle', options.title);
+      const sheet = makeEl('section', 'pt-sheet');
+      const pageLink = makeEl('a', 'pt-sheet-page', t('fullPage'));
+      const sheetId = 'pt-sheet-' + (++sheetNumber);
+
+      toggle.type = 'button';
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.setAttribute('aria-controls', sheetId);
+      sheet.id = sheetId;
+      sheet.hidden = true;
+      sheet.appendChild(makeEl('p', 'pt-sheet-message', options.body));
+      pageLink.href = options.page;
+      pageLink.hidden = true;
+      sheetRow.appendChild(toggle);
+      sheetRow.appendChild(sheet);
+      sheetRow.appendChild(pageLink);
+      sheets.appendChild(sheetRow);
+
+      toggle.onclick = () => {
+        const opening = sheet.hidden;
+        sheet.hidden = !opening;
+        pageLink.hidden = !opening;
+        toggle.setAttribute('aria-expanded', String(opening));
       };
     }
 
@@ -342,6 +387,7 @@
 
     addContentSheet({ src: CHANGELOG_SRC, page: CHANGELOG_PAGE, title: t('changelog'), render: renderChangelog });
     addContentSheet({ src: USECASES_SRC, page: USECASES_PAGE, title: t('usecases'), render: renderUsecases });
+    addStaticSheet({ page: COMMENTS_PAGE, title: t('comments'), body: t('commentsBody') });
   }
 
   global.protoSheets = { mount: mount };

@@ -19,6 +19,7 @@
   const FIREBASE_CDN = 'https://www.gstatic.com/firebasejs/10.12.2/';
   const COMMENTS_CONFIG_FILE = 'comments.config.json';
   const COMMENTS_CONFIG_SCHEMA_FILE = 'comments.config.schema.json';
+  const OVERVIEW_PAGE = 'comments.html';
   const THREAD_PAGE_SIZE = 50;
   const DETAIL_CONCURRENCY = 4;
   const STORE_PRIVATE = new WeakMap();
@@ -630,6 +631,23 @@
         + '<button type="button" class="pc-add" disabled>Add comment</button>'
         + '<button type="button" class="pc-more" hidden>Load older comments</button>'
         + '<label class="pc-filter"><input type="checkbox"> Show resolved</label>';
+      /* "What else is open?" is a question asked from inside a pin, not only
+         from the hub — proto-sheets.js gives the demo panel the matching
+         .pt-sheet-page link (IMPL-25); this is the toolbar's half, the
+         cheaper of the two routes since it is the surface already on screen.
+         Built from pageBase(), the ONLY correct base for anything clicked
+         in-page — shareBase() resolves against config.prototypeUrl and would
+         walk a reviewer off their own copy onto the published site (see
+         CLAUDE.md, "Two link kinds, and they must not share a base").
+         Assigned via the .href property rather than folded into the
+         innerHTML string above, so nothing built from location.href can
+         break out of the markup. RO/EN pair per CLAUDE.md funnel invariant
+         #11; the four controls above predate that rule and are unchanged. */
+      const overview = document.createElement('a');
+      overview.className = 'pc-overview';
+      overview.href = new URL(OVERVIEW_PAGE, this.pageBase()).href;
+      overview.textContent = document.documentElement.lang === 'en' ? 'Open the comments' : 'Deschide comentariile';
+      this.toolbar.appendChild(overview);
       this.tray = document.createElement('aside');
       this.tray.className = 'proto-comments-tray';
       this.tray.hidden = true;
