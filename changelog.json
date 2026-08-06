@@ -1,0 +1,798 @@
+{
+  "generatedAt": "2026-08-06T06:14:46.232Z",
+  "repository": "https://github.com/mkoslacz/litro-desktop-redesign",
+  "limited": true,
+  "limit": 50,
+  "entries": [
+    {
+      "sha": "03b7e424c38728f57a784f26643a54b555ca33fe",
+      "short": "03b7e42",
+      "date": "2026-08-06",
+      "subject": "Record the review lifecycle this prototype is now driven by",
+      "body": "The audits, the implementation guides, the implementation and verification reports\nand the project brief were all sitting untracked. They are the argument for every\nchange above, and the /impl-guide chain reads them by exact path — an untracked\nlifecycle artifact is one `git clean` from taking the reasoning with it.\n\nIncludes iteration 2's guide, which plans the fourteen findings the verification of\niteration 1 emitted.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/03b7e424c38728f57a784f26643a54b555ca33fe"
+    },
+    {
+      "sha": "5c21d774bf867c9a39fbac648f57823d39f9b902",
+      "short": "5c21d77",
+      "date": "2026-08-06",
+      "subject": "Give comments a page they can be read from, and the review round three pages it can be handed",
+      "body": "A stakeholder comment was reachable only by finding its pin on the screen it was\nwritten on. Nobody could see how many threads were open, what they said, or which\nscreens carried them — which is the question a workshop round opens with. The same\nwas true of the changelog and the product use cases: both existed, both were\nreadable only through a ~280 px sheet inside the floating panel.\n\nSo there are now three pages built for reading — changelog.html, usecases.html and\ncomments.html — linked from the hub and from the panel sheets, each linking back\ninto the screens or states it describes. They share one stylesheet, proto-review.css,\nand one contract about file://: a browser may not read sibling files there, so the\npages say so instead of sitting empty.\n\nUnderneath, the comment layer itself had five defects that only showed up once it\nran against a live Firebase project rather than being read:\n\n  · A configured prototypeUrl won over the page actually open, so history.replaceState\n    threw SecurityError and the pin did nothing on any other origin. There are two\n    kinds of link here and now two bases: pageBase() for anything in-page, shareBase()\n    only for a link meant to be pasted to somebody else.\n  · Three catch blocks discarded the cause, so a rules rejection, a missing document\n    and a cross-origin failure all read as one sentence.\n  · The error popover kept the last thread's coordinates — measured 9 000 px below\n    the fold, so the reviewer saw neither the thread nor the error explaining it.\n  · A pin drew on both language siblings, because identical markup means a selector\n    written on one resolves on the other. A pin now belongs to its own page.\n  · The popover clamped without subtracting its own width, so it ran off the right edge.\n\nComments are live on Firebase with a named allowlist in Firestore; comments.rules is\nthe deployed policy and comments.config.json points at the project.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>",
+      "screens": [
+        "changelog.html",
+        "checkout-en.html",
+        "checkout.html",
+        "comments.html",
+        "home-b.html",
+        "home-c-en.html",
+        "home-c.html",
+        "home-d-en.html",
+        "home-d.html",
+        "home.html",
+        "hotel-en.html",
+        "hotel.html",
+        "index.html",
+        "listing-b.html",
+        "listing-c-en.html",
+        "listing-c.html",
+        "listing.html",
+        "m-checkout-en.html",
+        "m-checkout.html",
+        "m-home-en.html",
+        "m-home.html",
+        "m-hotel-en.html",
+        "m-hotel.html",
+        "m-listing-en.html",
+        "m-listing.html",
+        "m-thankyou-en.html",
+        "m-thankyou.html",
+        "thankyou-en.html",
+        "thankyou.html",
+        "usecases.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/5c21d774bf867c9a39fbac648f57823d39f9b902"
+    },
+    {
+      "sha": "c85e402a3b9b7b949f50272b53a0f55a0f0f45d4",
+      "short": "c85e402",
+      "date": "2026-07-30",
+      "subject": "Make the page length a switch: 10 / 20 / 30 results",
+      "body": "How long a result page should be is a product question, not a constant. The panel\nrow \"Rezultate pe pagină\" (and ?per=10|20|30) moves the list and the pager together:\nthirty cards is a long scroll before anyone reaches pagination, ten brings the pager\ninto the first screen and puts more weight on sorting.\n\nThe DOM always holds the full thirty cards — PAGE_SIZE only decides how many are\nshown, so the switch is instant and nothing is re-rendered. The visibility cap is now\nmin(demo inventory, page size), so the demo inventory switch keeps working on top of\nit. Read before the export early-return, so a Figma frame can be captured at any page\nlength.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/c85e402a3b9b7b949f50272b53a0f55a0f0f45d4"
+    },
+    {
+      "sha": "c46bcb4ac72d9c552ae51e671cac1b9e7069bc2c",
+      "short": "c46bcb4",
+      "date": "2026-07-30",
+      "subject": "Make a page of results really hold a page of results, and let the big photo be leafed through",
+      "body": "Two things the prototype was claiming but not doing.\n\nThe pager says \"Afișăm 1–30 din 1 236 cazări\" while the list held six hand-written\ncards, so the first screen contradicted itself and the demo inventory switch could\nnever show a full page. fillListingPage() now clones the hand-written cards up to\nPAGE_SIZE before anything else in initListing() runs, so every new card gets the\nsame gallery, filters and room expander. A clone varies what belongs to a property\n— name, resort, distance to the beach, stars, score, reviews, price, photo, room\ntype, quote — and inherits the rest from its source card, so the chips never drift\nfrom the data attributes behind them. The names are real properties from\nlitoralulromanesc.ro, Mamaia first and then along the coast, which is what the\ndefault \"Tot litoralul\" search means; in production-photo mode each pulls its own\nphotos, so a full page also shows how uneven the real photo base is.\n\nThe big photo at the top of the hotel page now carries the same arrows as a listing\ncard, plus a counter, so the property's own photos can be leafed through in place.\nGuest photos stay behind the gallery, and clicking the photo still opens the mosaic.\n\nAlso fixed on the way: a card with data-disc=\"0\" but an .old-price element rendered\na struck-through \"0 Lei\" (visible on home-b, and multiplied by the clones); the\nstrikethrough now hides itself when there is no discount. Hub previews are lazy-loaded\n— with 30-card listings the page was pulling ~50 MB of PNGs at once.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>",
+      "screens": [
+        "index.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/c46bcb4ac72d9c552ae51e671cac1b9e7069bc2c"
+    },
+    {
+      "sha": "fd2aa80ee05b29a64360c3c6ea146579202a5b16",
+      "short": "fd2aa80",
+      "date": "2026-07-30",
+      "subject": "Let the prototype run on production photos, at a switch",
+      "body": "The prototype ships with clean stock photography, which flatters the layout. The\nnew \"Fotografii — Prototip / Producție\" row in the demo panel swaps every image\nfor the real one from litoralulromanesc.ro, so the design can be judged on the\nphoto base we actually have: inconsistent crops, portrait phone shots, campaign\nbadges burned into the JPEG, properties with no spa photo at all. Copy, prices\nand behaviour are untouched — only the pictures change.\n\nA hotel card and the hotel page get that property's own photos (the name is read\nfrom the card, so \"Complex Mediteranean\" shows Complex Mediteranean); the\ndestination cards get the resort's own photo from the site's gallery; everything\nelse falls back to a default set picked across properties. All 13 properties the\nprototype names by hand exist in production.\n\nThe swap sets `srcset` and never rewrites `src`, so every part of proto.js /\nproto-m.js that reads or writes `src` — card galleries, the lightbox, the gallery\ncategory map keyed by file name — keeps working untouched, and a MutationObserver\ncatches images injected later. `?assets=` is read at script-parse time, because\nthe prototype rewrites its own URL from the search state before DOMContentLoaded\nand the parameter would be gone by then.\n\nThe pinned campaign card is deliberately left alone: \"Super ofertele verii\" is\nalready a production creative. The current campaign banner and the other\ncreatives are in the pack but unused — the layout has no slot for them yet.\n\nassets/prod/ (13 MB) is generated by tools/scrape-prod-assets.py +\ntools/build-prod-assets.py; prod-assets.html is the catalogue of what is in it.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>",
+      "screens": [
+        "checkout-en.html",
+        "checkout.html",
+        "home-b.html",
+        "home-c-en.html",
+        "home-c.html",
+        "home-d-en.html",
+        "home-d.html",
+        "home.html",
+        "hotel-en.html",
+        "hotel.html",
+        "index.html",
+        "listing-b.html",
+        "listing-c-en.html",
+        "listing-c.html",
+        "listing.html",
+        "m-checkout-en.html",
+        "m-checkout.html",
+        "m-home-en.html",
+        "m-home.html",
+        "m-hotel-en.html",
+        "m-hotel.html",
+        "m-listing-en.html",
+        "m-listing.html",
+        "m-thankyou-en.html",
+        "m-thankyou.html",
+        "prod-assets.html",
+        "thankyou-en.html",
+        "thankyou.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/fd2aa80ee05b29a64360c3c6ea146579202a5b16"
+    },
+    {
+      "sha": "a5007411a5b5a0e9f3b6dda4a969416c1c538a88",
+      "short": "a500741",
+      "date": "2026-07-30",
+      "subject": "Stop the demo panel running off the screen, and let the filters hold their own column",
+      "body": "The panel was placed under the \"demo inventory\" box with getBoundingClientRect,\nand that box is centred vertically — so every switch added last round pushed the\npanel past the bottom edge of the window. Both boxes now live in one left-hand\nrail that scrolls inside itself, so the panel cannot be clipped however many\nrows it grows, and a \"⚙\" pill collapses it into the corner when it would sit\nover the page.\n\nThe \"interactive prototype\" hint bar is gone with it: it covered the bottom-left\ncorner, which is exactly where the prototype controls are.\n\nNew switch on the listing: the filter column can stay in view from the map down\nand scroll on its own, separately from the results. It steps below the docked\nsearch bar through :has(.ssearch.on), and stays off in export mode so a\nfull-page capture keeps the whole column.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/a5007411a5b5a0e9f3b6dda4a969416c1c538a88"
+    },
+    {
+      "sha": "889ccacff9d1ffb5b7cfcd9457af1617990b9d72",
+      "short": "889ccac",
+      "date": "2026-07-29",
+      "subject": "Give the hotel page the right bar for the right visitor",
+      "body": "The two states were swapped on mobile: whoever arrived from our own listing\ngot a docked summary they no longer need, while a cold visitor got a full\nsearch box pushing the hotel below the fold. Now it reads the way it should\n— from our listing, nothing at the top at all; direct arrival, the compact\ndocked bar, which opens the same search sheet. The big in-page search box is\ngone. Desktop already worked this way and is unchanged.\n\nThe stay bar in the rooms section now stays put while you scroll rooms —\ncomparing rooms is exactly when dates and guests need to be one tap away.\nDesktop gets it from CSS (sticky inside #camere, which unsticks itself at\nthe end of the section, sitting under the docked bar when there is one).\nMobile can't: the bar lives in a short section while the room cards are the\nnext block, so it is fixed from JS over the whole rooms region, with a\nspacer holding its place in the flow. Squeezed onto one row it drops\n\"· 7 nights\" and \"· 2 rooms\" into a <span class=\"xtra\"> the stuck state\nhides — the bound spans stay inside, so paint() keeps them current.\n\nBoth follow the hotel switch in the prototype panel.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>",
+      "screens": [
+        "index.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/889ccacff9d1ffb5b7cfcd9457af1617990b9d72"
+    },
+    {
+      "sha": "34e3c913cc0a2c3bf70de2438e7148cda89c1833",
+      "short": "34e3c91",
+      "date": "2026-07-29",
+      "subject": "Put the real campaign creative on the pinned card",
+      "body": "The banner comes straight off production\n(assets/dist/images/header/Banner_ofertele_verii_adela_2*.webp): the wide\n1140x260 one for the band, the tighter 856x280 phone one for the card in the\ncarousel row, where a 4.4:1 strip would crop past readable. The hand-built\nlockup it replaces is gone, along with the two script webfonts it needed —\nover the creative's own type it would only collide.\n\nSizes follow the creative, not the other way round: the band keeps its\naspect so nothing is cut, and the pinned card is cropped towards the lockup\n(62% on desktop, 66% on mobile, where the card also widens to 88% — below\nthat the crop eats into \"SUPERofertele VERII\"). Only the pin marker and the\nCTA sit on top, and on the phone band the CTA shrinks so it clears the\ncreative's own ribbon.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/34e3c913cc0a2c3bf70de2438e7148cda89c1833"
+    },
+    {
+      "sha": "fa1a1a0e140685db568b53be7b07fc5d213b8f2c",
+      "short": "fa1a1a0",
+      "date": "2026-07-29",
+      "subject": "Make the docked bar read as the header, not a white strip on white",
+      "body": "Navy background instead of white — on white pages the docked bar simply\ndisappeared into the content; navy separates it and matches the app bar on\nmobile. The search pill keeps the orange border it has in the page.\n\nIt also carries what the header carries: the call-centre number with its\nhours, the account button (label follows the guest/member switch) and\n☰ Meniu. Both open the header's own menus — initHeader now exposes the\nopeners with the anchor as a parameter, so the bar reuses the panel and the\nuser menu instead of building copies. Two breakpoints drop the labels, then\nthe phone, before the 1200px container would push off screen.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/fa1a1a0e140685db568b53be7b07fc5d213b8f2c"
+    },
+    {
+      "sha": "852fbfd1cd756a1afe5a56969f0978331d29c1b7",
+      "short": "852fbfd",
+      "date": "2026-07-29",
+      "subject": "Dock the search bar on scroll, and let the first campaign card be pinned",
+      "body": "Sticky search: once the big search card leaves the screen, the same three\nfields collapse into a bar fixed to the top — minimised but fully working,\nsince each field opens the very same destination / calendar / guests popover\n(moved into the bar through placePop's host argument) and the button reuses\nthe page's own submit handler. Three independent switches in the prototype\npanel — homepage, listing, hotel — kept in localStorage and in the URL\n(?sthome=&stlist=&sthotel=), so the same state carries across pages and\nbetween desktop and mobile. On the hotel page the bar follows today's rule:\nit only shows for a new visitor. Hidden in export mode (?nopanel=1).\n\nOn mobile the homepage gets a search pill docked under the app bar (nothing\nwas sticky there before), while listing and hotel already dock their summary\n— there the switch decides whether it stays, and it now collapses to a\nsingle line as you scroll.\n\nPinned campaign card: the first slot of the hero carousel can be taken out\nof the rotation, so the most important campaign no longer depends on the\nautoplay's luck. Two modes on a switch — \"Linie\" (first card, highlighted,\noutside the scroller, the others slide past it) and \"Banner\" (a wide band\nabove the carousel). The creative is real text, not a JPG, so it stays\neditable in Figma and exists in both languages.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>",
+      "screens": [
+        "index.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/852fbfd1cd756a1afe5a56969f0978331d29c1b7"
+    },
+    {
+      "sha": "57877df1ca4f104f0a96664aeb06c240d8cc609c",
+      "short": "57877df",
+      "date": "2026-07-29",
+      "subject": "Put the menu back on every mobile screen, and give the desktop one a panel",
+      "body": "The hamburger only existed on m-home. Every mobile sub-page header had a\nback arrow and no menu at all (thank-you had neither), so from listing,\nhotel, checkout and confirmation the whole taxonomy was unreachable —\ninitHeader() had been wiring a button that was not in the markup.\n\nThe burger is now the last item of the bar on all ten mobile pages: back\nstays on the left where it exists, and the menu is always the top-right\ncorner, so its position is the same on every screen.\n\nSame header, two more repairs. The #i-user symbol was never defined on\nany mobile page, so the guest account button rendered as an empty box\nwith a lone orange dot. And on desktop the burger worked but was an\nunlabelled icon opening a 900px modal with nine links adrift in white\nspace, whose href=\"#\" entries did nothing at all — it now reads\n\"Meniu\"/\"Menu\" and opens an anchored two-column panel with the phone\nnumber in the footer, and the dead links toast like they do on mobile.\n\ntools/serve.js serves the prototype with Cache-Control: no-store, so the\npreview pane stops testing a stale proto.js. tools/shoot-previews.js\nredoes all sixteen preview-*.png, which a header edit makes stale at once.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>",
+      "screens": [
+        "checkout-en.html",
+        "checkout.html",
+        "home-b.html",
+        "home-c-en.html",
+        "home-c.html",
+        "home-d-en.html",
+        "home-d.html",
+        "home.html",
+        "hotel-en.html",
+        "hotel.html",
+        "listing-b.html",
+        "listing-c-en.html",
+        "listing-c.html",
+        "listing.html",
+        "m-checkout-en.html",
+        "m-checkout.html",
+        "m-home-en.html",
+        "m-home.html",
+        "m-hotel-en.html",
+        "m-hotel.html",
+        "m-listing-en.html",
+        "m-listing.html",
+        "m-thankyou-en.html",
+        "m-thankyou.html",
+        "thankyou-en.html",
+        "thankyou.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/57877df1ca4f104f0a96664aeb06c240d8cc609c"
+    },
+    {
+      "sha": "1becd109d215b48eca691512c6aec2b140ff4c7d",
+      "short": "1becd10",
+      "date": "2026-07-29",
+      "subject": "Put guest photos under the reviews, and give the phone gallery a mosaic and real zoom",
+      "body": "Guest photos and the invitation to add your own now sit below the review cards\ninstead of above them, on desktop and mobile. The reviews are what a visitor came\nto that section for; the pictures read as their continuation rather than as an\ninterruption of them.\n\nOn mobile the second gallery step keeps the mosaic instead of a horizontal\nthumbnail strip. A strip under the photo wastes the whole lower half of a phone\nscreen, so the chosen picture sits above the same mosaic: the selected tile is\nringed, tapping another swaps the photo, and the header's back arrow drops the big\nphoto before it closes the gallery. Tapping the photo, or the zoom button on it,\nopens it full screen with real zoom — pinch, double-tap for 100% to 250%, plus and\nminus up to 400%, drag to pan, with panning clamped so the picture cannot be\ndragged off screen.\n\nThe two guest-content buttons on mobile now share one row instead of stacking, so\nthe block costs half the vertical space.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>",
+      "screens": [
+        "hotel-en.html",
+        "hotel.html",
+        "index.html",
+        "m-hotel-en.html",
+        "m-hotel.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/1becd109d215b48eca691512c6aec2b140ff4c7d"
+    },
+    {
+      "sha": "0cfff88421f37d271de5d3788151788c0e7c2256",
+      "short": "0cfff88",
+      "date": "2026-07-29",
+      "subject": "Open the gallery as a mosaic, put guest photos in the reviews, give documents a state",
+      "body": "Three changes across desktop and mobile, RO and EN.\n\nGallery in two steps: clicking any photo opens a mosaic of every picture first,\nwith category chips and counts (including \"from guests\"); clicking a tile switches\nto the big image with a horizontal thumbnail strip, arrow keys and a way back to\nthe mosaic. A side rail keeps the score, two guest quotes and the price with a\n\"see the rooms\" CTA visible in both steps, so the gallery sells instead of parking\nthe visitor. Mobile runs the same two steps in a full-screen sheet, where the\nheader's back arrow goes mosaic-ward first and only closes from the mosaic.\n\nPhotos and clips from guests: a named block in the reviews section with uploader\nnames, video duration badges and a \"+42\" tile, review cards carrying their own\nphotos and a verified-stay line, and everything opening the same gallery filtered\non guest content. \"Add photos or clips\" and \"Write a review\" are mockup flows with\na drop zone, a prunable file list, inline attachments that do not lose typed text,\nand an unticked consent that gates the send button — the same rule as checkout.\nThe first published set earns +20 FRIENDS credits, because guest content only\nexists if there is a reason to upload it.\n\nDocuments carry their state: a green tick for what is ready now, a gray hourglass\non a dashed row for what is issued later, with the action reading Download or\nComing soon / At check-in, plus a legend. After paying, the open question is what\nyou have and what you are still waiting for.\n\nAlso fixes a hardcoded Romanian \"+78 fotografii\" in the CSS that leaked onto the\nEnglish hotel page; the label is now injected in the page language.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>",
+      "screens": [
+        "hotel-en.html",
+        "hotel.html",
+        "index.html",
+        "m-hotel-en.html",
+        "m-hotel.html",
+        "m-thankyou-en.html",
+        "m-thankyou.html",
+        "thankyou-en.html",
+        "thankyou.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/0cfff88421f37d271de5d3788151788c0e7c2256"
+    },
+    {
+      "sha": "0ede2537fcc828fad2444159350bdc8397197005",
+      "short": "0ede253",
+      "date": "2026-07-28",
+      "subject": "Start from the whole coast on any cold entry, not just for first-time visitors",
+      "body": "The all-resorts default only reached people with no stored session. Anyone who\nhad used the prototype before still had \"Mamaia\" saved, so the search field kept\nshowing it and the change looked like it had not landed.\n\nEntering without a dest parameter — from Google, from a shared link, from the\noverview page — now starts from the whole coast regardless of what the session\nremembers. Navigation inside the prototype always carries dest in the query\nstring, so a search you actually ran is still carried from screen to screen.\nVerified both directions: cold entry gives \"Cazare pe tot litoralul\", and\n?dest=Eforie Nord still gives \"Cazare Eforie Nord\".\n\nAn earlier attempt versioned the stored state and expired old sessions once.\nDropped: it silently destroys someone's session, its effect depends on load\norder, and it cannot be verified without a persistent browser profile. The\nURL rule does the same job and is observable in one page load.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>",
+      "screens": [
+        "_seed.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/0ede2537fcc828fad2444159350bdc8397197005"
+    },
+    {
+      "sha": "f18d1ee956804a728716810a024f0920258c9379",
+      "short": "f18d1ee",
+      "date": "2026-07-28",
+      "subject": "Stop the hero clipping the search popovers; make the all-resorts default actually stick",
+      "body": "The search hero carried overflow:hidden to round its background image, which\nalso clipped the destination, calendar and guests popovers at its bottom edge —\non the homepage the dropdown was cut to a sliver. The rounding moved to the\nbackground layer, so the hero clips the photo and nothing else.\n\nThe all-resorts default only applied to fresh visitors. Anyone who had opened\nthe prototype before still had \"Mamaia\" in their stored session and saw it in\nthe search field, which reads as the default not having changed. The state now\ncarries a version marker and a stale one is dropped once. The static markup also\nsaid Mamaia before the engine painted over it, on both platforms and in both\nlanguages — it now says \"Tot litoralul\" / \"All resorts\".\n\nFound while checking the fix: the desktop destination picker was hardcoded in\nRomanian, so the English pages listed \"319 cazări\" under an English placeholder.\nBoth go through the language helper now.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>",
+      "screens": [
+        "home-c-en.html",
+        "home-c.html",
+        "home-d-en.html",
+        "home-d.html",
+        "m-home-en.html",
+        "m-home.html",
+        "m-listing-en.html",
+        "m-listing.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/f18d1ee956804a728716810a024f0920258c9379"
+    },
+    {
+      "sha": "177a46adbb76920fdf8a7610c107180c06a09644",
+      "short": "177a46a",
+      "date": "2026-07-28",
+      "subject": "Search the whole coast by default, cleaner listing headline, two new demo switches",
+      "body": "Search & homepage. The search now covers all resorts at once instead of making\nsomeone pick one first: \"Tot litoralul\" is the preselected destination and the\nfirst row in the picker, dropping out once you start typing a resort name. An\nempty dest means all resorts throughout both engines, so the listing headline\nreads \"Cazare pe tot litoralul\" and the demo inventory tops out at 1,236 — the\nwhole coast — rather than Mamaia's 81.\n\nListing. The headline carried the site-wide review score next to the place name\n(\"Stays in Mamaia 8.7/10 from 11,395 reviews\"), which said nothing about the\nresult set; it now carries the count and nothing else. The room-type expander on\nthe cards can be switched off from the prototype panel, desktop and mobile.\n\nHotel page. Someone landing cold — from Google, from an ad — has not searched\nanything yet, so the search bar is back on top for them; someone who arrived\nfrom a listing has already searched and the same bar would only pull them out of\nthe flow. Which case you are looking at is a switch in the panel, \"Sesiune:\nvizitator nou / de pe site\", and a ?session= parameter.\n\nAlso on the hotel page, below the map: \"De ce să rezervi prin noi\" — the agency\nfacts that were only ever on the homepage, where the decision is not being made.\n500+ directly contracted properties, licensed since 2005, 270,000 tourists in\n2024, 0% instalments, three holiday cards, consultants daily 10–18.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>",
+      "screens": [
+        "home-d-en.html",
+        "home-d.html",
+        "hotel-en.html",
+        "hotel.html",
+        "index.html",
+        "listing-b.html",
+        "listing-c-en.html",
+        "listing-c.html",
+        "m-hotel-en.html",
+        "m-hotel.html",
+        "m-listing-en.html",
+        "m-listing.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/177a46adbb76920fdf8a7610c107180c06a09644"
+    },
+    {
+      "sha": "934061dc97ca1c0afdf4adad687b9ebe660f9493",
+      "short": "934061d",
+      "date": "2026-07-28",
+      "subject": "Frame the charter cards instead of tinting them; fix two sidebar problems",
+      "body": "Three fixes from looking at the live listing.\n\nThe map card sat flush against the \"Garantat de noi\" button — it now takes the\nsame 12px gap the filter boxes use.\n\nThe availability box carried a blue highlight left over from an earlier round.\nWith the charter toggle above it, two accents competed and the one drawing the\neye was the one that mattered least; availability is a plain box now, and the\nonly accent in the rail belongs to the charter set.\n\nThe tint on charter cards was too weak to sell anything — it read as a row\nselected with Tab. Replaced by a navy frame: 2px border plus a soft halo, badge\nin the tag row. A full-width ribbon across the card head was tried first and\ndropped: at six cards in a column it turned the page into stripes.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/934061dc97ca1c0afdf4adad687b9ebe660f9493"
+    },
+    {
+      "sha": "ce91d18c2d5233a5864ccdeb05cdbc845f09bb68",
+      "short": "ce91d18",
+      "date": "2026-07-28",
+      "subject": "Paginate the listing at 30 per page instead of load-more",
+      "body": "\"Afișează mai multe rezultate\" hid two things at once: how much is left and\nwhere you are in the list. Infinite scroll would have added a third — it buries\nthe footer and makes a result you scrolled past impossible to return to. Both\nlistings now carry a pager with a range line, \"Afișăm 1–30 din 81 cazări\",\nbuilt from the result count so desktop and mobile stay in step. Below 31 results\nthe whole block hides itself, so a filtered set of three gets no decoration.\n\nTwo things had to be fixed for the count to mean anything. The desktop listing\nshipped with the \"Piscină\" filter pre-checked, which pinned the headline at four\nresults and put the page into the low-inventory treatment on first load; the\npreset is gone, and the filter chips still demo themselves the moment anything\nis ticked. The desktop demo-inventory switcher also had no initial state, so the\nlisting reported the six demo cards rather than the size of the result set —\nit now reads the first tier at init, the way mobile already did.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>",
+      "screens": [
+        "index.html",
+        "listing-b.html",
+        "listing-c-en.html",
+        "listing-c.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/ce91d18c2d5233a5864ccdeb05cdbc845f09bb68"
+    },
+    {
+      "sha": "1af4effcdf902313e9c90c008e37ea4470013849",
+      "short": "1af4eff",
+      "date": "2026-07-28",
+      "subject": "Reorder the listing filters, add a zero-inventory view, sign-in, and a filtered entry point",
+      "body": "Filter rail, in the order agreed at the workshop: map, then a big \"Garantat de\nnoi\" toggle, recent filters, popular filters, availability trimmed to the two\nrows that matter (bookable, instantly confirmed), the price histogram, then\nreview score, board, property type, payment and cancellation, discounts,\nholiday card and the rest. The order lives in the engine, so Romanian and\nEnglish cannot drift apart. The mobile filter sheet follows the same taxonomy,\nwith the charter toggle at the top and the histogram in the same position.\n\nThe demo switcher gains a zero-inventory tier. That exposed duplicate messaging:\nthe empty-state box and the static rescue band were both talking. The band now\nstands down at zero, and the empty state distinguishes its two causes — filters\ntoo tight versus nothing free for these dates — because the way out differs.\n\nCharter cards get a light navy tint and a hairline border on top of the left\naccent, so the set reads as a group when scanning.\n\nSigning in was missing entirely — the prototype could only offer to join\nFRIENDS. Added an account button in the mobile app bar, a proper button in the\ndesktop header for guests, and a homepage band that disappears for members; all\nthree open the same sign-in / create-account sheet, which states what an account\nis actually for. Fields are mock placeholders.\n\nThe \"see all guaranteed hotels\" link now opens the listing already filtered via\n?f=own. The parameter clears the page's preset filters first, so the link lands\non one intention rather than an accidental intersection.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>",
+      "screens": [
+        "home-c-en.html",
+        "home-c.html",
+        "home-d-en.html",
+        "home-d.html",
+        "listing-b.html",
+        "listing-c-en.html",
+        "listing-c.html",
+        "m-checkout-en.html",
+        "m-checkout.html",
+        "m-home-en.html",
+        "m-home.html",
+        "m-hotel-en.html",
+        "m-hotel.html",
+        "m-listing-en.html",
+        "m-listing.html",
+        "m-thankyou-en.html",
+        "m-thankyou.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/1af4effcdf902313e9c90c008e37ea4470013849"
+    },
+    {
+      "sha": "d6c724019b5b2d8ea6870e64c085aab4e8a37e5c",
+      "short": "d6c7240",
+      "date": "2026-07-28",
+      "subject": "Make the rescue widgets inventory-aware, fix the pre-selection CTA, add the charter set",
+      "body": "Three things from the workshop.\n\n1. The anti-dead-end widgets did not react to how many results were left. The\n   flexible-date strip did; the call-centre band, the nearby-resorts band and\n   \"load more\" were static markup, always on. They are now driven by the visible\n   result count, on desktop and mobile alike: above 5 stays they stay out of the\n   way, at 5 or fewer the date strip, a \"look at other options\" line and the\n   nearby band appear while \"load more\" and the pager go, and at 2 or fewer the\n   call-centre band moves directly under the last result, turns orange and names\n   the number left. The headline also switches from the general review score to\n   the real count. The desktop demo tiers capped at 6, which with six demo cards\n   changed nothing — they now cap at 4 and 2 so the states are actually visible.\n\n2. Before a room is picked there is nothing to book, so the desktop hotel CTA no\n   longer says \"Rezervă acum\" / \"Book now\". It says \"Alege camera\" / \"Choose a\n   room\", scrolls to the room picker and highlights it. Mobile already did this.\n\n3. The hotels we charter are now a first-class, promotable set. data-own=\"1\" on\n   a card gets a navy \"Garantat de noi\" badge and a navy accent; the badge opens\n   an explainer covering what actually differs — real availability from our own\n   allotment, instant confirmation, and consultants who can change the booking\n   without the hotel. The homepage gets a \"Hoteluri garantate de noi\" row on\n   desktop and mobile, the listing gets a matching filter, and the default\n   \"Recomandate de noi\" sort puts the set first.\n\nAll of it in Romanian and English. litro-final.fig regenerated from the 35\nframes; previews refreshed.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>",
+      "screens": [
+        "home-c-en.html",
+        "home-c.html",
+        "home-d-en.html",
+        "home-d.html",
+        "hotel-en.html",
+        "hotel.html",
+        "index.html",
+        "listing-b.html",
+        "listing-c-en.html",
+        "listing-c.html",
+        "listing.html",
+        "m-home-en.html",
+        "m-home.html",
+        "m-hotel-en.html",
+        "m-hotel.html",
+        "m-listing-en.html",
+        "m-listing.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/d6c724019b5b2d8ea6870e64c085aab4e8a37e5c"
+    },
+    {
+      "sha": "7904986d0323184ff2978336611d49e5d54a6297",
+      "short": "7904986",
+      "date": "2026-07-27",
+      "subject": "Add litro-final.fig — one Figma file with every screen and state variant",
+      "body": "35 editable frames on a single canvas, laid out in labelled rows: the desktop\nflow in Romanian and English, the desktop state variants, the archived A/B\nhomepages and listings, the mobile flow in both languages, and the mobile state\nvariants. 22,698 layers, 134 images; round-trip validated through the repo's own\ndecoder and renderer, data chunk is zstd.\n\nTo capture the states deterministically the prototypes now read them from the\nURL — on desktop and mobile alike:\n\n  ?auth=in|out      member vs guest (hides the \"sign in for FRIENDS\" bands)\n  ?density=a|b|c    listing card density\n  ?inv=many|some|few  demo inventory (mobile listing)\n  ?room=2           pre-selects rooms so the booking bar is up (mobile hotel)\n  ?nopanel=1        export mode\n\nThat doubles as a product nicety: any state can now be linked to directly.\n\nExport mode also had to hide the demo chrome that is part of the page rather\nthan the floating panel — the desktop inventory box and variant switcher — and\nneutralise position:fixed elements. A fixed bar is captured at the bottom edge\nof the 1200px capture window, which lands in the middle of a 4000px frame; in\nexport mode those bars join the normal flow instead. Without this the last\nexport carried the inventory panel and a stray booking bar across twelve\ndesktop frames.\n\ntools/dump-all.sh dumps all 35 frames; tools/generate-fig-all.js lays them out,\ncomputing row offsets from the dumps so nothing overlaps.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>",
+      "screens": [
+        "index.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/7904986d0323184ff2978336611d49e5d54a6297"
+    },
+    {
+      "sha": "2e2702c1447614c17414442c8aa332bba321038f",
+      "short": "2e2702c",
+      "date": "2026-07-27",
+      "subject": "Add the mobile Figma export and fix the search-summary card layout",
+      "body": "litro-mobile-web.fig — a native Figma file with all ten mobile screens as\neditable 430px frames, Romanian on the top row and English below. Round-trip\nvalidated through the repo's own decoder and renderer; the data chunk is zstd\n(deflate makes Figma's importer hang silently at \"0 of 1 files\").\n\nPipeline changes:\n- dump-dom.js takes an optional viewport width (still 1440 by default).\n- generate-fig-m.js is the 430px variant of generate-fig.js, with an `oy` field\n  so the frames can sit in two rows.\n- ?nopanel=1 puts the prototype in export mode: the floating demo panel is not\n  built and the fixed bottom bars join the normal flow. Without it the bars are\n  captured at the bottom of the 1200px capture window — the middle of the frame.\n\nFound while exporting: in the search-summary card the name and the date line\nwere inline spans, so a long hotel name pushed the dates onto a second line that\noverlapped the title. They are block-level now, which is also how the approved\nMobile (REDESIGN) frames draw that card — name on top, context underneath.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>",
+      "screens": [
+        "index.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/2e2702c1447614c17414442c8aa332bba321038f"
+    },
+    {
+      "sha": "df192787941af2601e9b439733719e04f5faecfe",
+      "short": "df19278",
+      "date": "2026-07-27",
+      "subject": "Add the mobile web flow (RO + EN) and a desktop/mobile prototype switch",
+      "body": "Five mobile screens at 390px — home, listing, hotel, checkout, confirmation —\nrebuilt from the desktop C flow and the approved \"Mobile (REDESIGN)\" frames in\nthe LITRO Master Pages Figma file: navy app bar, the white search-summary card\nwith the orange border, the Filters / Sort / Map row, the 3-step checkout\nstepper and the editable advance.\n\n- litro-m.css repeats the same :root token block as litro.css and then defines\n  only mobile components; litro.css stays the source of truth for tokens.\n- proto-m.js is a separate engine but shares the \"litro\" localStorage key and\n  the price model with proto.js, so state and prices carry across desktop and\n  mobile. Fully bilingual through t(ro, en); navigation resolves the -en pages.\n- Mobile-only interaction: full-screen sheets for search, calendar, guests,\n  filters and sort; a swipeable hotel gallery; a booking bar that slides up\n  after the first room is added; a fixed checkout bar with the amount due today.\n- Demo switches live in one floating \"Prototype · settings\" panel rather than in\n  the page: language, desktop/mobile view, guest/member, card density (A\n  detailed / B compact with icons / C horizontal summary) and demo inventory.\n- proto.js gains the same View row on desktop, so the phone screens are\n  reachable from a full-size browser window and back, carrying dest and dates.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>",
+      "screens": [
+        "index.html",
+        "m-checkout-en.html",
+        "m-checkout.html",
+        "m-home-en.html",
+        "m-home.html",
+        "m-hotel-en.html",
+        "m-hotel.html",
+        "m-listing-en.html",
+        "m-listing.html",
+        "m-thankyou-en.html",
+        "m-thankyou.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/df192787941af2601e9b439733719e04f5faecfe"
+    },
+    {
+      "sha": "ca5dbf0374fa00cf1fb8f406e2514f3e1366ebba",
+      "short": "ca5dbf0",
+      "date": "2026-07-24",
+      "subject": "Shorter C cards, orange guided checkout CTA, logged-in/out prototype switch",
+      "body": "- Card view C: compact the right column (cancel the margin-top:auto that stretched\n  it, smaller price/CTA, tighter icons, shorter photo) so the card is ~185px vs\n  222 (B) / 276 (A) — less empty space.\n- Checkout summary CTA is now always orange (not greyed); clicking it walks the\n  user through the form sections one by one (highlighting each) and, once consent\n  is ticked, proceeds to the confirmation page. The bottom form CTA keeps its\n  consent gating.\n- Prototype panel gains an Account switch (Guest / Member). Member hides the\n  'sign in for the FRIENDS discount' banners (.friends-band, .loyal-band) and the\n  header shows 'Ana'; Guest shows the banners and 'Sign in'. State persists in\n  localStorage across the flow.\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>",
+      "screens": [
+        "checkout-en.html",
+        "checkout.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/ca5dbf0374fa00cf1fb8f406e2514f3e1366ebba"
+    },
+    {
+      "sha": "d127339854bc177bbbfe83509e3b0f8289f83a8d",
+      "short": "d127339",
+      "date": "2026-07-24",
+      "subject": "Fix card density modes, dock prototype panel under inventory demo, checkout CTA in first viewport",
+      "body": "- Card density: A = detailed, B = compact (previous B: no quote/perks, plus now\n  no '2 adults…/VAT…' price note; keeps room + tags), C = big-icon summary (the\n  former B). Relabel C as Icons/Iconițe.\n- Dock the floating 'Prototype · settings' panel right below the inventory-demo\n  box (measured from .invdemo, repositioned on resize); rows stacked to fit.\n- Checkout: add a booking CTA inside the sticky summary card, placed right under\n  the total (before the 'to pay at the hotel' block) with a shorter summary photo\n  so it sits in the first viewport (~737px). It mirrors the consent gating of the\n  main CTA and scrolls to the consent box when still disabled.\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>",
+      "screens": [
+        "checkout-en.html",
+        "checkout.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/d127339854bc177bbbfe83509e3b0f8289f83a8d"
+    },
+    {
+      "sha": "9fae991c729a03c9a5583d88af4cc8c397aee469",
+      "short": "9fae991",
+      "date": "2026-07-24",
+      "subject": "Listing: icon-based Compact card view, prototype-controls panel, reordered filters",
+      "body": "- Compact (B) card view now shows a big-icon summary (date/nights · meal · room),\n  like the reference screenshot, and drops the '2 adults, 7 nights…/VAT…' note.\n  A = detailed, B = compact (icons), C = minimal.\n- Move the RO/EN language switch and the A/B/C card-view switch into a floating\n  'Prototype · settings' panel styled like the inventory-demo box — they are demo\n  controls, not product UI. Header langswitch hidden (via .header .langswitch to\n  beat the inline style on home-c/home-d).\n- Reorder the listing filter sidebar: Recent + Popular (compacted) on top,\n  Availability lower, the rest unchanged. Done at runtime in initListing so it\n  applies to listing-c and home-d in both languages.\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/9fae991c729a03c9a5583d88af4cc8c397aee469"
+    },
+    {
+      "sha": "db40143ad33b967dc2bba31d61fe2da3ebb2cd18",
+      "short": "db40143",
+      "date": "2026-07-24",
+      "subject": "Hotel: drop nearby-alternatives band; listings: remove type chips + count strip; sticky checkout summary; A/B/C card density switch",
+      "body": "- Hotel (RO+EN): remove the 'Nearby alternatives, from our inventory' section so\n  we don't derail the user off the chosen hotel.\n- Listing (RO+EN): drop the res-types chips (Hotels/Apartments/Rooms) and the\n  'X available stays' count; the header now shows only the review score (data-fixed\n  so applyFilters no longer re-adds the count).\n- Checkout: the right-hand summary column is now position:sticky.\n- Listing card density switch A/B/C (injected in initListing, RO/EN labels):\n  A = detailed (as now), B = compact (no quote/perks), C = minimal (name, meta,\n  rating, price, CTA only). Cards were too heavy; B/C slim them down.\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>",
+      "screens": [
+        "hotel-en.html",
+        "hotel.html",
+        "listing-c-en.html",
+        "listing-c.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/db40143ad33b967dc2bba31d61fe2da3ebb2cd18"
+    },
+    {
+      "sha": "db770af0045ede41689fa3b5e1456ccbceb60a9b",
+      "short": "db770af",
+      "date": "2026-07-24",
+      "subject": "Move top nav into the burger menu on homepages; make Home D show the whole inventory with a slimmer bar",
+      "body": "- proto.css: hide the .mainnav bar (it only renders on homepages).\n- proto.js: the burger menu is now built from the .mainnav links, so it follows\n  the page language (RO/EN) automatically; title i18n'd (Meniu/Menu).\n- Home D (RO+EN): the embedded listing now frames the WHOLE inventory, not one\n  city — fixed heading 'Toate ofertele de pe litoral' / 'All seaside offers'\n  (data-fixed so initListing no longer rewrites it to 'Cazare Mamaia'), the\n  res-types and filter chips are dropped, the default pool filter is off (all 6\n  cards show), and card locations span several resorts. Slimmer bar lets a piece\n  of the first card show in the first viewport.\n- proto.js: honor data-fixed on .listing-head h1 and .res-count.\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>",
+      "screens": [
+        "home-d-en.html",
+        "home-d.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/db770af0045ede41689fa3b5e1456ccbceb60a9b"
+    },
+    {
+      "sha": "056d6163f8517f8e4fe5f4f011da8a31a42408b6",
+      "short": "056d616",
+      "date": "2026-07-24",
+      "subject": "Hotel: drop the top sticky Book-now bar (bottom booking bar duplicates it) + fix guest count adults/kids",
+      "body": "- Remove the scroll-triggered top .stickybar on the hotel page; the bottom\n  .booking-bar already carries name + price + CTA.\n- Fix guestsTxt() RO branch (was infinite recursion) so the guest count reads\n  '2 adulți + 2 copii' / '4 adulți' (and EN '2 adults + 2 children' / '4 adults'),\n  updating live from the guest picker.\n- i18n the guest picker (Adults/Children/Rooms/Done + ages) and the checkout\n  guest summary row; no more '+ 0 copii' when there are no kids.\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/056d6163f8517f8e4fe5f4f011da8a31a42408b6"
+    },
+    {
+      "sha": "80996489947946e8c162b71403b65e7b54512e56",
+      "short": "8099648",
+      "date": "2026-07-24",
+      "subject": "Add homepage variant D — C base with the offer listing right under search (B idea, C listing)",
+      "body": "home-d.html / home-d-en.html: variant C top (tiles carousel + integrated search\nhero) followed immediately by the refreshed C listing (room-carousel expanders,\nfilters, conditional date banner, inventory demo). RO/EN switch on both.\nproto.js: i18n the injected \"See all room types\" / \"Hide room types\" labels.\nindex.html: Homepage · D card (RO/EN) + note.\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>",
+      "screens": [
+        "home-d-en.html",
+        "home-d.html",
+        "index.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/80996489947946e8c162b71403b65e7b54512e56"
+    },
+    {
+      "sha": "efc9c5334d04c65c82d0df84e5d19b6653aaa0ff",
+      "short": "efc9c53",
+      "date": "2026-07-23",
+      "subject": "index: RO/EN switch on every C-flow card (not just homepage)",
+      "body": "Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>",
+      "screens": [
+        "index.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/efc9c5334d04c65c82d0df84e5d19b6653aaa0ff"
+    },
+    {
+      "sha": "5a30623b64cab91b167109a0de2d01fcb13276c1",
+      "short": "5a30623",
+      "date": "2026-07-23",
+      "subject": "English version of the full C flow (all 5 screens) + RO/EN switch on every screen",
+      "body": "- Added English pages: home-c-en, listing-c-en, hotel-en, checkout-en,\n  thankyou-en (full translations of the C-flow screens).\n- RO/EN language switch in the header of every C-flow screen (RO and EN),\n  each linking to its own counterpart.\n- proto.js is language-aware: on <html lang=\"en\"> pages, navigation (search,\n  cards, booking, checkout, thank-you, logo/breadcrumbs) routes to the \"-en\"\n  pages, and the most visible dynamic strings (dates, guests, result count,\n  date-banner \"from/hotels\", \"Add room\", price notes, credits, listing H1)\n  render in English.\n- index.html: the C-flow entry now offers RO + EN for the homepage.\n- Removed the variant switcher from listing-c (kept from earlier); C is primary.\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>",
+      "screens": [
+        "checkout-en.html",
+        "checkout.html",
+        "home-c-en.html",
+        "hotel-en.html",
+        "hotel.html",
+        "listing-c-en.html",
+        "listing-c.html",
+        "thankyou-en.html",
+        "thankyou.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/5a30623b64cab91b167109a0de2d01fcb13276c1"
+    },
+    {
+      "sha": "b75c182f0ff7cd5be98e3745989ca9225f405524",
+      "short": "b75c182",
+      "date": "2026-07-23",
+      "subject": "Make C the primary variant (archive A/B, drop variant switcher) + English C homepage + loyalty band after 2nd result",
+      "body": "- Removed the variant switcher (vswitch) from home-c and listing-c; the C flow\n  is the primary one. index.html now leads with the C flow (RO·EN) and keeps\n  A/B under an \"Arhivă\" section. home-c search/tiles + listingHref now route to\n  listing-c (the C listing), not the archived listing-b.\n- English homepage: home-c-en.html (full translation of home-c) with a RO/EN\n  language switch in the header on both pages; a small inline script restores\n  English date/guests labels the shared proto.js would otherwise repaint in RO.\n- Loyalty \"FRIENDS\" band: restored (was hidden during compaction) and now\n  repositioned by proto.js to sit after the SECOND visible result, so a peek of\n  the 2nd card stays above the fold.\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>",
+      "screens": [
+        "home-c-en.html",
+        "home-c.html",
+        "index.html",
+        "listing-b.html",
+        "listing-c.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/b75c182f0ff7cd5be98e3745989ca9225f405524"
+    },
+    {
+      "sha": "e9f8ee8317e1a050c2ebd9ecd9b39884b4a179d2",
+      "short": "e9f8ee8",
+      "date": "2026-07-23",
+      "subject": "Hotel top CTA scrolls to room picker; tighter listing top shows a peek of the 2nd card",
+      "body": "- Hotel booking card \"Rezervă acum\" now smooth-scrolls to the room selection\n  (first .room-card, 80px offset) instead of going straight to checkout — the\n  bottom booking bar remains the path to checkout after picking rooms.\n- Listing B/C: tightened the whole top (header/search/breadcrumb/title/filters/\n  date-banner paddings) and densified the cards (hid the between-cards loyalty\n  band and the per-card review quote) so a piece of the second result is visible\n  above the fold — verified ~65px peek at a 1440x820 viewport.\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>",
+      "screens": [
+        "listing-b.html",
+        "listing-c.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/e9f8ee8317e1a050c2ebd9ecd9b39884b4a179d2"
+    },
+    {
+      "sha": "d27057bf3106295e46d6a3409881830d7873e63e",
+      "short": "d27057b",
+      "date": "2026-07-23",
+      "subject": "Hotel: title chips on one row; booking CTA in the first view",
+      "body": "- Merged the program badges + offer chips into a single non-wrapping row\n  (shortened the two badge labels so all six fit one line).\n- Restructured the booking card so \"Rezervă acum\" sits right under the price\n  (room + price + CTA first; perks, credits, resort-tax and the FRIENDS band\n  moved below it) — the CTA is now above the fold on a laptop viewport.\n  proto.js: reprice selector .bk-price .credits → .credits (credits moved out).\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>",
+      "screens": [
+        "hotel.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/d27057bf3106295e46d6a3409881830d7873e63e"
+    },
+    {
+      "sha": "036befcd80930ba9552e249b6124f59c434385e7",
+      "short": "036befc",
+      "date": "2026-07-23",
+      "subject": "Hotel page: no top search bar, tighter title chips, reviews+location right after room picker",
+      "body": "- Removed the search bar from the top of the hotel page (kept hidden in the DOM\n  only as the calendar/guests source for the inline stay-bar editor).\n- Title chips (offer chips + program badges) are smaller and kept to one row.\n- Section order: room picker → Recenziile oaspeților → Locație → the 3 promo\n  bands → Politici generale → Reguli casei → Alternative.\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>",
+      "screens": [
+        "hotel.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/036befcd80930ba9552e249b6124f59c434385e7"
+    },
+    {
+      "sha": "8b8ad81b335e4c768b5fa68cb6c059a863f378d7",
+      "short": "8b8ad81",
+      "date": "2026-07-23",
+      "subject": "Hotel stay-bar inline edit, collapsible flexi, meal filters + checkout editable advance",
+      "body": "Hotel:\n- Date/guests/rooms bar moved directly above the rooms; the flexi price-strip\n  sits just above it. \"Modifică datele\" (and clicking a field) now opens the\n  calendar/guests editor INLINE anchored to the bar and reprices in place —\n  no more redirect to the top search → listing. (placePop takes an explicit\n  host; the calendar/guests openers are exposed and re-anchor the popover.)\n- Flexi price-strip is collapsible: expanded when few rooms are available,\n  collapsed to a \"vezi prețurile ▾\" text toggle when many.\n- Meal chips get a \"Filtre masă:\" label (default Toate); \"Ce include…\" is\n  collapsed behind a \"Vezi ce include fiecare masă\" link.\n\nCheckout:\n- Advance amount is editable (contenteditable) with the minimum (30%) and\n  maximum shown; typing below the minimum clamps on blur.\n\nHomepage C: removed the \"Oferte Litoral 2026\" grid section.\nFooters: currency selector (.f-cur) hidden everywhere via CSS.\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>",
+      "screens": [
+        "checkout.html",
+        "home-c.html",
+        "hotel.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/8b8ad81b335e4c768b5fa68cb6c059a863f378d7"
+    },
+    {
+      "sha": "5f2a41ffd19e144e69ad8ada5e017ecb2b0ee50a",
+      "short": "5f2a41f",
+      "date": "2026-07-23",
+      "subject": "Hotel & listing-C refinements from workshop feedback",
+      "body": "- Listing C: the room carousel now spans the FULL card width (appended as a\n  full-width grid row, grid-column 1/-1) instead of being squeezed into the\n  middle column; scrolls internally, no page overflow.\n- Hotel rooms: unselected rates show an \"Adaugă cameră\" button (not a 0 ±\n  stepper) — only rooms already picked show the stepper.\n- Hotel gallery now fills the column height to match the taller booking card\n  (hp-grid align-items:stretch; gallery is a flex column, hero grows).\n- Hotel: the promo bands (răsplătește / Jurasica Park / \"datele scumpe\") moved\n  BELOW the room pricelist instead of above it.\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>",
+      "screens": [
+        "hotel.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/5f2a41ffd19e144e69ad8ada5e017ecb2b0ee50a"
+    },
+    {
+      "sha": "a337b956f4c9c0424b37c97ef85bed2c1e899fa2",
+      "short": "a337b95",
+      "date": "2026-07-23",
+      "subject": "Fix: room carousel (listing C) scrolls inside the card instead of pushing the page horizontally",
+      "body": ".lcard is a grid (252px 1fr 214px); the 1fr .lc-mid defaulted to min-width:auto,\nso the wide .rc-track forced the column — and the whole page — wider despite\noverflow-x:auto. Add min-width:0 to .lc-mid so the carousel is bounded and scrolls\ninternally; move the rc arrows inside the card edges.\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/a337b956f4c9c0424b37c97ef85bed2c1e899fa2"
+    },
+    {
+      "sha": "b618359ad63b74978dd1c83ab81ea0f2a710e4cd",
+      "short": "b618359",
+      "date": "2026-07-23",
+      "subject": "Workshop: hotel booking flow + on-request rooms, listing inventory demo & carousel C, home-C hotel tile",
+      "body": "Hotel page (hotel.html + proto.js + proto.css):\n- \"Alege\" → ± room stepper; after the first pick every online rate shows a\n  stepper (unified), max 4/room; a booking bar slides up from the bottom with\n  the multi-room summary, total and \"Continuă spre rezervare →\" (Szallas model)\n- On-request (indisponibil online) rate rows: greyed, \"Cere prin consultant\"\n  → callback modal; clearly separated from instant-online rooms to steer\n  demand online while still supporting low inventory\n\nListing:\n- Every card now gets \"Vezi toate tipurile de cameră (N)\" (not just the first)\n- Listing variant C (listing-c.html): the room expander opens a CAROUSEL of\n  room cards with photo + description + price (like the hotel page), not a list\n- Listing B: demo inventory switch (Mult/Mediu/Puțin) — shows the \"many vs few\n  results\" states; the date banner appears only when few results\n- 3-way listing switcher (A/B/C) on B and C\n\nHomepage C: one campaign-carousel tile links directly to a hotel (compact,\nrating badge + location), not to the listing.\n\nFix: hotel booking-bar selection no longer overwrites S.rooms (search state).\nindex.html + previews updated. Originals (home, home-b, listing) untouched.\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>",
+      "screens": [
+        "home-c.html",
+        "hotel.html",
+        "index.html",
+        "listing-b.html",
+        "listing-c.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/b618359ad63b74978dd1c83ab81ea0f2a710e4cd"
+    },
+    {
+      "sha": "35b595f7bc46652ec3551fc9243e51dbe90bc1a3",
+      "short": "35b595f",
+      "date": "2026-07-23",
+      "subject": "Workshop round: homepage C (hero-integrated search) + listing variant B",
+      "body": "Homepage C (home-c.html), built from variant A, kept A/B untouched:\n- Top campaign carousel in \"tiles\" style (≈3 tiles visible + peek, arrows, autoplay)\n- Search integrated into a hero image (\"nu ai găsit? caută\") instead of a separate banner\n- Flexible-date chips moved from the first view into the calendar widget\n- C flow routes to listing variant B\n\nListing variant B (listing-b.html), built from listing.html, A untouched:\n- Compact header (less vertical space, pushes the list up)\n- Slim date banner that appears ONLY when few results — shows \"de la {price}\"\n  and the number of available hotels per date range\n- \"Explorează stațiunile din apropiere\" moved to the bottom of the list\n\nproto.js / proto.css (shared, gated so A/B are unchanged):\n- Listing-card photo galleries: prev/next arrows cycling photos, synced dots\n- Calendar flexible-date chips rendered when body has data-flex-in-cal\n- listingHref() routes variant C to listing-b\n- Flexi-strip renderB() + conditional visibility for data-listing=\"b\"\n\nindex.html: added variant-C and listing-B cards; previews regenerated.\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>",
+      "screens": [
+        "home-c.html",
+        "index.html",
+        "listing-b.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/35b595f7bc46652ec3551fc9243e51dbe90bc1a3"
+    },
+    {
+      "sha": "7432576c7d460644acaed544cc641b35b714af62",
+      "short": "7432576",
+      "date": "2026-07-19",
+      "subject": "Add homepage variant B — the homepage IS the listing",
+      "body": "Parallel concept modelled on travelist.pl/hotele, in the LITRO design system:\nfull-bleed hero with the search overlaid + proof numbers, theme tiles for the\noffer programmes, results bar with sort and 'how we rank' modal, filter rail,\nwide deal cards (campaign badges, review quote, perk chips, hotel price vs our\nprice with savings, credits), 'picked for you' strip, FRIENDS band, call-centre\nrescue block, pagination, tabbed see-also index, newsletter, trust band.\n\nFully wired into the prototype (filters, sort, calendar, cards all work) and a\nfloating A/B switcher on both homepages.\n\nCo-Authored-By: Claude Fable 5 <noreply@anthropic.com>",
+      "screens": [
+        "home-b.html",
+        "home.html",
+        "index.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/7432576c7d460644acaed544cc641b35b714af62"
+    },
+    {
+      "sha": "9b870a7547ed742591f444a4ffa44c879fc86e43",
+      "short": "9b870a7",
+      "date": "2026-07-19",
+      "subject": "Turn the five screens into a working click-through prototype",
+      "body": "proto.js + proto.css add: destination picker, two-month calendar with per-night\nprices, guests/rooms stepper with child ages, flexible-date chips, price strip\nthat moves the stay, listing filters + sorting + chips + empty state, room-type\nexpander, favourites, gallery lightbox, meal-plan filter, rate selection, sticky\nbooking bar, promo code, voucher split payment, payment modes, consent gating,\ncallback form, modals for campaigns/policies/facilities, toasts and page transitions.\nState (destination, dates, guests, hotel, rate, payment) carries across screens.\n\nPrices are now derived from live production data instead of placeholders.\n\nCo-Authored-By: Claude Fable 5 <noreply@anthropic.com>",
+      "screens": [
+        "checkout.html",
+        "home.html",
+        "hotel.html",
+        "index.html",
+        "listing.html",
+        "thankyou.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/9b870a7547ed742591f444a4ffa44c879fc86e43"
+    },
+    {
+      "sha": "885e4c48dc11e8566e68181f4dda3c6f4c851d1c",
+      "short": "885e4c4",
+      "date": "2026-07-19",
+      "subject": "Iteration 2: restore the commercial machinery + first scalpel components",
+      "body": "listing: review quote per card, offer-expiry countdown, real campaign names with\nconditions, credits as a stay total, room-type expander, zero-review card state,\nsold-out rescue block with callback slot\nhotel: programme badges + offer chips, 'De ce aleg oamenii' with top dimension,\nown campaigns (te rasplateste / Jurasica Park), All-Inclusive definition block,\ncheapest-period teaser, sunbeds in unit names, human-help line in booking card\ncheckout: 6 rate fara dobanda (with consultant-assisted variant), holiday-card\nsplit payment, child ages\nhome: visible desktop nav, 15-programme offer catalogue, trust/scale band,\n19-resort index, ancillary programme links, instalments value prop\nthankyou: storno upsell with deadline, FRIENDS tier progress\n\nCo-Authored-By: Claude Fable 5 <noreply@anthropic.com>",
+      "screens": [
+        "audit.html",
+        "checkout.html",
+        "home.html",
+        "hotel.html",
+        "listing.html",
+        "thankyou.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/885e4c48dc11e8566e68181f4dda3c6f4c851d1c"
+    },
+    {
+      "sha": "40f2d59ef18d0ab37f7c63172112c7319fd0fd94",
+      "short": "40f2d59",
+      "date": "2026-07-19",
+      "subject": "Add README, full .fig pipeline tools and the live-site research the audit is based on",
+      "body": "Nothing of this work now lives only in a scratchpad: decoder, renderer, DOM dumper\nand .fig generator, plus the production dumps and raw audit findings.\n\nCo-Authored-By: Claude Fable 5 <noreply@anthropic.com>",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/40f2d59ef18d0ab37f7c63172112c7319fd0fd94"
+    },
+    {
+      "sha": "31044b1adcd2533c1903510c1c3d559b8a5535c0",
+      "short": "31044b1",
+      "date": "2026-07-19",
+      "subject": "Fix all 7 audit blockers across the five screens; regenerate .fig",
+      "body": "- resort tax as 'De plătit la hotel'; remove false 'Prețul include taxele' everywhere\n- consent unticked + gated CTA + separate marketing consent + Contractul cu turistul\n- promo code / gift card field in checkout\n- real house rules (pets not allowed) + Reguli casei block\n- per-rate confirmation type (instantă vs max. 2 ore)\n- call-centre hours 10:00-18:00, 30-second promise removed\n- legal operator identity (Creative Eye SRL, licence 536, ANPC) on all screens\n- listing counts/facets re-derived from production data + Disponibilitate filters\n- thank-you: real cancellation terms, Documentele tale, credit mechanics\n\nCo-Authored-By: Claude Fable 5 <noreply@anthropic.com>",
+      "screens": [
+        "audit.html",
+        "checkout.html",
+        "home.html",
+        "hotel.html",
+        "index.html",
+        "listing.html",
+        "thankyou.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/31044b1adcd2533c1903510c1c3d559b8a5535c0"
+    },
+    {
+      "sha": "b7c6d3d54a03520d5915230d64f857c528a3d7cc",
+      "short": "b7c6d3d",
+      "date": "2026-07-19",
+      "subject": "Add production gap audit: live funnel vs redesign + call-centre strategy",
+      "body": "Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>",
+      "screens": [
+        "audit.html",
+        "index.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/b7c6d3d54a03520d5915230d64f857c528a3d7cc"
+    },
+    {
+      "sha": "5157f476d8b7f64424160aa2611a72720a9d6c70",
+      "short": "5157f47",
+      "date": "2026-07-18",
+      "subject": "Add desktop checkout + thank-you pages; .fig now carries all 5 frames",
+      "body": "Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>",
+      "screens": [
+        "checkout.html",
+        "index.html",
+        "thankyou.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/5157f476d8b7f64424160aa2611a72720a9d6c70"
+    },
+    {
+      "sha": "8730e4296a0cce539e51187573990e49b2c1f897",
+      "short": "8730e42",
+      "date": "2026-07-18",
+      "subject": "Add native .fig export + Figma/dev handoff notes",
+      "body": "Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>",
+      "screens": [
+        "index.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/8730e4296a0cce539e51187573990e49b2c1f897"
+    },
+    {
+      "sha": "9200bc29ca21ccee5fd36aabbda78a7c53e1f265",
+      "short": "9200bc2",
+      "date": "2026-07-18",
+      "subject": "LITRO desktop redesign v2 — home, listing, hotel + specs",
+      "body": "Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>",
+      "screens": [
+        "home.html",
+        "hotel.html",
+        "index.html",
+        "listing.html",
+        "specs.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/9200bc29ca21ccee5fd36aabbda78a7c53e1f265"
+    }
+  ]
+}
