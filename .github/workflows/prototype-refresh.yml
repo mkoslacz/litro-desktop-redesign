@@ -55,6 +55,16 @@ jobs:
           REFRESH_DUMP_TIMEOUT_MS: '1800000'
         run: node tools/refresh.js
 
+      - name: Remove build-only dependencies
+        shell: bash
+        run: |
+          target="${GITHUB_WORKSPACE:?}/tools/node_modules"
+          test "$PWD" = "$GITHUB_WORKSPACE"
+          test "$target" = "$PWD/tools/node_modules"
+          test -d "$target"
+          test ! -L "$target"
+          rm -rf -- "$target"
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
