@@ -17,7 +17,9 @@ permissions:
 # Pages deployments are serialized. Let an active deployment finish; GitHub
 # keeps the newest queued run and discards obsolete queued runs for this group.
 concurrency:
-  group: pages
+  # The original `pages` group contains a GitHub-side orphaned deployment
+  # that ignores both regular and forced cancellation requests.
+  group: pages-v2
   cancel-in-progress: false
 
 jobs:
