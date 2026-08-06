@@ -1,0 +1,70 @@
+// Firestore rules for the prototype stakeholder comment layer.
+//
+// Access model chosen for this prototype: a named allowlist only, no hosted-domain
+// rule. A reviewer is admitted by one empty document at allowed/{their email} and by
+// nothing else, so LITRO, Szallas and external reviewers are all added the same way
+// and revoking access is deleting one document. The upstream template also offered a
+// domain regex; it is deliberately absent here — the reviewers do not share one
+// domain, and the owner's own address is a free-mail one, which a domain rule would
+// have opened to the entire provider.
+//
+// An empty allowlist denies everybody. There is deliberately no open mode.
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedInWithEmail() {
+      return request.auth != null
+        && request.auth.token.email != null
+        && request.auth.token.email_verified == true;
+    }
+
+    function explicitlyAllowed() {
+      return exists(/databases/$(database)/documents/allowed/$(request.auth.token.email));
+    }
+
+    function reviewer() {
+      return signedInWithEmail() && explicitlyAllowed();
+    }
+
+    match /allowed/{email} {
+      // `exists()` is enough for a reviewer check; the allowlist itself stays private.
+      allow read, write: if false;
+    }
+
+    match /prototypes/{prototypeId}/threads/{threadId} {
+      allow read: if reviewer();
+      allow create: if reviewer()
+        && request.resource.data.createdBy.uid == request.auth.uid
+        && request.resource.data.createdBy.email == request.auth.token.email
+        && request.resource.data.status == 'open'
+        && request.resource.data.resolvedAt == null
+        && request.resource.data.resolvedBy == null
+        && request.resource.data.orphaned == false;
+      // Any reviewer may change status (the implementer is often not the author),
+      // but no reviewer may rewrite the original anchor or authoring record.
+      allow update: if reviewer()
+        && request.resource.data.createdBy == resource.data.createdBy
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.anchor == resource.data.anchor
+        && request.resource.data.status in ['open', 'resolved']
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['status', 'resolvedAt', 'resolvedBy', 'orphaned', 'updatedAt']);
+      allow delete: if false; // workshop mode archives, never deletes.
+
+      match /messages/{messageId} {
+        allow read: if reviewer();
+        allow create: if reviewer()
+          && request.resource.data.author.uid == request.auth.uid
+          && request.resource.data.author.email == request.auth.token.email
+          && request.resource.data.agent == false;
+        // A message body belongs to its author. The agent's Admin SDK bypasses
+        // these browser rules by construction and is bounded in tools/comments.js.
+        allow update: if reviewer()
+          && resource.data.author.uid == request.auth.uid
+          && request.resource.data.author == resource.data.author
+          && request.resource.data.agent == resource.data.agent;
+        allow delete: if false;
+      }
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "prototypeId": "litro-desktop-redesign",
+  "prototypeUrl": "https://mateuszkoslacz.com/litro-desktop-redesign/",
+  "firebase": {
+    "apiKey": "AIzaSyDm_Ax8ES0i3XLQPXY68AxgTxbrDrtsyxY",
+    "authDomain": "litoralul-prototype.firebaseapp.com",
+    "projectId": "litoralul-prototype",
+    "storageBucket": "litoralul-prototype.firebasestorage.app",
+    "messagingSenderId": "790637809283",
+    "appId": "1:790637809283:web:8f6ffdcc0e5240f0b2d5b6"
+  },
+  "stateKeys": ["auth", "session", "inv", "density", "per", "rooms", "pin"]
+}

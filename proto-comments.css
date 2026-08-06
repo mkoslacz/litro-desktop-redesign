@@ -1,0 +1,70 @@
+/* ============================================================
+   Prototype · stakeholder comments — deliberately scaffolding,
+   never a product component. Include after proto-tools.css.
+   ============================================================ */
+.proto-comments-tools,
+.proto-comments-tray,
+.proto-comments-popover,
+.proto-comment-pin {
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  z-index: 9100;
+}
+.proto-comments-tools {
+  position: fixed; right: 18px; bottom: 18px; display: flex; align-items: center; gap: 7px;
+  max-width: calc(100vw - 36px); padding: 9px; color: #313131; background: #FFF9E8;
+  border: 1px solid #E3C86A; border-radius: 12px; box-shadow: 0 8px 28px rgba(20,20,20,.16);
+}
+.proto-comments-tools button,
+.proto-comments-tray button,
+.proto-comments-popover button {
+  min-height: 28px; border: 1px solid #9C7A12; border-radius: 7px; padding: 0 9px;
+  color: #342500; background: #FFF; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer;
+}
+.proto-comments-tools button:disabled { cursor: not-allowed; opacity: .52; }
+.pc-filter { display: inline-flex; align-items: center; gap: 4px; color: #5C4A17; font-size: 11px; font-weight: 600; white-space: nowrap; }
+.proto-comment-pin {
+  position: fixed; width: 23px; height: 23px; margin: -11px 0 0 -11px; border: 2px solid #FFF;
+  border-radius: 50%; color: #FFF; background: #C23A23; box-shadow: 0 2px 9px rgba(0,0,0,.34);
+  font-size: 13px; line-height: 1; cursor: pointer;
+}
+.proto-comment-pin.resolved { color: #184C2A; background: #B7E5C1; }
+.proto-comments-tray {
+  position: fixed; right: 18px; top: 18px; width: min(300px, calc(100vw - 36px)); padding: 12px;
+  color: #4A1720; background: #FFF1F3; border: 1px solid #E5A9B3; border-radius: 12px;
+  box-shadow: 0 8px 28px rgba(20,20,20,.16);
+}
+.proto-comments-tray strong { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: .4px; }
+.proto-comments-tray p { margin: 5px 0 9px; font-size: 12px; line-height: 1.35; }
+.proto-comments-tray ul { max-height: 180px; margin: 0; padding-left: 17px; overflow: auto; }
+.proto-comments-tray li + li { margin-top: 5px; }
+.proto-comments-tray button { max-width: 100%; overflow: hidden; text-overflow: ellipsis; border-color: #C97987; white-space: nowrap; }
+.proto-comments-popover {
+  position: fixed; width: min(350px, calc(100vw - 36px)); max-height: min(560px, calc(100vh - 36px));
+  overflow: auto; padding: 12px; color: #252525; background: #FFF; border: 1px solid #D1A526;
+  border-radius: 12px; box-shadow: 0 12px 38px rgba(20,20,20,.25);
+}
+.proto-comments-popover header { display: flex; align-items: start; justify-content: space-between; gap: 12px; margin-bottom: 9px; }
+.proto-comments-popover header strong { font-size: 13px; line-height: 1.3; }
+.proto-comments-popover .pc-close { min-width: 25px; padding: 0; border: 0; color: #6B6B6B; font-size: 20px; line-height: 20px; }
+.pc-messages { display: grid; gap: 8px; max-height: 270px; overflow: auto; margin-bottom: 10px; }
+.pc-messages article { padding: 8px; background: #F7F7F7; border-radius: 8px; }
+.pc-messages small { color: #6B6B6B; font-size: 10px; font-weight: 700; }
+.pc-messages p { margin: 4px 0 0; font-size: 13px; line-height: 1.4; white-space: pre-wrap; }
+.proto-comments-popover textarea { box-sizing: border-box; width: 100%; resize: vertical; padding: 8px; border: 1px solid #BFBFBF; border-radius: 8px; color: #202020; font: inherit; font-size: 13px; }
+.proto-comments-popover footer { display: flex; justify-content: flex-end; gap: 7px; margin-top: 8px; }
+.proto-comments-popover .pc-resolve { border-color: #467F55; color: #154222; background: #EAF8ED; }
+.pc-error { margin: 0; color: #8D1826; font-size: 13px; line-height: 1.4; }
+body[data-commenting="1"] * { cursor: crosshair !important; }
+body[data-commenting="1"] .proto-comments-tools,
+body[data-commenting="1"] .proto-comments-tray,
+body[data-commenting="1"] .proto-comments-popover { cursor: default !important; }
+.proto-comment-target { outline: 3px solid #F3B81E !important; outline-offset: 3px; }
+@media (max-width: 700px) {
+  .proto-comments-tools { right: 12px; bottom: 12px; flex-wrap: wrap; justify-content: flex-end; }
+  .proto-comments-tray { top: 12px; right: 12px; }
+}
+/* Export mode needs a belt-and-braces declaration even though init returns early. */
+body[data-export="1"] .proto-comments-tools,
+body[data-export="1"] .proto-comments-tray,
+body[data-export="1"] .proto-comments-popover,
+body[data-export="1"] .proto-comment-pin { display: none !important; }

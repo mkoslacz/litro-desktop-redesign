@@ -123,6 +123,8 @@
     spin.classList.add('on');
     setTimeout(() => { location.href = enp(url) + qs() + (extra || ''); }, delay == null ? 400 : delay);
   }
+  /* vezi proto.js: la „înapoi” pagina vine din bfcache cu spinnerul încă pornit */
+  window.addEventListener('pageshow', () => spin.classList.remove('on'));
 
   /* ---------- toast ---------- */
   const toastWrap = el('div', 'toast-wrap'); document.body.appendChild(toastWrap);
@@ -485,7 +487,9 @@
        ca fiecare variantă să poată fi exportată în Figma fără clic în panou. */
     if (qp.get('auth')) document.body.dataset.auth = qp.get('auth');
     if (qp.get('density')) document.body.dataset.density = qp.get('density');
-    if (qp.get('rooms')) document.body.dataset.rooms = qp.get('rooms');
+    /* vezi proto.js: „rooms" e și numărul de camere din căutare (qs()), și comutatorul
+       „Tipuri de cameră" din panou — acceptăm doar cele două valori ale comutatorului */
+    if (['on', 'off'].indexOf(qp.get('rooms')) >= 0) document.body.dataset.rooms = qp.get('rooms');
     if (qp.get('session')) document.body.dataset.session = qp.get('session');
     if (!document.body.dataset.rooms) document.body.dataset.rooms = 'on';
     if (!document.body.dataset.session) document.body.dataset.session = 'site';
@@ -527,7 +531,9 @@
     const btn = (attr, label, on) => '<span class="pt-b' + (on ? ' on' : '') + '" ' + attr + '>' + label + '</span>';
     const lnk = (href, label, on) => '<a class="pt-b' + (on ? ' on' : '') + '" href="' + href + '">' + label + '</a>';
 
-    const box = el('div', 'proto-tools' + ($('.bookbar, .pricebar') ? ' up' : ''));
+    /* pt-dark: panoul de mobil e pastila întunecată, nu cardul alb din rail-ul
+       de desktop — proto-sheets.css alege pielea după clasa asta */
+    const box = el('div', 'proto-tools pt-dark' + ($('.bookbar, .pricebar') ? ' up' : ''));
     let html = '<div class="pt-h">' + t('Prototip · setări', 'Prototype · settings') + '</div>';
     html += '<div class="pt-row"><span class="pt-lbl">' + t('Limbă', 'Language') + '</span>' +
       seg('pt-lang', lnk(roFile, 'RO', !EN()) + lnk(enFile, 'EN', EN())) + '</div>';
@@ -627,6 +633,10 @@
     $('.pt-min', box).onclick = () => box.classList.toggle('mini');
     /* linkurile de limbă/vedere duc mai departe starea curentă */
     $$('a.pt-b', box).forEach(a => a.href = a.getAttribute('href') + qs());
+    /* Changelog and product use cases, same two sheets as the desktop panel.
+       Mounted last so the state-carrying rewrite above never sees their links —
+       a use case pins its own state and must not inherit the current one. */
+    if (window.protoSheets) protoSheets.mount(box, { en: EN(), carry: qs() });
   }
 
   /* ============================================================

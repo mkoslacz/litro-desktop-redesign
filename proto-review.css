@@ -1,0 +1,255 @@
+/* ============================================================
+   REVIEW PAGES — shared shell for changelog.html, usecases.html, comments.html
+   ============================================================
+
+   These three pages are review scaffolding, exactly like the demo panel and
+   its sheets: they describe the prototype, they are not part of it. So they
+   borrow the review hub's visual language (index.html) — off-white page,
+   white cards, navy headings, orange affordances — and nothing from
+   litro.css, which is handoff material for developers and would make a
+   reviewer read these pages as a proposal.
+
+   The panel sheets (proto-sheets.js) stay the preview; each of them links
+   here. This file is the only stylesheet the three pages load.
+
+   ------------------------------------------------------------
+   THE SHELL — copy this into each page, change the three marked spots
+   ------------------------------------------------------------
+
+     <!doctype html>
+     <html lang="ro">
+     <head>
+     <meta charset="utf-8">
+     <meta name="viewport" content="width=device-width,initial-scale=1">
+     <title>Jurnal de modificări · Changelog — LITRO desktop redesign</title>
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+     <link rel="stylesheet" href="proto-review.css">
+     <script>if (location.protocol === 'file:') document.documentElement.dataset.origin = 'file';</script>
+     </head>
+     <body class="rp-page">
+     <div class="rp-wrap">
+       <header class="rp-head">
+         <a class="rp-back" href="index.html">← Hub-ul de recenzie · Review hub</a>
+         <h1 class="rp-title">Jurnal de modificări <span>· Changelog</span></h1>
+         <p class="rp-lede">Ce s-a schimbat de la o rundă la alta. · What changed between rounds.</p>
+         <nav class="rp-nav" aria-label="Pagini de recenzie · Review pages">
+           <a href="changelog.html" aria-current="page">Jurnal · Changelog</a>
+           <a href="usecases.html">Situații · Use cases</a>
+           <a href="comments.html">Comentarii · Comments</a>
+         </nav>
+       </header>
+
+       <p class="rp-note rp-file-note">
+         Pagina e deschisă de pe <code>file://</code>, iar browserul nu are voie să citească
+         fișierele alăturate — deci conținutul de mai jos nu se poate încărca. Deschide adresa
+         publicată sau pornește <code>node tools/serve.js</code> și intră pe
+         <code>localhost:8080</code>.
+         <span class="rp-en">This page is open from <code>file://</code>, where the browser may not
+         read sibling files, so the content below cannot load. Use the published URL, or run
+         <code>node tools/serve.js</code> and open <code>localhost:8080</code>.</span>
+       </p>
+
+       <main class="rp-main rp-needs-url"> …the page… </main>
+     </div>
+     </body>
+     </html>
+
+   ------------------------------------------------------------
+   THE file:// STORY — decided once, here, for all three pages
+   ------------------------------------------------------------
+
+   All three pages read a sibling file (changelog.json, usecases.built.json,
+   comments.config.json), and fetch() of a sibling is blocked over file://.
+   The panel sheets already say so instead of failing silently; a full page
+   owes the reviewer the same honesty, and owes it *before* the fetch, not as
+   an error after it.
+
+   The one-line boot script above stamps data-origin="file" on <html>. From
+   there the split is pure CSS and every page inherits it:
+
+     .rp-file-note   shown only over file://   (hidden everywhere else)
+     .rp-needs-url   hidden only over file://  (put it on the regions whose
+                     content comes from a fetch — never on the shell itself,
+                     or the page has nothing left to explain itself with)
+
+   A page with content that does not need a fetch simply leaves .rp-needs-url
+   off that part; it keeps working from a local copy.
+
+   ------------------------------------------------------------
+   LANGUAGE
+   ------------------------------------------------------------
+
+   Shell chrome is labelled in both languages the prototype ships, in the same
+   idiom as proto-sheets.js: "Jurnal · Changelog". There is no RO/EN switch on
+   these pages, so the shell renders identically for both audiences — a
+   reviewer and a stakeholder are rarely the same reader, and neither should
+   have to meet the other's language to find the page. Content pulled out of
+   changelog.json / usecases.built.json / Firestore keeps whatever language it
+   was written in.
+   ============================================================ */
+
+:root {
+  --rp-bg: #F7F5F3;
+  --rp-surface: #fff;
+  --rp-ink: #1E1E1E;
+  --rp-muted: #57585A;
+  --rp-line: #EFEDED;
+  --rp-navy: #004B97;
+  --rp-navy-deep: #012B55;
+  --rp-orange: #EB802D;
+  --rp-info-bg: #EEF4FB;
+  --rp-info-line: #CBDEF2;
+  --rp-warn-bg: #FDF3EA;
+  --rp-warn-line: #F3CFA5;
+  --rp-warn-ink: #7A3E06;
+  --rp-shadow: 0 2px 10px rgba(30, 30, 30, .06);
+  --rp-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* ===== page chrome — only on the review pages themselves ===== */
+/* index.html loads this file too, for the "review pages" section of the hub,
+   so nothing below .rp-page may touch the hub's own layout. */
+
+.rp-page {
+  margin: 0; padding: 50px 20px;
+  font-family: 'DM Sans', sans-serif; font-size: 15px; line-height: 1.55;
+  color: var(--rp-ink); background: var(--rp-bg);
+}
+.rp-page * { box-sizing: border-box; }
+.rp-wrap { max-width: 1080px; margin: 0 auto; }
+
+.rp-head { margin-bottom: 26px; }
+.rp-back {
+  display: inline-block; margin-bottom: 14px;
+  color: var(--rp-navy); font-size: 14px; font-weight: 700; text-decoration: none;
+}
+.rp-back:hover { text-decoration: underline; }
+.rp-title {
+  margin: 0 0 6px; font-family: 'Outfit', sans-serif; font-size: 34px; line-height: 1.15;
+  font-weight: 700; color: var(--rp-ink);
+}
+.rp-title span { color: var(--rp-muted); font-weight: 500; }
+.rp-lede { margin: 0; max-width: 760px; color: var(--rp-muted); font-size: 15.5px; }
+
+/* The nav strip is the only thing that makes the three pages one family from
+   inside; the back-link is what makes them one family with the hub. */
+.rp-nav { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.rp-nav a {
+  padding: 7px 14px; border: 1px solid var(--rp-line); border-radius: 999px;
+  background: var(--rp-surface); box-shadow: var(--rp-shadow);
+  color: var(--rp-navy); font-size: 13.5px; font-weight: 700; text-decoration: none;
+}
+.rp-nav a:hover { border-color: var(--rp-navy); }
+.rp-nav a[aria-current="page"] {
+  background: var(--rp-navy-deep); border-color: var(--rp-navy-deep); color: #fff;
+}
+
+/* ===== notes, states and messages — one look for all three pages ===== */
+
+.rp-note {
+  margin: 0 0 22px; padding: 14px 18px; border-radius: 14px;
+  background: var(--rp-info-bg); border: 1px solid var(--rp-info-line);
+  color: var(--rp-navy-deep); font-size: 14.5px; line-height: 1.55;
+}
+.rp-note code { font-family: var(--rp-mono); font-size: 13px; }
+.rp-note-warn {
+  background: var(--rp-warn-bg); border-color: var(--rp-warn-line); color: var(--rp-warn-ink);
+}
+/* The English half of a bilingual note reads as a translation, not as a
+   second paragraph of instructions. */
+.rp-en { display: block; margin-top: 6px; opacity: .75; }
+
+.rp-msg { margin: 0; padding: 18px 0; color: var(--rp-muted); font-size: 15px; }
+
+/* file:// split — see THE file:// STORY above. Both rules are keyed on the
+   same attribute, so a page cannot implement half of the contract. */
+.rp-file-note { display: none; }
+:root[data-origin="file"] .rp-file-note { display: block; }
+:root[data-origin="file"] .rp-needs-url { display: none; }
+
+/* ===== toolbar — filters and counts (comments.html, changelog.html) ===== */
+
+.rp-toolbar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+  margin-bottom: 18px;
+}
+.rp-chip {
+  padding: 6px 13px; border: 1px solid var(--rp-line); border-radius: 999px;
+  background: var(--rp-surface); box-shadow: var(--rp-shadow);
+  font: inherit; font-size: 13.5px; font-weight: 700; color: var(--rp-navy);
+  cursor: pointer;
+}
+.rp-chip:hover { border-color: var(--rp-navy); }
+.rp-chip[aria-pressed="true"] {
+  background: var(--rp-navy-deep); border-color: var(--rp-navy-deep); color: #fff;
+}
+.rp-count { margin-left: auto; color: var(--rp-muted); font-size: 13.5px; }
+
+/* ===== sections and cards ===== */
+
+.rp-section { margin-bottom: 34px; }
+.rp-section > h2 {
+  margin: 0 0 14px; font-family: 'Outfit', sans-serif; font-size: 22px; font-weight: 700;
+}
+.rp-section > h2 a { color: inherit; text-decoration: none; }
+.rp-sub {
+  margin: 0 0 12px; color: var(--rp-muted); font-size: 12px; font-weight: 800;
+  letter-spacing: .06em; text-transform: uppercase;
+}
+
+.rp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+
+.rp-card {
+  padding: 16px 18px; border: 1px solid var(--rp-line); border-radius: 14px;
+  background: var(--rp-surface); box-shadow: var(--rp-shadow);
+}
+.rp-card + .rp-card { margin-top: 12px; }
+.rp-grid .rp-card + .rp-card { margin-top: 0; }
+.rp-card h3 {
+  margin: 0 0 4px; font-family: 'Outfit', sans-serif; font-size: 17px; font-weight: 700;
+}
+.rp-card p { margin: 0 0 8px; }
+.rp-card p:last-child { margin-bottom: 0; }
+.rp-card a { color: var(--rp-navy); }
+
+.rp-meta { color: var(--rp-muted); font-size: 13px; }
+.rp-meta .rp-mono { font-family: var(--rp-mono); font-size: 12.5px; }
+.rp-body { margin: 8px 0 0; white-space: pre-wrap; }
+
+.rp-links { margin-top: 10px; font-size: 13.5px; }
+.rp-links a { color: var(--rp-navy); text-decoration: underline; text-underline-offset: 2px; }
+.rp-links a + a { margin-left: 10px; }
+
+.rp-tag {
+  display: inline-block; padding: 1px 7px; border-radius: 5px;
+  background: var(--rp-navy); color: #fff;
+  font-family: var(--rp-mono); font-size: 11.5px; font-weight: 400;
+}
+.rp-tag-open { background: var(--rp-orange); }
+.rp-tag-done { background: #0B5E38; }
+
+/* The primary affordance is the hub's orange button, so a review page and the
+   hub offer the same-looking way out to a screen. */
+/* Typed as a.rp-btn so it also wins inside a card, where `.rp-card a` would
+   otherwise repaint the label navy on orange. */
+a.rp-btn {
+  display: inline-block; padding: 9px 18px; border-radius: 10px;
+  background: var(--rp-orange); color: #fff;
+  font-size: 14px; font-weight: 700; text-decoration: none;
+}
+a.rp-btn:hover { filter: brightness(.95); }
+a.rp-btn-alt { background: var(--rp-surface); color: var(--rp-orange); box-shadow: inset 0 0 0 1.5px var(--rp-orange); }
+.rp-btn + .rp-btn { margin-left: 6px; }
+
+/* Anything that can outgrow the column scrolls inside itself — a review page
+   that scrolls sideways is unusable in a workshop, at either viewport. */
+.rp-scroll { max-width: 100%; overflow-x: auto; }
+.rp-page img, .rp-page table { max-width: 100%; }
+.rp-page pre, .rp-page code { overflow-wrap: anywhere; }
+
+@media (max-width: 720px) {
+  .rp-page { padding: 28px 14px; }
+  .rp-title { font-size: 27px; }
+  .rp-count { margin-left: 0; width: 100%; }
+}

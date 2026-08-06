@@ -16,7 +16,14 @@ inside that sandbox.
 | `m-home.html` `m-listing.html` `m-hotel.html` `m-checkout.html` `m-thankyou.html` (+ `-en`) | The same flow as **mobile web**, at 390px, in Romanian and English |
 | `litro.css` | The design system: colour/radius/shadow/type tokens + every component |
 | `litro-m.css` `proto-m.js` | Mobile stylesheet + mobile interaction engine (see below) |
-| `litro-final.fig` | **The handoff file** — 35 editable frames: desktop + mobile, RO + EN, plus every state variant |
+| `litro-final.fig` | **The handoff file** — 38 editable frames: desktop + mobile, RO + EN, plus every state variant. Generated from `prototype.json`; never hand-edited |
+| `prototype.json` | Declares every exported frame — a page plus the query params that pin its state. A new state is a line here, not an edited script |
+| `changelog.json` | Generated from Git by `tools/build-changelog.js`; read in the panel's *Jurnal de modificări* sheet |
+| `usecases.json` | **Hand-written source**: what every demo state means, plus ten declared product situations |
+| `usecases.built.json` `docs/usecases.md` `docs/usecases/` | Generated from it — panel payload, developer documentation, and one capture per use-case screen |
+| `proto-sheets.js` `proto-sheets.css` | The two read-only panel sheets (changelog + use cases), shared by the desktop and mobile engines |
+| `proto-comments.js` `proto-comments.css` `proto-comments-boot.js` | Stakeholder comment layer — pins, threads, replies, resolve. Dormant until `comments.config.json` exists |
+| `comments.config.example.json` `comments.config.schema.json` `comments.rules` | Comment-layer configuration contract and the Firestore security rules to deploy |
 | `litro-mobile-web.fig` `litro-desktop-redesign.fig` `litro-c-flow-en.fig` | Earlier partial exports, superseded by `litro-final.fig` |
 | `specs.html` | Measurement spec for developers (component by component, all values in px) |
 | `audit.html` | Production gap audit — live funnel vs these screens + call-centre strategy |
@@ -267,6 +274,87 @@ by a pager plus a range line — *Afișăm 1–30 din 81 cazări* — because a 
 much is left and where you are, and infinite scroll additionally buries the footer and makes a result
 impossible to return to. The pager hides itself below 31 results, so a filtered set of three does not
 get decoration it does not need.
+
+## The two panel sheets — changelog and use cases
+
+At the foot of the demo panel are two things that are *content*, not switches: they explain the
+prototype rather than change it, so they are collapsed by default and fetched only when opened.
+
+**Jurnal de modificări** is generated from Git by `tools/build-changelog.js`: date, subject, the
+screens the commit touched (as links) and the commit SHA linking to GitHub. It exists because a
+stakeholder comparing today's screen against yesterday's screenshot needs to know which one they
+are holding. Note the ordering constraint — *a file cannot contain the SHA of the commit that
+writes it*, so the changelog is generated **after** the content commit and committed on top. The
+refresh workflow does that automatically; by hand it is two commits.
+
+**Situații de utilizare** is generated from the hand-written `usecases.json`, which is the real
+deliverable here. It documents what each demo state *means* as a product situation — guest vs
+member, full inventory vs zero, each card density — and declares ten scenarios that pin a complete
+state, each with a deep link that opens it. Two validation rules keep it honest and
+`tools/build-usecases.js` fails the build on either: **every axis and every option carries a `doc`**,
+and **every option appears in at least one declared use case**. Twelve axes and twenty-nine options
+are covered today. The matrix is deliberately declared rather than exhaustive — twelve axes make
+thousands of combinations and almost none is a real situation.
+
+Both sheets need `fetch`, which a browser refuses to do for a sibling file over `file://`. From a
+local copy they say so; run `node tools/serve.js` or use the published URL.
+
+## Stakeholder comments
+
+An optional workshop layer: an allowlisted Google-signed-in reviewer drops a **pin on the element
+being discussed**, writes a thread, replies, and resolves it — live for everyone in the room. A
+comment anchors to the **view**, not just the element: page, viewport, language and the demo state
+it was written in, so a thread opened on "member + zero inventory" reopens in that state. If the
+element moves, the layer falls back to the visible text; if that fails too, the thread goes to the
+detached tray rather than being silently lost.
+
+**The layer is installed but dormant.** It stays a quiet no-op until `comments.config.json` exists
+beside the screens, which needs a Firebase project this repository cannot create. To turn it on:
+
+1. Create the Firebase project, enable **Authentication → Google**, deploy `comments.rules` to
+   Firestore, and add the published Pages domain to the Google provider's **authorized domains**.
+   Skipping that last step looks exactly like an OAuth popup that closes for no reason.
+2. Copy `comments.config.example.json` to `comments.config.json` and fill in `prototypeId`, the
+   Firebase **web** config and `allowedEmailDomains`. The web config is public by design — the
+   Firestore rules and the allowlist are what protect the threads. The file takes only the fields in
+   `comments.config.schema.json`: never a service account, a private key or any JavaScript.
+3. Set `stateKeys` to the axes that should form an anchor. Keep that list stable: changing its shape
+   orphans existing threads.
+
+Then the workshop loop is `node tools/comments.js dump` → make the agreed change → write
+`comments/replies.json` → `node tools/comments.js apply comments/replies.json --round <N> --commit <SHA>`.
+
+> **Before inviting reviewers, tell them the threads — with their names and email addresses — are
+> stored by the configured third-party service (Firebase/Google Cloud).** Dumps carry that same
+> personal data: `comments/` is gitignored and must stay that way. A comment dump is also *not* a
+> review — it feeds a workshop round, not `/impl-guide`. `/ux-review`, `/conversion-review` and
+> `/legal-review` remain the routes that turn this prototype into findings.
+
+## Rebuilding the generated artifacts
+
+```bash
+node tools/refresh.js            # changelog → use cases → hub previews → litro-final.fig
+node tools/refresh.js --fast     # skip everything that needs a browser
+node tools/refresh.js --only fig # just the Figma export
+```
+
+The screens themselves still need no build step — this only regenerates derived artifacts. The
+`.fig` comes from `prototype.json`, so adding a state to the export is a line of JSON, not an edited
+script. Two things that will waste an afternoon if forgotten:
+
+- **The data chunk must be zstd.** With deflate, Figma accepts the file and then hangs forever at
+  "0 of 1 files" with no error. The schema chunk stays deflate-raw, copied byte-for-byte from the
+  donor at `tools/.schema/canvas.fig` — a 28 KB schema fragment, header plus chunk 0 and no design
+  data, which is why it can be committed when a source `.fig` export cannot.
+- **Frames are dumped with `?nopanel=1`.** Any new `position:fixed` element must be added to the
+  export-mode CSS, or it is captured at the bottom edge of the capture window and lands in the
+  middle of the exported frame.
+
+`.github/workflows/prototype-refresh.yml` runs the same thing in CI after a screen commit and pushes
+the regenerated artifacts back. Its three loop guards — `paths-ignore`, the `[skip ci]` marker on the
+bot commit, and `concurrency` — must stay together; removing any one makes the workflow retrigger on
+its own commit. It installs from `tools/package-lock.json`, which is why the root `.gitignore`
+entries for `package.json` are anchored with a leading slash.
 
 ## Design decisions that are business rules, not taste
 

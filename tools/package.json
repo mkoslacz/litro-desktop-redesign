@@ -1,0 +1,30 @@
+{
+  "name": "litro-prototype-tools",
+  "private": true,
+  "description": "The .fig <-> HTML pipeline for this prototype, installed from the design-prototype skill (toolkit 6.0.0). The screens themselves need none of this: they are static HTML that opens from file://. These dependencies exist only for the generators — DOM dumps, the Figma export, the changelog, the use-case documentation and the comment-dump CLI.",
+  "license": "MIT",
+  "//": [
+    "Versions follow the toolkit manifest, pinned to their major so a breaking bump cannot",
+    "arrive silently. kiwi-schema matters most: it is a 0.x package, so the caret pins the",
+    "minor as well — a change in what the encoder emits shows up as Figma hanging at",
+    "'0 of 1 files' with no error message at all.",
+    "The Node floor is >=22 because the generator needs zlib.zstdCompressSync for the data",
+    "chunk; with deflate, Figma accepts the file and never finishes opening it.",
+    "firebase-admin is only used by tools/comments.js (the stakeholder-comment dump and",
+    "reply CLI). It is declared here so `npm ci` produces a working checkout, but nothing",
+    "in the screen or export path loads it."
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "firebase-admin": "^14.2.0",
+    "kiwi-schema": "^0.5.0",
+    "pako": "^3.0.1",
+    "puppeteer-core": "^25.4.0"
+  },
+  "overrides": {
+    "uuid": "^11.1.1"
+  },
+  "//overrides": "uuid override: advisory 1119441 (buffer bounds in v3/v5/v6) reaches us only through @google-cloud/* transitive deps of firebase-admin@14, which still resolve uuid<11.1.1. Remove the override once `npm ls uuid` shows every path at >=11.1.1 without it."
+}

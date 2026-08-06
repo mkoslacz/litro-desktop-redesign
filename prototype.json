@@ -1,0 +1,99 @@
+{
+  "_comment": "Manifest for tools/dump-frames.js + tools/generate-fig.js, and the previews step of tools/refresh.js. One frame entry = one editable Figma frame: a page plus the query parameters that pin its demo state, so a state exports without anyone having to click it. Every frame is dumped with ?nopanel=1 (export mode) by the dumper. This supersedes the hand-maintained tools/dump-all.sh + tools/generate-fig-all.js pair.",
+
+  "fileName": "LITRO — Desktop + Mobile redesign",
+  "canvasName": "LITRO — Desktop + Mobile redesign",
+  "out": "litro-final.fig",
+  "background": "#F7F5F3",
+  "thumbnail": "preview-home-c.png",
+
+  "pagesDir": ".",
+  "assets": "assets",
+  "dumpDir": "tools/dumps",
+  "schemaFrom": "tools/.schema/canvas.fig",
+  "width": 1440,
+  "jobs": 3,
+
+  "refresh": {
+    "previews": {
+      "command": ["node", "tools/shoot-previews.js"],
+      "timeoutMs": 600000
+    }
+  },
+
+  "rows": [
+    {
+      "label": "Desktop · main flow (RO)",
+      "frames": [
+        { "id": "home-c", "page": "home-c.html", "name": "Desktop / Home — C (proposal)" },
+        { "id": "home-d", "page": "home-d.html", "name": "Desktop / Home — D" },
+        { "id": "listing-c", "page": "listing-c.html", "name": "Desktop / Listing" },
+        { "id": "hotel", "page": "hotel.html", "name": "Desktop / Hotel" },
+        { "id": "checkout", "page": "checkout.html", "name": "Desktop / Checkout" },
+        { "id": "thankyou", "page": "thankyou.html", "name": "Desktop / Confirmation" }
+      ]
+    },
+    {
+      "label": "Desktop · main flow (EN)",
+      "frames": [
+        { "id": "home-c-en", "page": "home-c-en.html", "name": "Desktop EN / Home — C (proposal)" },
+        { "id": "home-d-en", "page": "home-d-en.html", "name": "Desktop EN / Home — D" },
+        { "id": "listing-c-en", "page": "listing-c-en.html", "name": "Desktop EN / Listing" },
+        { "id": "hotel-en", "page": "hotel-en.html", "name": "Desktop EN / Hotel" },
+        { "id": "checkout-en", "page": "checkout-en.html", "name": "Desktop EN / Checkout" },
+        { "id": "thankyou-en", "page": "thankyou-en.html", "name": "Desktop EN / Confirmation" }
+      ]
+    },
+    {
+      "label": "Desktop · states",
+      "frames": [
+        { "id": "listing-c-denb", "page": "listing-c.html?density=b", "name": "Desktop / Listing — compact cards" },
+        { "id": "listing-c-denc", "page": "listing-c.html?density=c", "name": "Desktop / Listing — icon cards" },
+        { "id": "listing-c-member", "page": "listing-c.html?auth=in", "name": "Desktop / Listing — signed in" },
+        { "id": "home-c-member", "page": "home-c.html?auth=in", "name": "Desktop / Home — signed in" },
+        { "id": "listing-c-few", "page": "listing-c.html?inv=few", "name": "Desktop / Listing — last rooms (phone offered)" },
+        { "id": "listing-c-zero", "page": "listing-c.html?inv=zero", "name": "Desktop / Listing — nothing available" }
+      ]
+    },
+    {
+      "label": "Desktop · archive (superseded concepts)",
+      "frames": [
+        { "id": "home-a", "page": "home.html", "name": "Archive / Home — A (classic hero)" },
+        { "id": "home-b", "page": "home-b.html", "name": "Archive / Home — B (listing first)" },
+        { "id": "listing-a", "page": "listing.html", "name": "Archive / Listing — A" },
+        { "id": "listing-b", "page": "listing-b.html", "name": "Archive / Listing — B" }
+      ]
+    },
+    {
+      "label": "Mobile · main flow (RO)",
+      "frames": [
+        { "id": "m-home", "page": "m-home.html", "width": 430, "name": "Mobile / Home" },
+        { "id": "m-listing", "page": "m-listing.html", "width": 430, "name": "Mobile / Listing" },
+        { "id": "m-hotel", "page": "m-hotel.html", "width": 430, "name": "Mobile / Hotel" },
+        { "id": "m-checkout", "page": "m-checkout.html", "width": 430, "name": "Mobile / Checkout" },
+        { "id": "m-thankyou", "page": "m-thankyou.html", "width": 430, "name": "Mobile / Confirmation" }
+      ]
+    },
+    {
+      "label": "Mobile · main flow (EN)",
+      "frames": [
+        { "id": "m-home-en", "page": "m-home-en.html", "width": 430, "name": "Mobile EN / Home" },
+        { "id": "m-listing-en", "page": "m-listing-en.html", "width": 430, "name": "Mobile EN / Listing" },
+        { "id": "m-hotel-en", "page": "m-hotel-en.html", "width": 430, "name": "Mobile EN / Hotel" },
+        { "id": "m-checkout-en", "page": "m-checkout-en.html", "width": 430, "name": "Mobile EN / Checkout" },
+        { "id": "m-thankyou-en", "page": "m-thankyou-en.html", "width": 430, "name": "Mobile EN / Confirmation" }
+      ]
+    },
+    {
+      "label": "Mobile · states",
+      "frames": [
+        { "id": "m-listing-denb", "page": "m-listing.html?density=b", "width": 430, "name": "Mobile / Listing — compact cards" },
+        { "id": "m-listing-denc", "page": "m-listing.html?density=c", "width": 430, "name": "Mobile / Listing — summary cards" },
+        { "id": "m-listing-member", "page": "m-listing.html?auth=in", "width": 430, "name": "Mobile / Listing — signed in" },
+        { "id": "m-listing-few", "page": "m-listing.html?inv=few", "width": 430, "name": "Mobile / Listing — last rooms" },
+        { "id": "m-listing-zero", "page": "m-listing.html?inv=zero", "width": 430, "name": "Mobile / Listing — nothing available" },
+        { "id": "m-hotel-room", "page": "m-hotel.html?room=2", "width": 430, "name": "Mobile / Hotel — room picked (booking bar up)" }
+      ]
+    }
+  ]
+}

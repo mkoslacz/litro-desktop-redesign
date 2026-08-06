@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Design prototype stakeholder comments configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["prototypeId", "firebase"],
+  "properties": {
+    "prototypeId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "firebase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["apiKey", "authDomain", "projectId", "appId"],
+      "properties": {
+        "apiKey": { "type": "string", "minLength": 1 },
+        "authDomain": { "type": "string", "minLength": 1 },
+        "projectId": { "type": "string", "minLength": 1 },
+        "appId": { "type": "string", "minLength": 1 },
+        "storageBucket": { "type": "string", "minLength": 1 },
+        "messagingSenderId": { "type": "string", "minLength": 1 },
+        "measurementId": { "type": "string", "minLength": 1 }
+      }
+    },
+    "prototypeUrl": {
+      "type": "string",
+      "minLength": 1,
+      "format": "http-url-without-credentials"
+    },
+    "allowedEmailDomains": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "stateKeys": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "agentAuthor": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "uid": { "type": "string", "minLength": 1 },
+        "name": { "type": "string", "minLength": 1 },
+        "email": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

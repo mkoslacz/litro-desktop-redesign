@@ -30,6 +30,9 @@
   .sw { display:inline-block; width:13px; height:13px; border-radius:4px; vertical-align:-2px; margin-right:6px; border:1px solid rgba(0,0,0,.12); }
   .note { background:#EEF4FB; border:1px solid #CBDEF2; border-radius:14px; padding:16px 20px; color:#012B55; font-size:14.5px; line-height:1.55; margin-top:26px; }
 </style>
+<!-- The three review pages share proto-review.css; the hub loads it too, so the
+     section that links them is built from the same cards as the pages. -->
+<link rel="stylesheet" href="proto-review.css">
 </head>
 <body>
 <div class="wrap">
@@ -41,7 +44,9 @@
     <b>▶ Prototip interactiv, nu un mockup.</b> Deschide oricare ecran și clic: caută o stațiune, schimbă datele în calendar (prețurile se recalculează pe zi), filtrează, deschide galeria, alege o cameră, aplică codul promo <code>LITORAL10</code>, bifează condițiile și finalizează rezervarea — starea se transmite de la un ecran la altul.<br><br>
     <b>▶ Nou: bară de căutare lipită sus.</b> Când caseta mare de căutare iese din ecran, aceleași câmpuri se strâng într-o bară fixată sus — minimizată, dar complet funcțională: deschide exact aceleași popovere de destinație / calendar / oaspeți. Trei comutatoare <b>independente</b> în panoul de prototip (<i>homepage</i>, <i>listing</i>, <i>pagina hotelului</i>), pe desktop și pe mobil. Pe <b>pagina hotelului</b>: cine vine din listingul nostru a căutat deja, deci sus nu are nimic — datele le schimbă din <b>bara de sejur de la camere, care rămâne lipită cât ține secțiunea de camere</b>; cine intră direct primește sus bara compactă de căutare.<br><br>
     <b>▶ Nou: card fixat pe caruselul de campanii.</b> Primul loc din carusel poate fi scos din rotație, ca să nu depindă de norocul autoplay-ului. Două moduri, la comutator: <b>„Linie"</b> — primul card, evidențiat, cu restul campaniilor trecând pe lângă el, și <b>„Banner"</b> — bandă lată deasupra caruselului. Creația („Superofertele verii") e text real, nu un JPG: iese editabilă în Figma și există în RO și EN.<br><br>
-    <b>▶ Nou: pozele de producție, la un comutator.</b> Rândul <b>„Fotografii — Prototip / Producție"</b> din panoul de prototip schimbă <b>toate</b> imaginile cu cele reale de pe litoralulromanesc.ro: cardul unui hotel primește fotografiile <i>acelui</i> hotel, cardurile de stațiune primesc poza stațiunii, galeria hotelului se umple din galeria lui de pe site. Macheta, textele și prețurile rămân identice — se vede exact cum arată designul pe baza de imagini pe care o avem azi. <a href="prod-assets.html">Vezi tot pachetul →</a> sau deschide direct <a href="home-c.html?assets=prod">homepage-ul</a> / <a href="hotel.html?assets=prod">pagina hotelului</a> cu poze de producție.
+    <b>▶ Nou: pozele de producție, la un comutator.</b> Rândul <b>„Fotografii — Prototip / Producție"</b> din panoul de prototip schimbă <b>toate</b> imaginile cu cele reale de pe litoralulromanesc.ro: cardul unui hotel primește fotografiile <i>acelui</i> hotel, cardurile de stațiune primesc poza stațiunii, galeria hotelului se umple din galeria lui de pe site. Macheta, textele și prețurile rămân identice — se vede exact cum arată designul pe baza de imagini pe care o avem azi. <a href="prod-assets.html">Vezi tot pachetul →</a> sau deschide direct <a href="home-c.html?assets=prod">homepage-ul</a> / <a href="hotel.html?assets=prod">pagina hotelului</a> cu poze de producție.<br><br>
+    <b>▶ Nou: jurnal de modificări și situații de utilizare, în panou.</b> Jos de tot în panoul de prototip sunt două foi de citit, nu comutatoare. <b>„Jurnal de modificări"</b> arată ce s-a schimbat de la o rundă la alta, cu data și legătura către commit — deci un ecran comparat cu o captură de ieri se poate data. <b>„Situații de utilizare"</b> descrie <b>ce înseamnă</b> fiecare stare de demo ca situație de produs (musafir vs membru, inventar plin vs zero, densitățile celulelor), cu un link care deschide direct starea respectivă. Zece situații declarate acoperă toate cele 29 de opțiuni ale panoului; documentația pentru dezvoltatori e în <a href="docs/usecases.md">docs/usecases.md</a>. Foile se încarcă doar când le deschizi și doar de pe adresa publicată — de pe <code>file://</code> browserul nu are voie să citească fișierele alăturate.<br><br>
+    <b>▶ Nou: comentarii pe prototip.</b> Un recenzent autentificat cu Google poate pune un <b>pin direct pe elementul discutat</b>, poate scrie un fir, poate răspunde și îl poate marca rezolvat — iar firele se actualizează live pentru toți cei din atelier. Un comentariu reține <b>vederea</b>, nu doar elementul: pagina, limba, dispozitivul și starea de demo în care a fost scris, deci un fir deschis pe „membru + inventar zero" se redeschide exact acolo. <b>Se activează după ce proiectul Firebase e configurat</b> (vezi README, <i>Stakeholder comments</i>); până atunci stratul stă tăcut și nu schimbă cu nimic ecranele. <b>De reținut înainte de prima rundă cu comentarii:</b> firele, numele și adresele de e-mail ale recenzenților sunt stocate la furnizorul configurat (Firebase / Google Cloud) — spune-le asta oamenilor înainte să scrie primul comentariu.
   </div>
 
   <div class="pages">
@@ -72,6 +77,31 @@
     <div class="pg"><img src="preview-m-hotel.png" alt="" loading="lazy" decoding="async"><div class="b"><h3>Mobile · Detalii hotel <span style="color:#EB802D">RO · EN</span></h3><p>Galerie swipe care se deschide în <b>mozaic → imagine mare peste același mozaic</b>, cu <b>zoom pe tot ecranul</b> (pinch / dublu-tap); fotografii de la turiști sub recenzii + încărcare proprie, editare inline a datelor din <b>bara de sejur lipită cât ține secțiunea de camere</b>, camere cu stepper ±, camere „la cerere”, bară de rezervare care urcă de jos.</p><a href="m-hotel.html">RO</a> <a class="alt" href="m-hotel-en.html">EN</a></div></div>
     <div class="pg"><img src="preview-m-checkout.png" alt="" loading="lazy" decoding="async"><div class="b"><h3>Mobile · Checkout <span style="color:#EB802D">RO · EN</span></h3><p>Stepper în 3 pași, avans editabil (min. 30%), card de vacanță, rate, cod promo, condiții de anulare, bară fixă cu suma de azi.</p><a href="m-checkout.html">RO</a> <a class="alt" href="m-checkout-en.html">EN</a></div></div>
     <div class="pg"><img src="preview-m-thankyou.png" alt="" loading="lazy" decoding="async"><div class="b"><h3>Mobile · Confirmare <span style="color:#EB802D">RO · EN</span></h3><p>Stare plată + „plătește restul”, pașii următori, <b>documente cu bifă verde / clepsidră gri</b>, credite FRIENDS, condiții de anulare.</p><a href="m-thankyou.html">RO</a> <a class="alt" href="m-thankyou-en.html">EN</a></div></div>
+  </div>
+
+  <h2>Pagini de recenzie — jurnal, situații, comentarii</h2>
+  <div class="rp-note" style="margin-bottom:18px">
+    Trei pagini pentru <b>runda de atelier</b>, nu pentru produs: aceleași date pe care le arată foile din panoul plutitor, dar pe lățime întreagă, cu tot textul și cu legături către ecranul despre care vorbesc. Foaia din panou rămâne previzualizarea — fiecare foaie are acum un link către pagina ei. Paginile citesc fișiere alăturate (<code>changelog.json</code>, <code>usecases.built.json</code>, <code>comments.config.json</code>), iar de pe <code>file://</code> browserul nu are voie să le citească: acolo paginile <b>spun asta</b> în loc să rămână goale. Deschide adresa publicată sau pornește <code>node tools/serve.js</code>.
+  </div>
+  <div class="rp-grid" style="margin-bottom:44px">
+    <div class="rp-card">
+      <h3>Jurnal de modificări</h3>
+      <p class="rp-meta">Din <code class="rp-mono">changelog.json</code></p>
+      <p>Toate intrările, cele mai noi întâi, grupate pe runde — cu <b>textul întreg</b>, nu doar titlul, cu ecranele atinse ca legături și cu commit-ul către GitHub.</p>
+      <p><a class="rp-btn" href="changelog.html">Deschide jurnalul</a></p>
+    </div>
+    <div class="rp-card">
+      <h3>Situații de utilizare</h3>
+      <p class="rp-meta">Din <code class="rp-mono">usecases.built.json</code></p>
+      <p>Cele zece situații cu poveste, reguli, starea rezolvată și legături care deschid direct starea respectivă, plus referința completă a stărilor din panou. Versiunea pentru dezvoltatori rămâne <a href="docs/usecases.md">docs/usecases.md</a>.</p>
+      <p><a class="rp-btn" href="usecases.html">Deschide situațiile</a></p>
+    </div>
+    <div class="rp-card">
+      <h3>Comentarii pe prototip</h3>
+      <p class="rp-meta">Din stratul de comentarii configurat</p>
+      <p>Toate firele într-un singur loc, grupate pe ecrane, cu răspunsuri, stare și legătură către pinul lor — răspunsul la întrebarea cu care începe orice rundă: câte fire sunt deschise și ce spun. Cere autentificare, ca și pinurile de pe ecrane.</p>
+      <p><a class="rp-btn" href="comments.html">Deschide comentariile</a></p>
+    </div>
   </div>
 
   <h2>Arhivă — variante A / B (referință)</h2>
@@ -133,16 +163,19 @@
 
   <h2>Handoff — back to Figma &amp; to dev</h2>
   <div class="note" style="margin-top:10px">
-    <b>To Figma — the final file:</b> <a href="litro-final.fig" download><b>⬇ litro-final.fig</b></a> — one native Figma file with <b>everything: 35 editable frames</b> (layers, texts, photos, exact sizes; single-line texts are auto-width), laid out in labelled rows:<br>
+    <b>To Figma — the final file:</b> <a href="litro-final.fig" download><b>⬇ litro-final.fig</b></a> — one native Figma file with <b>everything: 38 editable frames</b> (layers, texts, photos, exact sizes; single-line texts are auto-width), laid out in labelled rows:<br>
     <b>1.</b> Desktop, flux principal RO (Home C, Home D, Listing C, Hotel, Checkout, Thank you) · <b>2.</b> the same six in EN ·
-    <b>3.</b> Desktop states — listing cu celule compacte (B), cu iconițe (C), listing și home ca <b>membru FRIENDS autentificat</b> ·
+    <b>3.</b> Desktop states — listing cu celule compacte (B), cu iconițe (C), listing și home ca <b>membru FRIENDS autentificat</b>, plus <b>ultimele camere</b> și <b>„niciun rezultat"</b> ·
     <b>4.</b> Desktop archive A / B · <b>5.</b> Mobile RO (5 ecrane) · <b>6.</b> Mobile EN ·
-    <b>7.</b> Mobile states — celule compacte (B), rezumat pe orizontală (C), membru autentificat, inventar redus, hotel cu camera aleasă și bara de rezervare.<br>
+    <b>7.</b> Mobile states — celule compacte (B), rezumat pe orizontală (C), membru autentificat, inventar redus, <b>inventar zero</b>, hotel cu camera aleasă și bara de rezervare.<br>
     Drag it onto the Figma home screen / “Import” — done. Fonts used: <b>Outfit</b> + <b>DM Sans</b> (both in Figma’s Google Fonts catalog).
     Older exports (<code>litro-desktop-redesign.fig</code>, <code>litro-c-flow-en.fig</code>, <code>litro-mobile-web.fig</code>) are superseded by this one.<br><br>
     <b>Cum au fost făcute stările:</b> ecranele acceptă parametri în URL — <code>?auth=in</code> (membru), <code>?density=a|b|c</code> (densitatea celulelor),
-    <code>?inv=many|some|few</code> (inventar demo, mobil), <code>?room=2</code> (camere preselectate, mobil) și <code>?nopanel=1</code> (modul de export: fără panoul de demo,
-    barele fixe intră în flux). Deci orice stare din fișier se poate deschide și live, ca link.<br><br>
+    <code>?inv=many|some|few|zero</code> (inventar demo, <b>acum și pe desktop</b>), <code>?per=10|20|30</code> (rezultate pe pagină), <code>?stf=</code> (coloana de filtre),
+    <code>?sthome/stlist/sthotel=</code> (bara lipită), <code>?pin=off|inline|banner</code>, <code>?assets=prod</code>, <code>?session=new|site</code>, <code>?room=2</code> (camere preselectate, mobil)
+    și <code>?nopanel=1</code> (modul de export: fără panoul de demo, barele fixe intră în flux). Deci orice stare din fișier se poate deschide și live, ca link — și tocmai de asta poate ajunge într-o ramă.<br><br>
+    <b>Fișierul se reface dintr-o comandă:</b> <code>node tools/refresh.js</code> regenerează jurnalul, documentația situațiilor, capturile pentru hub și <code>litro-final.fig</code>, în ordinea corectă.
+    Ramele sunt declarate în <code>prototype.json</code> — o stare nouă înseamnă o linie acolo, nu un script editat de mână. Detalii în <a href="tools/README.md">tools/README.md</a>.<br><br>
     <b>Alternative route:</b> the <b>html.to.design</b> plugin (already used by the team for “LITRO Master Pages”) — capture these live pages: <code>home.html</code>, <code>listing.html</code>, <code>hotel.html</code>, <code>checkout.html</code>, <code>thankyou.html</code> from this site’s URL, or via its Chrome extension.<br><br>
     <b>To Figma — mobile:</b> <a href="litro-mobile-web.fig" download><b>⬇ litro-mobile-web.fig</b></a> — a native Figma file with all ten mobile screens as editable frames at 430&nbsp;px (Romanian on the top row, English below). Same import route as the desktop file: drag it onto the Figma home screen.<br><br>
     <b>To dev — mobile:</b> <code>litro-m.css</code> is the mobile stylesheet (same token block as <code>litro.css</code>, then only mobile components: bare fixe, sheet-uri, carduri pe o coloană) and <code>proto-m.js</code> is the mobile interaction engine (same state key and same price model as <code>proto.js</code>, so desktop and mobile stay in sync). The five <code>m-*.html</code> files are reference implementations at 390 px.<br><br>

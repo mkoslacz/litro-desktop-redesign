@@ -1,9 +1,19 @@
 node_modules/
 .DS_Store
-package.json
-package-lock.json
+# Anchored to the root on purpose: tools/package.json and tools/package-lock.json
+# ARE committed — the refresh workflow runs `npm ci` in tools/ and cannot install
+# from a manifest that is not in the repository.
+/package.json
+/package-lock.json
 _figtmp/
 _*.png
 tools/litro/
 tools/figout/
 tools/dump-*.json
+# Frame dumps from tools/dump-frames.js — ~27 MB of regenerable intermediates
+# between the screens and the .fig. Same reasoning as tools/dump-*.json above.
+tools/dumps/
+
+# Stakeholder comment dumps carry reviewer names and email addresses.
+# Never commit them; they are private working files, not research.
+comments/

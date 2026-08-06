@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Situații de utilizare · Use cases — LITRO desktop redesign</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="proto-review.css">
+<script>if (location.protocol === 'file:') document.documentElement.dataset.origin = 'file';</script>
+<style>
+  /* Page-local additions the shared shell does not carry. Kept out of
+     proto-review.css because they only make sense for this page's shape. */
+  .uc-item { margin-bottom: 30px; }
+  .uc-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; margin-bottom: 4px; }
+  .uc-id {
+    font-family: var(--rp-mono); font-size: 12.5px; font-weight: 700;
+    color: #fff; background: var(--rp-navy-deep); padding: 2px 8px; border-radius: 6px;
+  }
+  .uc-name { margin: 0; font-family: 'Outfit', sans-serif; font-size: 19px; font-weight: 700; }
+  .uc-story { margin: 6px 0 10px; color: var(--rp-muted); }
+  .uc-rules { margin: 0 0 12px; padding-left: 20px; }
+  .uc-rules li { margin-bottom: 4px; }
+  .uc-state {
+    margin: 0 0 12px; padding: 8px 12px; border-radius: 10px;
+    background: var(--rp-info-bg); border: 1px solid var(--rp-info-line);
+    color: var(--rp-navy-deep); font-family: var(--rp-mono); font-size: 12.5px;
+    line-height: 1.6; word-break: break-word;
+  }
+  .uc-screens { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+  .uc-shot {
+    display: block; width: 100%; height: auto; border-radius: 10px;
+    border: 1px solid var(--rp-line); background: var(--rp-bg);
+  }
+  .uc-shot-wrap { margin-top: 10px; }
+  .uc-shot-caption { margin: 6px 0 0; font-size: 12.5px; color: var(--rp-muted); }
+  .uc-shot-missing {
+    padding: 14px; border-radius: 10px; border: 1px dashed var(--rp-line);
+    color: var(--rp-muted); font-size: 13px; text-align: center;
+  }
+
+  /* State reference — every axis with every option and its doc string. */
+  .ref-axis { margin-bottom: 22px; }
+  .ref-axis h3 { margin: 0 0 6px; font-family: 'Outfit', sans-serif; font-size: 17px; font-weight: 700; }
+  .ref-axis-doc { margin: 0 0 10px; color: var(--rp-muted); }
+  .ref-option { margin: 0 0 8px; padding-left: 14px; border-left: 2px solid var(--rp-line); }
+  .ref-option strong { color: var(--rp-navy-deep); }
+</style>
+</head>
+<body class="rp-page">
+<div class="rp-wrap">
+  <header class="rp-head">
+    <a class="rp-back" href="index.html">← Hub-ul de recenzie · Review hub</a>
+    <h1 class="rp-title">Situații de utilizare <span>· Use cases</span></h1>
+    <p class="rp-lede">
+      Zece situații de produs, fiecare o combinație fixată a stărilor din panoul de demonstrație —
+      cu poveste, reguli, starea rezolvată, legături per ecran și o captură.
+      <span class="rp-en">Ten product situations, each a pinned combination of the demo-panel
+      state axes — with story, rules, the resolved state, per-screen deep links and a capture.</span>
+    </p>
+    <nav class="rp-nav" aria-label="Pagini de recenzie · Review pages">
+      <a href="changelog.html">Jurnal · Changelog</a>
+      <a href="usecases.html" aria-current="page">Situații · Use cases</a>
+      <a href="comments.html">Comentarii · Comments</a>
+    </nav>
+  </header>
+
+  <p class="rp-note rp-file-note">
+    Pagina e deschisă de pe <code>file://</code>, iar browserul nu are voie să citească
+    fișierele alăturate — deci conținutul de mai jos nu se poate încărca. Deschide adresa
+    publicată sau pornește <code>node tools/serve.js</code> și intră pe
+    <code>localhost:8080</code>.
+    <span class="rp-en">This page is open from <code>file://</code>, where the browser may not
+    read sibling files, so the content below cannot load. Use the published URL, or run
+    <code>node tools/serve.js</code> and open <code>localhost:8080</code>.</span>
+  </p>
+
+  <p class="rp-note">
+    Versiunea pentru dezvoltatori, cu context suplimentar de implementare, rămâne
+    <a href="docs/usecases.md">docs/usecases.md</a> — pagina de aici nu o duplică, ci o citează.
+    <span class="rp-en">The developer-facing version, with implementation context, stays
+    <a href="docs/usecases.md">docs/usecases.md</a> — this page cites it rather than
+    duplicating its role.</span>
+  </p>
+
+  <main class="rp-main rp-needs-url">
+    <section class="rp-section">
+      <h2>Situații <span class="rp-sub" id="uc-count"></span></h2>
+      <div id="uc-list" class="rp-scroll"><p class="rp-msg">Se încarcă… · Loading…</p></div>
+    </section>
+
+    <section class="rp-section">
+      <h2>Referința completă a stărilor</h2>
+      <p class="rp-sub">Fiecare axă a panoului, fiecare opțiune, cu explicația ei · Every panel
+        axis, every option, with its explanation</p>
+      <div id="uc-states"><p class="rp-msg">Se încarcă… · Loading…</p></div>
+    </section>
+  </main>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var SRC = 'usecases.built.json';
+  var listEl = document.getElementById('uc-list');
+  var countEl = document.getElementById('uc-count');
+  var statesEl = document.getElementById('uc-states');
+
+  function el(tag, className, text) {
+    var node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text != null) node.textContent = String(text);
+    return node;
+  }
+
+  /* Deep links in usecases.built.json are captured with the panel hidden
+     (nopanel=1) so the capture tool gets a clean screenshot. A link meant to
+     be clicked by a reviewer must open the interactive page instead — strip
+     the parameter rather than duplicating the capture-time query. */
+  function withoutNopanel(href) {
+    var raw = String(href || '');
+    var hashAt = raw.indexOf('#');
+    var beforeHash = hashAt === -1 ? raw : raw.slice(0, hashAt);
+    var hash = hashAt === -1 ? '' : raw.slice(hashAt);
+    var queryAt = beforeHash.indexOf('?');
+    if (queryAt === -1) return raw;
+    var path = beforeHash.slice(0, queryAt);
+    var query = new URLSearchParams(beforeHash.slice(queryAt + 1));
+    query.delete('nopanel');
+    var serialized = query.toString();
+    return path + (serialized ? '?' + serialized : '') + hash;
+  }
+
+  function stateLine(state, states) {
+    var keys = Object.keys(state || {});
+    return keys.map(function (key) {
+      var def = states && states[key];
+      var opt = def && def.options && def.options[state[key]];
+      return ((def && def.label) || key) + ': ' + ((opt && opt.label) || state[key]);
+    }).join(' · ');
+  }
+
+  /* Capture files are named UC-<n>-<screen-basename>.png under docs/usecases/.
+     Not every screen a use case touches was captured (mobile/desktop pairs
+     mostly capture one viewport), so a miss is expected, not an error — the
+     <img> is asked to hide itself rather than show a broken-image icon. */
+  function capturePath(usecaseId, screenFile) {
+    var base = String(screenFile || '').replace(/\.html?$/, '');
+    if (!base) return null;
+    return 'docs/usecases/' + usecaseId + '-' + base + '.png';
+  }
+
+  function renderUsecase(usecase, states) {
+    var item = el('article', 'rp-card uc-item');
+
+    var head = el('div', 'uc-head');
+    head.appendChild(el('span', 'uc-id', usecase.id || 'UC'));
+    head.appendChild(el('h3', 'uc-name', usecase.name || ''));
+    item.appendChild(head);
+
+    if (usecase.story) item.appendChild(el('p', 'uc-story', usecase.story));
+
+    if (Array.isArray(usecase.rules) && usecase.rules.length) {
+      var rules = el('ul', 'uc-rules');
+      usecase.rules.forEach(function (rule) { rules.appendChild(el('li', '', rule)); });
+      item.appendChild(rules);
+    }
+
+    var line = stateLine(usecase.state, states);
+    if (line) item.appendChild(el('div', 'uc-state', line));
+
+    var screens = Array.isArray(usecase.screens) ? usecase.screens : [];
+    if (screens.length) {
+      var links = el('div', 'rp-links uc-screens');
+      screens.forEach(function (screen) {
+        var label = screen && (screen.screen || screen.label);
+        var href = screen && (screen.deepLink || screen.href || screen.screen);
+        if (!label || !href) return;
+        var a = el('a', '', label + (screen.viewport ? ' (' + screen.viewport + ')' : ''));
+        a.href = withoutNopanel(href);
+        links.appendChild(a);
+      });
+      item.appendChild(links);
+    }
+
+    /* One capture per use case: the first screen with a file that actually
+       exists. Lazy-loaded — the full set is ~61 MB and this page renders all
+       ten use cases on one load. */
+    if (screens.length) {
+      var shotWrap = el('div', 'uc-shot-wrap');
+      var tried = 0;
+      var img = document.createElement('img');
+      img.className = 'uc-shot';
+      img.loading = 'lazy';
+      img.decoding = 'async';
+      img.alt = (usecase.name || usecase.id || 'Use case') + ' — captură · capture';
+
+      function tryNext() {
+        if (tried >= screens.length) {
+          shotWrap.textContent = '';
+          shotWrap.appendChild(el('p', 'uc-shot-missing',
+            'Captura lipsește din acest clonă locală (fișierele docs/usecases/ pot fi absente pe un clonă proaspăt). · ' +
+            'Capture missing from this local clone (docs/usecases/ files may be absent on a fresh clone).'));
+          return;
+        }
+        var screen = screens[tried++];
+        var path = capturePath(usecase.id, screen && screen.screen);
+        if (!path) { tryNext(); return; }
+        img.src = path;
+      }
+      img.onerror = tryNext;
+      shotWrap.appendChild(img);
+      tryNext();
+      if (tried <= screens.length) item.appendChild(shotWrap);
+    }
+
+    return item;
+  }
+
+  function renderStateAxis(key, def) {
+    var axis = el('div', 'ref-axis');
+    axis.appendChild(el('h3', '', (def && def.label) || key));
+    if (def && def.doc) axis.appendChild(el('p', 'ref-axis-doc', def.doc));
+    var options = (def && def.options) || {};
+    Object.keys(options).forEach(function (value) {
+      var opt = options[value] || {};
+      var line = el('p', 'ref-option');
+      var strong = el('strong', '', (opt.label || value) + ': ');
+      line.appendChild(strong);
+      line.appendChild(document.createTextNode(opt.doc || 'Fără documentație. · No documentation supplied.'));
+      axis.appendChild(line);
+    });
+    return axis;
+  }
+
+  function render(data) {
+    var usecases = data && Array.isArray(data.usecases) ? data.usecases : null;
+    var states = data && data.states && typeof data.states === 'object' ? data.states : {};
+
+    if (!usecases) {
+      listEl.textContent = '';
+      listEl.appendChild(el('p', 'rp-msg', 'Fișierul de situații este nevalid. · This use-case file is invalid.'));
+    } else if (!usecases.length) {
+      listEl.textContent = '';
+      listEl.appendChild(el('p', 'rp-msg', 'Încă nu există situații declarate. · No use cases yet.'));
+      countEl.textContent = '';
+    } else {
+      listEl.textContent = '';
+      usecases.forEach(function (usecase) { listEl.appendChild(renderUsecase(usecase, states)); });
+      countEl.textContent = usecases.length + ' situații · use cases';
+    }
+
+    var stateKeys = Object.keys(states);
+    if (!stateKeys.length) {
+      statesEl.textContent = '';
+      statesEl.appendChild(el('p', 'rp-msg', 'Nicio axă de stare declarată. · No state axes declared.'));
+    } else {
+      statesEl.textContent = '';
+      stateKeys.forEach(function (key) { statesEl.appendChild(renderStateAxis(key, states[key])); });
+    }
+  }
+
+  if (location.protocol === 'file:') return; /* shell's .rp-file-note explains this */
+  if (typeof fetch !== 'function') {
+    listEl.textContent = '';
+    listEl.appendChild(el('p', 'rp-msg', 'Browserul nu poate încărca această pagină. · This browser cannot load this page.'));
+    statesEl.textContent = '';
+    return;
+  }
+
+  fetch(SRC)
+    .then(function (response) {
+      if (response && response.ok === false) throw new Error('HTTP ' + response.status);
+      return response.json();
+    })
+    .then(render)
+    .catch(function () {
+      listEl.textContent = '';
+      listEl.appendChild(el('p', 'rp-msg', 'Foaia nu a putut fi încărcată. · This page could not be loaded.'));
+      statesEl.textContent = '';
+    });
+})();
+</script>
+</body>
+</html>

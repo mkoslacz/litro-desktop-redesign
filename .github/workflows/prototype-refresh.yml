@@ -1,0 +1,88 @@
+name: Refresh prototype artifacts
+
+# Static screens remain plain HTML that opens from file:// with no build step.
+# This workflow only regenerates and commits their derived review artifacts after
+# a screen change has already been committed to the published branch.
+on:
+  push:
+    # Change this when the prototype is published from a branch other than main.
+    branches: [main]
+    # These are all generated outputs. The workflow's own commit must not queue
+    # another refresh run; [skip ci] and concurrency below are the other two guards.
+    paths-ignore:
+      - changelog.json
+      - usecases.built.json
+      - docs/usecases.md
+      - docs/usecases/**
+      - preview-*.png
+      - tools/dumps/**
+      - '*.fig'
+      - '**/*.fig'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: prototype-refresh-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # build-changelog.js refuses a shallow history rather than publishing
+          # a changelog that silently looks complete but is truncated.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: tools/package-lock.json
+
+      - name: Install prototype tools
+        working-directory: tools
+        run: npm ci
+
+      - name: Regenerate derived artifacts
+        env:
+          # ubuntu-latest supplies this Chrome binary for puppeteer-core.
+          CHROME_PATH: /usr/bin/google-chrome
+        run: node tools/refresh.js
+
+      - name: Commit regenerated artifacts
+        # Forks and protected branches commonly expose a read-only token. Skipping
+        # this write is intentional: a maintainer can run the workflow on a writable
+        # automation branch rather than leaving the refresh job red. The committed
+        # donor at tools/.schema/canvas.fig is a tiny Figma schema fragment, not a
+        # source design export; source exports stay out of Git because they are large.
+        if: github.event.repository.fork == false && github.ref_protected == false
+        run: |
+          generated=()
+          add_if_present() {
+            if [[ -e "$1" ]] || git ls-files --error-unmatch -- "$1" >/dev/null 2>&1; then
+              generated+=("$1")
+            fi
+          }
+          add_if_present changelog.json
+          add_if_present usecases.built.json
+          add_if_present docs/usecases.md
+          add_if_present docs/usecases
+          shopt -s nullglob
+          for artifact in preview-*.png *.fig; do
+            add_if_present "$artifact"
+          done
+          if ((${#generated[@]})); then
+            git add -A -- "${generated[@]}"
+          fi
+          if git diff --cached --quiet; then
+            echo "No generated artifact changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore(prototype): refresh generated artifacts [skip ci]"
+          git push

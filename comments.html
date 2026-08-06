@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Comentarii · Comments — LITRO desktop redesign</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="proto-review.css">
+<script>if (location.protocol === 'file:') document.documentElement.dataset.origin = 'file';</script>
+<style>
+  /* This page borrows proto-comments.js's store, not its on-screen UI: the
+     pin toolbar, detached tray and popover it builds are addressed to a
+     screen with anchors to pin against, which comments.html is not. Keep
+     them out of the flow entirely rather than fighting their positioning —
+     their hidden attribute is toggled by the layer itself, so display:none
+     has to win regardless of that toggle. */
+  .proto-comments-tools, .proto-comments-tray, .proto-comments-popover { display: none !important; }
+</style>
+</head>
+<body class="rp-page">
+<div class="rp-wrap">
+  <header class="rp-head">
+    <a class="rp-back" href="index.html">← Hub-ul de recenzie · Review hub</a>
+    <h1 class="rp-title">Comentarii <span>· Comments</span></h1>
+    <p class="rp-lede">
+      Toate firele de discuție într-un singur loc, grupate pe ecran — răspunsul la întrebarea cu
+      care începe orice rundă de atelier: câte fire sunt deschise și ce spun.
+      <span class="rp-en">Every comment thread in one place, grouped by screen — the question every
+      workshop round starts with: how many threads are open, and what do they say.</span>
+    </p>
+    <nav class="rp-nav" aria-label="Pagini de recenzie · Review pages">
+      <a href="changelog.html">Jurnal · Changelog</a>
+      <a href="usecases.html">Situații · Use cases</a>
+      <a href="comments.html" aria-current="page">Comentarii · Comments</a>
+    </nav>
+  </header>
+
+  <p class="rp-note rp-file-note">
+    Pagina e deschisă de pe <code>file://</code>, iar browserul nu are voie să citească
+    fișierele alăturate — deci conținutul de mai jos nu se poate încărca. Deschide adresa
+    publicată sau pornește <code>node tools/serve.js</code> și intră pe
+    <code>localhost:8080</code>.
+    <span class="rp-en">This page is open from <code>file://</code>, where the browser may not
+    read sibling files, so the content below cannot load. Use the published URL, or run
+    <code>node tools/serve.js</code> and open <code>localhost:8080</code>.</span>
+  </p>
+
+  <main class="rp-main rp-needs-url">
+    <p class="rp-note rp-note-warn" id="cm-unconfigured" hidden>
+      Stratul de comentarii nu e configurat pentru acest prototip (lipsește sau e invalid
+      <code>comments.config.json</code>), sau proiectul Firebase nu răspunde. Pagina nu are ce
+      să afișeze până atunci — vezi README, secțiunea „Stakeholder comments”.
+      <span class="rp-en">The comment layer is not configured for this prototype (missing or
+      invalid <code>comments.config.json</code>), or the Firebase project is not responding.
+      There is nothing to show until then — see README, "Stakeholder comments".</span>
+    </p>
+
+    <p class="rp-note" id="cm-signedout" hidden>
+      Nu ești autentificat. Firele de discuție sunt private pentru recenzenții acceptați —
+      autentifică-te cu contul Google din lista de acces ca să le vezi, exact ca la pinurile de
+      pe ecrane.
+      <span class="rp-en">You are not signed in. Comment threads are private to accepted
+      reviewers — sign in with the Google account on the allowlist to see them, exactly like the
+      pins on the screens.</span>
+      <br><br>
+      <button type="button" class="rp-btn" id="cm-signin">Autentificare Google · Sign in with Google</button>
+    </p>
+
+    <p class="rp-note rp-note-warn" id="cm-error" hidden></p>
+
+    <p class="rp-msg" id="cm-loading">Se încarcă firele de discuție… · Loading comment threads…</p>
+
+    <div class="rp-toolbar" id="cm-toolbar" hidden>
+      <button type="button" class="rp-chip" data-filter="all" aria-pressed="true">Toate · All</button>
+      <button type="button" class="rp-chip" data-filter="open" aria-pressed="false">Deschise · Open</button>
+      <button type="button" class="rp-chip" data-filter="resolved" aria-pressed="false">Rezolvate · Resolved</button>
+      <span class="rp-count" id="cm-count"></span>
+    </div>
+
+    <div id="cm-groups"></div>
+    <p class="rp-msg" id="cm-empty" hidden>Niciun fir de discuție. · No comment threads yet.</p>
+  </main>
+</div>
+
+<script src="proto-comments.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  // file:// is handled entirely by the shell's CSS (.rp-needs-url) — the
+  // page shows the note above and never fetches anything.
+  if (location.protocol === 'file:') return;
+
+  var $ = function (id) { return document.getElementById(id); };
+  var groupsEl = $('cm-groups');
+  var toolbarEl = $('cm-toolbar');
+  var countEl = $('cm-count');
+  var loadingEl = $('cm-loading');
+  var emptyEl = $('cm-empty');
+  var errorEl = $('cm-error');
+  var signedOutEl = $('cm-signedout');
+  var unconfiguredEl = $('cm-unconfigured');
+  var filter = 'all';
+
+  function esc(value) {
+    var div = document.createElement('div');
+    div.textContent = value == null ? '' : String(value);
+    return div.innerHTML;
+  }
+
+  function fmtDate(value) {
+    var date = new Date(value);
+    return isNaN(date.getTime()) ? String(value || 'unknown') : date.toLocaleString();
+  }
+
+  function personLabel(person) {
+    if (!person) return 'Reviewer';
+    return person.name || person.email || person.uid || 'Reviewer';
+  }
+
+  // A thread stored before comments.config.json's page field, or one whose
+  // page no longer resolves, has no reliable home — group it apart instead
+  // of guessing it belongs to whatever page this overview happens to be
+  // (comments.html itself, which owns no anchors at all).
+  function groupKey(thread) {
+    var page = thread && thread.anchor && thread.anchor.page;
+    return page || 'Pagină necunoscută · Unknown page';
+  }
+
+  function safeLink(layer, thread) {
+    try {
+      return layer.shareLink(thread).href;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function render(layer) {
+    loadingEl.hidden = true;
+    var threads = layer.threads.slice();
+    var visible = threads.filter(function (thread) {
+      if (filter === 'open') return thread.status !== 'resolved';
+      if (filter === 'resolved') return thread.status === 'resolved';
+      return true;
+    });
+    var openCount = threads.filter(function (thread) { return thread.status !== 'resolved'; }).length;
+    var resolvedCount = threads.length - openCount;
+    countEl.textContent = openCount + ' deschise · open, ' + resolvedCount + ' rezolvate · resolved (' + threads.length + ' total)';
+    toolbarEl.hidden = false;
+    emptyEl.hidden = visible.length !== 0;
+
+    var groups = {};
+    var order = [];
+    visible.forEach(function (thread) {
+      var key = groupKey(thread);
+      if (!groups[key]) { groups[key] = []; order.push(key); }
+      groups[key].push(thread);
+    });
+    order.sort(function (a, b) { return a.localeCompare(b); });
+
+    groupsEl.replaceChildren();
+    order.forEach(function (key) {
+      var section = document.createElement('section');
+      section.className = 'rp-section';
+      var heading = document.createElement('h2');
+      heading.textContent = key;
+      section.appendChild(heading);
+
+      groups[key]
+        .slice()
+        .sort(function (a, b) { return String(b.createdAt).localeCompare(String(a.createdAt)); })
+        .forEach(function (thread) {
+          section.appendChild(threadCard(layer, thread));
+        });
+      groupsEl.appendChild(section);
+    });
+  }
+
+  function threadCard(layer, thread) {
+    var anchor = thread.anchor || {};
+    var messages = Array.isArray(thread.messages) ? thread.messages : null;
+    var first = messages && messages[0];
+    var replies = messages ? messages.slice(1) : [];
+    var link = safeLink(layer, thread);
+
+    var card = document.createElement('article');
+    card.className = 'rp-card';
+
+    var title = document.createElement('h3');
+    title.innerHTML = (thread.status === 'resolved' ? '<span class="rp-tag rp-tag-done">rezolvat · resolved</span> ' : '<span class="rp-tag rp-tag-open">deschis · open</span> ')
+      + esc(anchor.label || 'Comentariu fără etichetă · Unlabelled comment');
+    card.appendChild(title);
+
+    var meta = document.createElement('p');
+    meta.className = 'rp-meta';
+    meta.innerHTML = esc(personLabel(thread.createdBy)) + ' · ' + esc(fmtDate(thread.createdAt))
+      + (anchor.viewport ? ' · ' + esc(anchor.viewport) : '')
+      + (anchor.lang ? ' · ' + esc(anchor.lang) : '')
+      + (thread.orphaned ? ' · <span title="Ancora nu mai găsește elementul pe ecran. · The anchor no longer finds its element on the screen.">pin desprins · detached</span>' : '');
+    card.appendChild(meta);
+
+    var body = document.createElement('p');
+    body.className = 'rp-body';
+    if (first) {
+      body.textContent = first.body;
+    } else if (messages) {
+      body.textContent = '(fir fără mesaje · thread has no messages)';
+    } else {
+      body.textContent = 'Se încarcă textul… · Loading text…';
+      body.style.opacity = '.6';
+    }
+    card.appendChild(body);
+
+    if (replies.length) {
+      var repliesWrap = document.createElement('div');
+      repliesWrap.style.marginTop = '10px';
+      var repliesLabel = document.createElement('p');
+      repliesLabel.className = 'rp-sub';
+      repliesLabel.textContent = replies.length + ' răspuns(uri) · repl' + (replies.length === 1 ? 'y' : 'ies');
+      repliesWrap.appendChild(repliesLabel);
+      replies.forEach(function (message) {
+        var reply = document.createElement('p');
+        reply.className = 'rp-body';
+        reply.style.margin = '0 0 8px';
+        reply.innerHTML = '<strong>' + esc(personLabel(message.author)) + '</strong> · '
+          + esc(fmtDate(message.createdAt)) + '<br>' + esc(message.body);
+        repliesWrap.appendChild(reply);
+      });
+      card.appendChild(repliesWrap);
+    }
+
+    var links = document.createElement('p');
+    links.className = 'rp-links';
+    if (link) {
+      var a = document.createElement('a');
+      a.href = link;
+      a.textContent = 'Deschide pinul · Open the pin (' + (anchor.page || 'pagină necunoscută · unknown page') + ')';
+      links.appendChild(a);
+    } else {
+      var span = document.createElement('span');
+      span.className = 'rp-meta';
+      span.textContent = 'Legătura nu se poate construi (pagina ancorei lipsește sau e invalidă). · Link could not be built (the anchor page is missing or invalid).';
+      links.appendChild(span);
+    }
+    card.appendChild(links);
+
+    return card;
+  }
+
+  function showError(message) {
+    errorEl.hidden = false;
+    errorEl.textContent = message;
+  }
+
+  // The store keeps only thread summaries (createdAt / createdBy / status /
+  // anchor); a message body lives in a subcollection and reaches the browser
+  // only through CommentLayer.openThread. That method is written for a pin
+  // on the page it belongs to, so two of its default behaviours would break
+  // an overview page listing threads from every screen: it navigates the
+  // whole tab away when the thread's anchor page differs from the current
+  // one (true for nearly every thread here), and it rewrites the address
+  // bar to that other page's URL. Both are neutralised only for the
+  // duration of the hydration call — the fetch itself (privateLoadThreadDetail,
+  // routed through the layer's own concurrency limiter) is untouched, so this
+  // is still the one store this page reads from, never a second client.
+  var hydrating = {};
+  function hydrate(layer, threads) {
+    var pending = threads.filter(function (thread) {
+      return !Array.isArray(thread.messages) && !hydrating[thread.id];
+    });
+    if (!pending.length) return;
+    pending.forEach(function (thread) { hydrating[thread.id] = true; });
+    var originalNeedsRestore = layer.needsRestore;
+    var originalReplaceState = history.replaceState;
+    layer.needsRestore = function () { return false; };
+    history.replaceState = function () {};
+    Promise.all(pending.map(function (thread) {
+      return layer.openThread(thread).catch(function (error) {
+        if (window.console && console.error) console.error('[comments.html] thread detail failed:', thread.id, error);
+      });
+    })).finally(function () {
+      layer.needsRestore = originalNeedsRestore;
+      history.replaceState = originalReplaceState;
+    });
+  }
+
+  function wire(layer) {
+    var originalSetThreads = layer.setThreads.bind(layer);
+    layer.setThreads = function (threads, merge) {
+      originalSetThreads(threads, merge);
+      render(layer);
+      hydrate(layer, layer.threads);
+    };
+
+    var originalSetUser = layer.setUser.bind(layer);
+    layer.setUser = function (user) {
+      originalSetUser(user);
+      var signedIn = Boolean(layer.user);
+      signedOutEl.hidden = signedIn;
+      if (!signedIn) {
+        loadingEl.hidden = true;
+        toolbarEl.hidden = true;
+        groupsEl.replaceChildren();
+        emptyEl.hidden = true;
+      }
+    };
+
+    var originalShowError = layer.showError.bind(layer);
+    layer.showError = function (message, cause) {
+      originalShowError(message, cause);
+      loadingEl.hidden = true;
+      showError(message);
+    };
+
+    $('cm-signin').onclick = function () { layer.signIn(); };
+
+    Array.prototype.forEach.call(document.querySelectorAll('#cm-toolbar .rp-chip'), function (chip) {
+      chip.onclick = function () {
+        filter = chip.dataset.filter;
+        Array.prototype.forEach.call(document.querySelectorAll('#cm-toolbar .rp-chip'), function (other) {
+          other.setAttribute('aria-pressed', String(other === chip));
+        });
+        render(layer);
+      };
+    });
+
+    // The layer applies its initial state through the same setUser/setThreads
+    // hooks once start() finishes wiring auth and the store, so the current
+    // state (already signed in from a previous visit, or already loaded) is
+    // reflected too, not just future changes.
+    signedOutEl.hidden = Boolean(layer.user);
+    if (Array.isArray(layer.threads) && layer.threads.length) render(layer);
+  }
+
+  if (!window.protoComments) {
+    loadingEl.hidden = true;
+    unconfiguredEl.hidden = false;
+    return;
+  }
+
+  protoComments.init().then(function (layer) {
+    if (!layer) {
+      loadingEl.hidden = true;
+      unconfiguredEl.hidden = false;
+      return;
+    }
+    wire(layer);
+  }).catch(function (error) {
+    loadingEl.hidden = true;
+    unconfiguredEl.hidden = false;
+    if (window.console && console.error) console.error('[comments.html] init failed:', error);
+  });
+})();
+</script>
+</body>
+</html>

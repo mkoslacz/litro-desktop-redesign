@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jurnal de modificări · Changelog — LITRO desktop redesign</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="proto-review.css">
+<style>
+  /* Commit bodies wrap long unbroken tokens (file paths, URLs) so a card never
+     forces the page wider than the viewport — proto-review.css's .rp-body only
+     preserves line breaks, it does not break long words. Scoped to this page's
+     own root, so it cannot leak into the shared stylesheet's contract. */
+  #cl-root .rp-body { overflow-wrap: anywhere; word-break: break-word; }
+</style>
+<script>if (location.protocol === 'file:') document.documentElement.dataset.origin = 'file';</script>
+</head>
+<body class="rp-page">
+<div class="rp-wrap">
+  <header class="rp-head">
+    <a class="rp-back" href="index.html">← Hub-ul de recenzie · Review hub</a>
+    <h1 class="rp-title">Jurnal de modificări <span>· Changelog</span></h1>
+    <p class="rp-lede">
+      Toate rundele de lucru, cu motivul din spatele fiecăreia — nu doar titlul commit-ului.
+      <span class="rp-en">Every round of work, with the reasoning behind it — not only the commit title.</span>
+    </p>
+    <nav class="rp-nav" aria-label="Pagini de recenzie · Review pages">
+      <a href="changelog.html" aria-current="page">Jurnal · Changelog</a>
+      <a href="usecases.html">Situații · Use cases</a>
+      <a href="comments.html">Comentarii · Comments</a>
+    </nav>
+  </header>
+
+  <p class="rp-note rp-file-note">
+    Pagina e deschisă de pe <code>file://</code>, iar browserul nu are voie să citească
+    fișierele alăturate — deci conținutul de mai jos nu se poate încărca. Deschide adresa
+    publicată sau pornește <code>node tools/serve.js</code> și intră pe
+    <code>localhost:8080</code>.
+    <span class="rp-en">This page is open from <code>file://</code>, where the browser may not
+    read sibling files, so the content below cannot load. Use the published URL, or run
+    <code>node tools/serve.js</code> and open <code>localhost:8080</code>.</span>
+  </p>
+
+  <main class="rp-main rp-needs-url">
+    <div id="cl-toolbar" class="rp-toolbar" hidden>
+      <span class="rp-count" id="cl-count"></span>
+    </div>
+    <nav id="cl-jump" class="rp-nav" aria-label="Sari la o rundă · Jump to a round" hidden></nav>
+    <div id="cl-root">
+      <p class="rp-msg" id="cl-status">Se încarcă jurnalul… <span class="rp-en">Loading the changelog…</span></p>
+    </div>
+  </main>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var root = document.getElementById('cl-root');
+  var status = document.getElementById('cl-status');
+  var toolbar = document.getElementById('cl-toolbar');
+  var count = document.getElementById('cl-count');
+  var jump = document.getElementById('cl-jump');
+
+  function el(tag, className, text) {
+    var node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text != null) node.textContent = String(text);
+    return node;
+  }
+
+  function slugify(value) {
+    return String(value || 'unreleased')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '') || 'unreleased';
+  }
+
+  /* Same ordering the panel sheet uses (proto-sheets.js orderedEntries), so the
+     full page and the sheet preview never disagree on what "newest" means. */
+  function orderedEntries(entries) {
+    return entries
+      .map(function (entry, index) { return { entry: entry || {}, index: index }; })
+      .sort(function (a, b) {
+        var aTime = Date.parse(a.entry.date || '');
+        var bTime = Date.parse(b.entry.date || '');
+        var aValid = Number.isFinite(aTime);
+        var bValid = Number.isFinite(bTime);
+        if (aValid && bValid && aTime !== bTime) return bTime - aTime;
+        if (aValid !== bValid) return aValid ? -1 : 1;
+        return a.index - b.index;
+      })
+      .map(function (item) { return item.entry; });
+  }
+
+  function renderScreenLinks(screens) {
+    var wrap = el('div', 'rp-links');
+    wrap.appendChild(document.createTextNode('Ecrane · Screens: '));
+    var rendered = 0;
+    (screens || []).forEach(function (screen) {
+      var label = typeof screen === 'string' ? screen : screen && (screen.screen || screen.label);
+      var href = typeof screen === 'string' ? screen : screen && (screen.href || screen.screen);
+      if (!label || !href) return;
+      if (rendered++) wrap.appendChild(document.createTextNode(', '));
+      var link = el('a', '', label);
+      link.href = href;
+      wrap.appendChild(link);
+    });
+    return rendered ? wrap : null;
+  }
+
+  function renderEntry(entry) {
+    var card = el('article', 'rp-card');
+
+    var meta = el('div', 'rp-meta');
+    meta.appendChild(document.createTextNode((entry.date || 'Dată necunoscută') + ' · '));
+    var short = entry.short || (entry.sha ? String(entry.sha).slice(0, 7) : 'commit');
+    if (entry.url) {
+      var commit = el('a', 'rp-mono', short);
+      commit.href = entry.url;
+      commit.target = '_blank';
+      commit.rel = 'noreferrer';
+      meta.appendChild(commit);
+    } else {
+      meta.appendChild(el('span', 'rp-mono', short));
+    }
+    card.appendChild(meta);
+
+    card.appendChild(el('h3', '', entry.subject || 'Commit fără titlu'));
+
+    if (entry.body) {
+      /* The subject is already the heading above; strip a leading duplicate
+         line from the commit body so it is not shown twice. */
+      var body = String(entry.body);
+      var firstLine = body.split('\n')[0].trim();
+      if (entry.subject && firstLine === String(entry.subject).trim()) {
+        body = body.slice(body.indexOf('\n') + 1).replace(/^\n+/, '');
+      }
+      body = body.trim();
+      if (body) card.appendChild(el('p', 'rp-body', body));
+    }
+
+    var screenLinks = renderScreenLinks(entry.screens);
+    if (screenLinks) card.appendChild(screenLinks);
+
+    return card;
+  }
+
+  function render(data) {
+    var entries = data && Array.isArray(data.entries) ? data.entries : null;
+    if (!entries) {
+      status.textContent = 'Fișierul de jurnal este nevalid. ';
+      status.appendChild(el('span', 'rp-en', 'This changelog file is invalid.'));
+      return;
+    }
+    if (!entries.length) {
+      status.textContent = 'Încă nu există intrări în jurnal. ';
+      status.appendChild(el('span', 'rp-en', 'No changelog entries yet.'));
+      return;
+    }
+
+    var ordered = orderedEntries(entries);
+    root.textContent = '';
+
+    var groups = [];
+    var currentGroup = null;
+    ordered.forEach(function (entry) {
+      var roundName = entry.round || 'Nepublicat';
+      if (!currentGroup || currentGroup.round !== roundName) {
+        currentGroup = { round: roundName, entries: [] };
+        groups.push(currentGroup);
+      }
+      currentGroup.entries.push(entry);
+    });
+
+    groups.forEach(function (group) {
+      var slug = 'round-' + slugify(group.round);
+      var jumpLink = el('a', '', group.round + ' (' + group.entries.length + ')');
+      jumpLink.href = '#' + slug;
+      jump.appendChild(jumpLink);
+
+      var section = el('section', 'rp-section');
+      section.id = slug;
+      var heading = el('h2', '', null);
+      var headingLink = el('a', '', group.round);
+      headingLink.href = '#' + slug;
+      heading.appendChild(headingLink);
+      section.appendChild(heading);
+      section.appendChild(el('p', 'rp-sub', group.entries.length + (group.entries.length === 1 ? ' intrare · entry' : ' intrări · entries')));
+
+      group.entries.forEach(function (entry) {
+        section.appendChild(renderEntry(entry));
+      });
+
+      root.appendChild(section);
+    });
+
+    jump.hidden = groups.length < 2;
+    toolbar.hidden = false;
+    count.textContent = ordered.length + (data.limited ? (' din primele ' + (data.limit || ordered.length) + ' commit-uri · of the latest ' + (data.limit || ordered.length) + ' commits') : ' intrări · entries');
+  }
+
+  if (location.protocol === 'file:') return; /* .rp-needs-url hides #cl-status's parent already */
+  if (typeof fetch !== 'function') {
+    status.textContent = 'Browserul nu poate încărca acest jurnal. ';
+    status.appendChild(el('span', 'rp-en', 'This browser cannot load this changelog.'));
+    return;
+  }
+
+  fetch('changelog.json')
+    .then(function (response) {
+      if (response && response.ok === false) throw new Error('HTTP ' + response.status);
+      return response.json();
+    })
+    .then(render)
+    .catch(function () {
+      status.textContent = 'Jurnalul nu a putut fi încărcat. ';
+      status.appendChild(el('span', 'rp-en', 'The changelog could not be loaded.'));
+    });
+})();
+</script>
+</body>
+</html>

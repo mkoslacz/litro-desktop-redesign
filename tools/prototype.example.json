@@ -1,0 +1,75 @@
+{
+  "_comment": "Manifest for dump-frames.js + generate-fig.js. Copy to the prototype root as prototype.json. Every path is relative to this file. One frame entry = one editable Figma frame; a frame is a page URL plus the demo state its query params pin, so states export without a click.",
+
+  "fileName": "Acme — Desktop + Mobile",
+  "canvasName": "Acme — Desktop + Mobile",
+  "out": "acme-prototype.fig",
+  "background": "#F7F5F3",
+  "thumbnail": "preview-home.png",
+
+  "pagesDir": ".",
+  "assets": "assets",
+  "dumpDir": "tools/dumps",
+  "schemaFrom": "tools/.schema/canvas.fig",
+  "width": 1440,
+  "jobs": 3,
+
+  "rows": [
+    {
+      "label": "Desktop · main flow (source language)",
+      "frames": [
+        { "id": "home", "page": "home.html", "name": "Desktop / Home" },
+        { "id": "listing", "page": "listing.html", "name": "Desktop / Listing" },
+        { "id": "detail", "page": "detail.html", "name": "Desktop / Detail" },
+        { "id": "checkout", "page": "checkout.html", "name": "Desktop / Checkout" },
+        { "id": "thankyou", "page": "thankyou.html", "name": "Desktop / Confirmation" }
+      ]
+    },
+    {
+      "label": "Desktop · main flow (EN)",
+      "frames": [
+        { "id": "home-en", "page": "home-en.html", "name": "Desktop EN / Home" },
+        { "id": "listing-en", "page": "listing-en.html", "name": "Desktop EN / Listing" },
+        { "id": "detail-en", "page": "detail-en.html", "name": "Desktop EN / Detail" },
+        { "id": "checkout-en", "page": "checkout-en.html", "name": "Desktop EN / Checkout" },
+        { "id": "thankyou-en", "page": "thankyou-en.html", "name": "Desktop EN / Confirmation" }
+      ]
+    },
+    {
+      "label": "Desktop · states",
+      "frames": [
+        { "id": "listing-member", "page": "listing.html?auth=in", "name": "Desktop / Listing — signed in" },
+        { "id": "listing-dense-b", "page": "listing.html?density=b", "name": "Desktop / Listing — compact cards" },
+        { "id": "listing-empty", "page": "listing.html?inv=none", "name": "Desktop / Listing — empty state" },
+        { "id": "home-member", "page": "home.html?auth=in", "name": "Desktop / Home — signed in" }
+      ]
+    },
+    {
+      "label": "Mobile · main flow",
+      "frames": [
+        { "id": "m-home", "page": "m-home.html", "width": 430, "name": "Mobile / Home" },
+        { "id": "m-listing", "page": "m-listing.html", "width": 430, "name": "Mobile / Listing" },
+        { "id": "m-detail", "page": "m-detail.html", "width": 430, "name": "Mobile / Detail" },
+        { "id": "m-checkout", "page": "m-checkout.html", "width": 430, "name": "Mobile / Checkout" },
+        { "id": "m-thankyou", "page": "m-thankyou.html", "width": 430, "name": "Mobile / Confirmation" }
+      ]
+    },
+    {
+      "label": "Mobile · states",
+      "frames": [
+        {
+          "id": "m-listing-few",
+          "page": "m-listing.html?inv=few",
+          "width": 430,
+          "name": "Mobile / Listing — low inventory"
+        },
+        {
+          "id": "m-detail-picked",
+          "page": "m-detail.html?item=2",
+          "width": 430,
+          "name": "Mobile / Detail — item picked (action bar up)"
+        }
+      ]
+    }
+  ]
+}

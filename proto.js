@@ -140,6 +140,13 @@
     document.body.classList.add('searching');
     setTimeout(() => { location.href = url; }, delay == null ? 420 : delay);
   }
+  /* La „înapoi” pagina se întoarce din bfcache exact cum am părăsit-o — adică cu spinnerul pornit și cu
+     vălul peste tot, deci pare că se încarcă la nesfârșit. `pageshow` e singurul eveniment care se
+     declanșează și la restaurare, nu doar la încărcare, deci acolo curățăm starea de tranziție. */
+  window.addEventListener('pageshow', () => {
+    spin.classList.remove('on');
+    document.body.classList.remove('searching');
+  });
   function qs() {
     return '?dest=' + encodeURIComponent(S.dest) + '&from=' + S.from + '&to=' + S.to +
       '&adults=' + S.adults + '&kids=' + S.kids + '&rooms=' + S.rooms;
@@ -759,7 +766,11 @@
        (?auth=in|out, ?density=a|b|c) fără să dăm clic în panou. */
     if (q.get('auth')) document.body.dataset.auth = q.get('auth');
     if (q.get('density')) document.body.dataset.density = q.get('density');
-    if (q.get('rooms')) document.body.dataset.rooms = q.get('rooms');
+    /* „rooms" e folosit de două ori în URL: qs() duce mai departe numărul de camere
+       din căutare (rooms=2), iar panoul are comutatorul „Tipuri de cameră" (rooms=on|off).
+       Fără verificarea valorii, orice link între ecrane scria data-rooms="2" — starea
+       documentată se strica și în panou nu mai era aprins niciun buton. */
+    if (['on', 'off'].indexOf(q.get('rooms')) >= 0) document.body.dataset.rooms = q.get('rooms');
     if (q.get('session')) document.body.dataset.session = q.get('session');
     if (!document.body.dataset.rooms) document.body.dataset.rooms = 'on';
     if (!document.body.dataset.session) document.body.dataset.session = 'site';
@@ -917,6 +928,10 @@
       $$('.pt-assets .pt-b', box).forEach(b => b.classList.toggle('on', b === btn));
     });
     applyAuth(document.body.dataset.auth);
+    /* Two read-only sheets at the foot of the panel: the changelog and the
+       product use cases. They are content, not state axes, so proto-sheets.js
+       only fetches them when a reviewer opens one. */
+    if (window.protoSheets) protoSheets.mount(box, { en: EN(), carry: qs() });
     /* Comenzile de demo stau într-un jgheab în stânga, împreună cu caseta „inventar
        demo": o singură coloană care se derulează pe dinăuntru, deci nu mai poate fi
        tăiată de marginea de jos a ecranului, oricâte comutatoare adăugăm. (Înainte
@@ -1172,11 +1187,7 @@
       if (anchor) anchor.after(ic); else mid.appendChild(ic);
     });
 
-    /* --- hearts --- */
-    $$('.heart').forEach(h => h.onclick = e => {
-      e.stopPropagation(); h.classList.toggle('on');
-      toast(h.classList.contains('on') ? 'Adăugat la favorite' : 'Eliminat din favorite', h.classList.contains('on') ? 'ok' : null);
-    });
+    /* --- inimile de favorite: cablate în initGeneric, ca să răspundă și pe home --- */
 
     /* --- card photo galleries (arrows + dots on each listing card photo) --- */
     const PHOTO_POOL = ['pool-rooftop', 'room-seaview', 'lobby', 'aerial-hotel', 'pool-sunset', 'room-double', 'jacuzzi-view', 'spa-indoor', 'apartment-family', 'coastline']
@@ -1596,8 +1607,17 @@
     /* --- demo: comutator de inventar (mult / puțin) — arată starea „multe" vs „puține" rezultate --- */
     /* starea inițială vine din primul buton (sau din cel marcat .on), altfel
        lista ar raporta cele 6 carduri demo în loc de mărimea reală a rezultatului */
-    const invFirst = $('.invdemo [data-cap].on') || $('.invdemo [data-cap]');
+    /* ?inv=many|some|few|zero fixează starea pentru export și pentru un link
+       trimis pe chat — altfel starea „zero rezultate", adică exact locul unde
+       cade lejerul, s-ar vedea doar cu un clic și n-ar ajunge într-o ramă de
+       Figma. Cheile sunt aceleași ca pe mobil (proto-m.js), iar potrivirea se
+       face pe data-cap, nu pe poziția butonului în markup. */
+    const INV_CAP = { many: 99, some: 4, few: 2, zero: 0 };
+    const invWanted = INV_CAP[q.get('inv')];
+    const invFirst = (invWanted != null && $('.invdemo [data-cap="' + invWanted + '"]'))
+      || $('.invdemo [data-cap].on') || $('.invdemo [data-cap]');
     if (invFirst) {
+      $$('.invdemo [data-cap]').forEach(x => x.classList.remove('on'));
       invFirst.classList.add('on');
       demoCap = +invFirst.dataset.cap; demoCount = +invFirst.dataset.count;
     }
@@ -2049,12 +2069,6 @@
       mealInfoLink.textContent = mealDef.classList.contains('open') ? 'Ascunde info despre mese ▴' : 'Vezi ce include fiecare masă ▾';
     };
 
-    /* --- nearby hotels --- */
-    $$('.hcard').forEach(c => c.onclick = () => {
-      S.hotel = $('.hname', c).childNodes[0].textContent.trim(); save();
-      goto(en('hotel.html') + qs());
-    });
-
     /* --- bara sticky de sus a fost eliminată: bara de rezervare de jos (.booking-bar) o dublează --- */
   }
 
@@ -2316,12 +2330,32 @@
     });
 
     /* home tiles → listing */
-    $$('.insp-card, .mz, .prev-card').forEach(c => c.onclick = () => {
+    $$('.insp-card, .mz, .prev-card, .resort-index a').forEach(c => c.onclick = e => {
+      e.preventDefault();
       const cap = $('.cap, .t', c);
-      const txt = cap ? cap.textContent.trim() : '';
-      const match = RESORTS.find(r => txt.startsWith(r[0]));
+      const txt = (cap ? cap.textContent : c.textContent).trim();
+      /* cel mai lung nume care se potrivește, altfel „Mamaia Nord” ar cădea pe „Mamaia” */
+      const match = RESORTS.filter(r => txt.startsWith(r[0])).sort((a, b) => b[0].length - a[0].length)[0];
       if (match) S.dest = match[0];
       save(); goto(listingHref() + qs());
+    });
+
+    /* Cardurile de hotel duc la pagina hotelului, pe orice pagină ar sta — secțiunile de pe home
+       („garantate de noi”, campanii, „all inclusive”). Cablajul stătea în initHotel, unde era cod mort:
+       hotel.html nu mai are niciun .hcard de când i-a plecat banda de hoteluri din apropiere. */
+    $$('.hcard').forEach(c => c.onclick = e => {
+      if (e.target.closest('.heart, .own-badge, a')) return;
+      const h = $('.hname', c);
+      if (h) S.hotel = h.childNodes[0].textContent.trim();
+      save(); goto(en('hotel.html') + qs());
+    });
+
+    /* favoritele: erau cablate doar în initListing, deci inimile de pe home nu răspundeau */
+    $$('.heart').forEach(h => h.onclick = e => {
+      e.stopPropagation(); h.classList.toggle('on');
+      const on = h.classList.contains('on');
+      toast(on ? lang('Adăugat la favorite', 'Added to favourites')
+               : lang('Eliminat din favorite', 'Removed from favourites'), on ? 'ok' : null);
     });
     /* linkurile care poartă un filtru merg singure, cu tot cu starea căutării */
     $$('[data-filter]').forEach(a => a.onclick = e => {

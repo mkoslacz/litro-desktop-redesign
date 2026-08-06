@@ -1,0 +1,12 @@
+{
+  "prototypeId": "replace-with-a-stable-prototype-id",
+  "prototypeUrl": "https://example.github.io/prototype/",
+  "firebase": {
+    "apiKey": "replace-with-firebase-web-api-key",
+    "authDomain": "replace-with-project.firebaseapp.com",
+    "projectId": "replace-with-project-id",
+    "appId": "replace-with-firebase-app-id"
+  },
+  "allowedEmailDomains": ["your-company.example"],
+  "stateKeys": ["auth", "session", "density", "inv"]
+}

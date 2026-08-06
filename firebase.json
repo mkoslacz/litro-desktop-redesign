@@ -1,0 +1,6 @@
+{
+  "//": "Deploy config for the stakeholder comment layer only. Firebase hosts nothing here — the prototype is published from GitHub Pages; this project supplies Authentication and Firestore. Keeping the rules in the repo is the point: comments.rules is reviewable in a diff and deployable reproducibly, instead of living only in a console text box.",
+  "firestore": {
+    "rules": "comments.rules"
+  }
+}
