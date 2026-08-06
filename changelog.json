@@ -1,9 +1,39 @@
 {
-  "generatedAt": "2026-08-06T12:49:09.804Z",
+  "generatedAt": "2026-08-06T13:17:38.164Z",
   "repository": "https://github.com/mkoslacz/litro-desktop-redesign",
   "limited": true,
   "limit": 50,
   "entries": [
+    {
+      "sha": "ca98209ccfc885c7fe1f5403ee80e7eecd31e26e",
+      "short": "ca98209",
+      "date": "2026-08-06",
+      "subject": "fix: stop the refresh job staging a path git is configured to refuse",
+      "body": "The Chrome fix got the workflow all the way to its commit step, where it died\non `docs/usecases.md` and `docs/usecases`. Those are regenerated every run and\nthey are also ignored now — this repository is public and Pages serves it from\nthe branch, so the review apparatus stays untracked. An ignored path is not an\nabsent one: it exists on the runner, `git add` refuses it, and under `bash -e`\nthat takes the job down.\n\nThe helper now asks git what it will accept instead of carrying a second list\nof what is ignored, so the next ignore rule cannot redden this job the same\nway. Simulated locally against the real tree: 22 artifacts collected, both\ndocs paths skipped, exit 0.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/ca98209ccfc885c7fe1f5403ee80e7eecd31e26e"
+    },
+    {
+      "sha": "c2118c3b151c37cd22cd619cac3345eef1037d8a",
+      "short": "c2118c3",
+      "date": "2026-08-06",
+      "subject": "fix: let every browser tool find Chrome where CI actually keeps it",
+      "body": "The refresh workflow shipped in this push and ran for the first time. It sets\nCHROME_PATH to the runner's Chrome, and only one of the four tools that drive\na browser was reading it — so the run got through the use-case captures and\nthen died in shoot-previews.js on a macOS path that cannot exist on a Linux\nrunner.\n\nThree occurrences of one hardcoded string is the threshold for extracting it\nrather than patching each: tools/chrome-path.js now resolves CHROME_PATH with\nthe macOS install as the fallback, so passing the variable stays optional on a\ndeveloper's machine. build-usecases.js keeps its own local name because the\ncapture path injects it as a dependency; only the resolution moved.\n\nVerified by running the script that failed: it launches and writes its preview.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/c2118c3b151c37cd22cd619cac3345eef1037d8a"
+    },
+    {
+      "sha": "905bccaef2bc8c212e0a846910ec57da660cdb34",
+      "short": "905bcca",
+      "date": "2026-08-06",
+      "subject": "chore: keep the review apparatus out of the published repository",
+      "body": "This repository is public and Pages serves it from `main`, so committing a\nfile here publishes it under mateuszkoslacz.com. docs/, CLAUDE.md and\n.review-lineage/ had never been pushed — they were untracked until this\nsession's loop committed them, and pushing would have put the conversion\nanalysis, the product owner's rulings and every finding raised against the\nprototype on a public site, permanently and in history.\n\nThey are ignored now rather than merely absent, so the next round cannot\nre-add them by accident, and the reason is written where someone about to\ndelete the rule will read it. The files stay on disk; nothing was lost.\n\nchangelog.json is rebuilt because the commits it described no longer exist.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/905bccaef2bc8c212e0a846910ec57da660cdb34"
+    },
     {
       "sha": "f0c51571a6d1342460f434a1f84d4e27ac11b146",
       "short": "f0c5157",
@@ -731,50 +761,6 @@
       ],
       "round": "unreleased",
       "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/7432576c7d460644acaed544cc641b35b714af62"
-    },
-    {
-      "sha": "9b870a7547ed742591f444a4ffa44c879fc86e43",
-      "short": "9b870a7",
-      "date": "2026-07-19",
-      "subject": "Turn the five screens into a working click-through prototype",
-      "body": "proto.js + proto.css add: destination picker, two-month calendar with per-night\nprices, guests/rooms stepper with child ages, flexible-date chips, price strip\nthat moves the stay, listing filters + sorting + chips + empty state, room-type\nexpander, favourites, gallery lightbox, meal-plan filter, rate selection, sticky\nbooking bar, promo code, voucher split payment, payment modes, consent gating,\ncallback form, modals for campaigns/policies/facilities, toasts and page transitions.\nState (destination, dates, guests, hotel, rate, payment) carries across screens.\n\nPrices are now derived from live production data instead of placeholders.\n\nCo-Authored-By: Claude Fable 5 <noreply@anthropic.com>",
-      "screens": [
-        "checkout.html",
-        "home.html",
-        "hotel.html",
-        "index.html",
-        "listing.html",
-        "thankyou.html"
-      ],
-      "round": "unreleased",
-      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/9b870a7547ed742591f444a4ffa44c879fc86e43"
-    },
-    {
-      "sha": "885e4c48dc11e8566e68181f4dda3c6f4c851d1c",
-      "short": "885e4c4",
-      "date": "2026-07-19",
-      "subject": "Iteration 2: restore the commercial machinery + first scalpel components",
-      "body": "listing: review quote per card, offer-expiry countdown, real campaign names with\nconditions, credits as a stay total, room-type expander, zero-review card state,\nsold-out rescue block with callback slot\nhotel: programme badges + offer chips, 'De ce aleg oamenii' with top dimension,\nown campaigns (te rasplateste / Jurasica Park), All-Inclusive definition block,\ncheapest-period teaser, sunbeds in unit names, human-help line in booking card\ncheckout: 6 rate fara dobanda (with consultant-assisted variant), holiday-card\nsplit payment, child ages\nhome: visible desktop nav, 15-programme offer catalogue, trust/scale band,\n19-resort index, ancillary programme links, instalments value prop\nthankyou: storno upsell with deadline, FRIENDS tier progress\n\nCo-Authored-By: Claude Fable 5 <noreply@anthropic.com>",
-      "screens": [
-        "audit.html",
-        "checkout.html",
-        "home.html",
-        "hotel.html",
-        "listing.html",
-        "thankyou.html"
-      ],
-      "round": "unreleased",
-      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/885e4c48dc11e8566e68181f4dda3c6f4c851d1c"
-    },
-    {
-      "sha": "40f2d59ef18d0ab37f7c63172112c7319fd0fd94",
-      "short": "40f2d59",
-      "date": "2026-07-19",
-      "subject": "Add README, full .fig pipeline tools and the live-site research the audit is based on",
-      "body": "Nothing of this work now lives only in a scratchpad: decoder, renderer, DOM dumper\nand .fig generator, plus the production dumps and raw audit findings.\n\nCo-Authored-By: Claude Fable 5 <noreply@anthropic.com>",
-      "screens": [],
-      "round": "unreleased",
-      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/40f2d59ef18d0ab37f7c63172112c7319fd0fd94"
     }
   ]
 }
