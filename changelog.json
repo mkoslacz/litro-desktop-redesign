@@ -1,18 +1,73 @@
 {
-  "generatedAt": "2026-08-06T06:14:46.232Z",
+  "generatedAt": "2026-08-06T12:49:09.804Z",
   "repository": "https://github.com/mkoslacz/litro-desktop-redesign",
   "limited": true,
   "limit": 50,
   "entries": [
     {
-      "sha": "03b7e424c38728f57a784f26643a54b555ca33fe",
-      "short": "03b7e42",
+      "sha": "f0c51571a6d1342460f434a1f84d4e27ac11b146",
+      "short": "f0c5157",
       "date": "2026-08-06",
-      "subject": "Record the review lifecycle this prototype is now driven by",
-      "body": "The audits, the implementation guides, the implementation and verification reports\nand the project brief were all sitting untracked. They are the argument for every\nchange above, and the /impl-guide chain reads them by exact path — an untracked\nlifecycle artifact is one `git clean` from taking the reasoning with it.\n\nIncludes iteration 2's guide, which plans the fourteen findings the verification of\niteration 1 emitted.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>",
+      "subject": "fix: style the control this round added, instead of letting the product paint it [IMPL-25]",
+      "body": "IMPL-25 added a fifth control to the comment layer's toolbar and shipped no\nCSS for it. Nobody noticed, because every check that round was behavioural —\nhrefs, counts, gates, export mode, file://, the seam. The completeness critic\nmeasured the thing itself and found it inheriting `--navy-500` from litro.css\nat 16px weight 400, sitting between siblings at 12px weight 700 inside a\ncomponent whose own stylesheet header says it is \"deliberately scaffolding,\nnever a product component\". That coupling is precisely what the file exists to\nprevent.\n\nIt also came out at 23.19px tall on desktop and 21.75px on mobile — the only\ncontrol in the toolbar below the 24x24 floor of WCAG 2.2 SC 2.5.8, which its\nfour siblings clear at 28px, and the 7px flex gap denies it the spacing\nexception. It now states its own size and colour: 28px, 12px/700, the same\n#9C7A12 border and 7px radius, measured on both surfaces.\n\nOne deliberate difference from the buttons: no fill. The way out of the layer\nshould not read as loud as the actions inside it.\n\nNot fixed here, and worth an operator decision rather than a unilateral\nredesign: a fifth always-on control grows the toolbar from 227x48 to 389x48 on\ndesktop, and on 390px it wraps to two rows at 354x83, covering more of the\nscreen and overlapping the mobile price bar. Styling shrinks it slightly; the\nwrap is intrinsic to the control count.\n\nproto-sheets.css's header still said two sheets while its module builds three.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>",
       "screens": [],
       "round": "unreleased",
-      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/03b7e424c38728f57a784f26643a54b555ca33fe"
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/f0c51571a6d1342460f434a1f84d4e27ac11b146"
+    },
+    {
+      "sha": "6032b9b4e3432c21a0fe973d2f003c460de17733",
+      "short": "6032b9b",
+      "date": "2026-08-06",
+      "subject": "feat: let a reviewer reach the open-threads page from inside a screen [IMPL-25]",
+      "body": "comments.html was linked from the hub and from nowhere else. The panel shipped\ntwo content sheets, each carrying a .pt-sheet-page link to its full page, and\nthe comment layer's own toolbar carried four controls and no way out. So a\nreviewer standing on a screen, looking at a pin, who wanted to know what else\nwas open had to navigate back to the hub to find out — which is the one\nquestion the overview exists to answer.\n\nTwo routes now, because they answer at different moments. The panel gains a\nthird sheet, built like its siblings: the page link sits beside the sheet\nrather than inside its redrawn body, which is what makes it survive every\nredraw and failure path including file://. It has no changelog-like data to\nlist, so its body is a short bilingual statement of what the page is. And the\ncomment layer's toolbar gains a link built from pageBase(), never shareBase()\n— the two-link rule this loop has now been bitten by twice.\n\nBoth inherit their exclusions structurally rather than by special case: the\ntoolbar is not built at all when the layer mounts in overview mode, and\nneither surface exists under ?nopanel=1, which is what keeps a pin out of a\nFigma frame.\n\nThis closes BC-3, the last red business criterion: all three review pages are\nnow reachable from the hub and from the panel, and each links back into the\nscreens or states it describes.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/6032b9b4e3432c21a0fe973d2f003c460de17733"
+    },
+    {
+      "sha": "9011e77e390bf739001ad0ed1ddc11bc2fd9bd14",
+      "short": "9011e77",
+      "date": "2026-08-06",
+      "subject": "docs: say plainly that the live comment path cannot be verified here [IMPL-26]",
+      "body": "One Definition of Done in this loop said \"signed in on localhost, the page\nstill lists every thread\". No automated actor in this repository can show\nthat: the rules admit only an allowlisted reviewer with a verified Google\nemail, FIREBASE_SERVICE_ACCOUNT is unset and no key file exists. The round\nthat met it honestly marked the card partial. The next round would have marked\nit met, because nothing here said the claim was unavailable.\n\nThe missing credential was never the defect. The silence about it was.\n\nREADME now says which credential a live check needs, that its absence makes\nthe claim unverifiable rather than assumed-good, what the createFirebaseClient\nseam does prove, and — the part worth the section on its own — that\ninit({store}) is a different seam that reports a vacuous zero updateDoc count,\nthe same zero correct code produces. A criterion measured that way passes\nwhether or not the code works.\n\nIt states the requirement and stops: no instructions for obtaining, storing or\ncommitting a credential, and an explicit line that the allowlist is an\noperator decision rather than the obstacle.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/9011e77e390bf739001ad0ed1ddc11bc2fd9bd14"
+    },
+    {
+      "sha": "a9af1f5eed37228c7ad0a8af285745f93ead0ea3",
+      "short": "a9af1f5",
+      "date": "2026-08-06",
+      "subject": "fix: eight defects in the comment layer, most of them created by the round that fixed the last eight [IMPL-11..IMPL-18]",
+      "body": "The overview's \"open the pin\" row was built from shareLink(), the one builder\nthat resolves against prototypeUrl — so on localhost every row walked the\nreviewer off their own copy onto the published site. That is OP-01 again, at a\ncall site the round fixing OP-01 created, because the pageBase/shareBase rule\nlived in a code comment and nowhere a later card would read it. The row is now\na deepLink; shareLink keeps its real job on a separate copy-link button.\n\nThe overview also: hung on \"Loading\" whenever the first delivery beat wire(),\nbecause setThreads was resolved before the await and the catch-up was guarded\non a length that cannot distinguish an empty store from an unanswered one;\nissued Firestore writes from a page that calls itself read-only, because\nhiding the pins with display:none is not suppressing them — an overview flag\nnow short-circuits renderThreads and the CSS block is gone; and rendered a\nconfident link to nowhere for an unresolvable anchor, because deepLink never\nthrows and its on-a-screen fallback is comments.html here.\n\nhydrate() captured history.replaceState afresh per batch, so two overlapping\nbatches left the native function permanently stubbed. It is an in-flight\ncounter now, and a failed detail fetch is retried instead of being remembered\nas done.\n\nPage identity is the whole path, not the basename, and needsRestore now agrees\nwith the render decision. A thread with no anchor.page still renders where its\nselector resolves — that fallback is load-bearing for legacy threads — but no\nlonger flaps the store's orphaned flag as the reviewer walks between screens.\n\nThe popover's 18px chrome gutter is back on all four clamps, measured against\nthe layout viewport rather than innerWidth, so a classic scrollbar cannot\nclamp it into itself. 252 assertions over 6 corners x 2 heights x 3 viewports.\n\ncomments.rules is untouched: the named-allowlist model is an operator decision.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>",
+      "screens": [
+        "comments.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/a9af1f5eed37228c7ad0a8af285745f93ead0ea3"
+    },
+    {
+      "sha": "68c27f62d0d28a326d390adfedac1358607c88d4",
+      "short": "68c27f6",
+      "date": "2026-08-06",
+      "subject": "fix: stop a panel switch becoming NaN, and give the review pages copy a stakeholder can read [IMPL-23, IMPL-24]",
+      "body": "?rooms= is read by two consumers: the numeric search state and the demo\npanel's room-types-on-card axis. The search state coerced it unconditionally,\nso ?rooms=on rendered \"2 adulti, 2 copii, NaN camere\" — on four of the\ntwenty-two use-case deep links, which is to say on the page built to\ndemonstrate the prototype's states. The axis is not renamed: ?rooms= is in the\nURL register CLAUDE.md invariant #10 protects and live deep links carry it.\nThe coercion is narrowed instead, to a finite number, at both engines. All 22\ndeep links now render with no NaN and no Infinity; the panel axis still reads\non/off; a legitimate 0 still applies.\n\nThe changelog printed the data token \"unreleased\" as a heading on a Romanian\npage while proto-sheets.js already mapped that exact value to \"Nepublicat\";\nsaid \"din primele 50\" in Romanian against \"of the latest 50\" in English; and\nended all fifty cards with the commit trailer. The round label now comes from\none function shared by the heading and the jump nav, so they cannot disagree;\nthe Romanian half says \"ultimele\" with the 20+ \"de\" agreement; and the whole\ntrailer block is stripped at render time — changelog.json keeps it, all fifty\nentries. A commit whose body is only a trailer renders no paragraph at all.\n\nTwo Romanian gender agreements fixed in usecases.html: clona is feminine.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>",
+      "screens": [
+        "changelog.html",
+        "usecases.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/68c27f62d0d28a326d390adfedac1358607c88d4"
+    },
+    {
+      "sha": "5c154ad42b9f782553e0e1cf5a8a1822e9a10c28",
+      "short": "5c154ad",
+      "date": "2026-08-06",
+      "subject": "fix: make a hidden review-page control actually hide, and let a button be the primary affordance [IMPL-19, IMPL-20]",
+      "body": "Two review-page stylesheet defects with the same shape: a rule at class\nspecificity deciding something an attribute or an element type should decide.\n\n.rp-nav and .rp-toolbar set `display: flex`, which beats the UA sheet's\n`[hidden] { display: none }`, so every page that toggles them through the\n`hidden` attribute rendered them anyway — 36.9 px of jump nav on the changelog\nand 34.9 px of live filter chips offered to a signed-out reviewer who has\nnothing to filter. Both now measure 0 while hidden and unchanged when shown.\n\n.rp-btn was typed to `a` alone, so comments.html's sign-in <button> — the only\ncall to action a signed-out reviewer sees — fell through to the UA grey\nrgb(239,239,239). It is now the orange token, with the border, font and cursor\na button does not inherit on its own.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/5c154ad42b9f782553e0e1cf5a8a1822e9a10c28"
     },
     {
       "sha": "5c21d774bf867c9a39fbac648f57823d39f9b902",
@@ -720,79 +775,6 @@
       "screens": [],
       "round": "unreleased",
       "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/40f2d59ef18d0ab37f7c63172112c7319fd0fd94"
-    },
-    {
-      "sha": "31044b1adcd2533c1903510c1c3d559b8a5535c0",
-      "short": "31044b1",
-      "date": "2026-07-19",
-      "subject": "Fix all 7 audit blockers across the five screens; regenerate .fig",
-      "body": "- resort tax as 'De plătit la hotel'; remove false 'Prețul include taxele' everywhere\n- consent unticked + gated CTA + separate marketing consent + Contractul cu turistul\n- promo code / gift card field in checkout\n- real house rules (pets not allowed) + Reguli casei block\n- per-rate confirmation type (instantă vs max. 2 ore)\n- call-centre hours 10:00-18:00, 30-second promise removed\n- legal operator identity (Creative Eye SRL, licence 536, ANPC) on all screens\n- listing counts/facets re-derived from production data + Disponibilitate filters\n- thank-you: real cancellation terms, Documentele tale, credit mechanics\n\nCo-Authored-By: Claude Fable 5 <noreply@anthropic.com>",
-      "screens": [
-        "audit.html",
-        "checkout.html",
-        "home.html",
-        "hotel.html",
-        "index.html",
-        "listing.html",
-        "thankyou.html"
-      ],
-      "round": "unreleased",
-      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/31044b1adcd2533c1903510c1c3d559b8a5535c0"
-    },
-    {
-      "sha": "b7c6d3d54a03520d5915230d64f857c528a3d7cc",
-      "short": "b7c6d3d",
-      "date": "2026-07-19",
-      "subject": "Add production gap audit: live funnel vs redesign + call-centre strategy",
-      "body": "Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>",
-      "screens": [
-        "audit.html",
-        "index.html"
-      ],
-      "round": "unreleased",
-      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/b7c6d3d54a03520d5915230d64f857c528a3d7cc"
-    },
-    {
-      "sha": "5157f476d8b7f64424160aa2611a72720a9d6c70",
-      "short": "5157f47",
-      "date": "2026-07-18",
-      "subject": "Add desktop checkout + thank-you pages; .fig now carries all 5 frames",
-      "body": "Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>",
-      "screens": [
-        "checkout.html",
-        "index.html",
-        "thankyou.html"
-      ],
-      "round": "unreleased",
-      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/5157f476d8b7f64424160aa2611a72720a9d6c70"
-    },
-    {
-      "sha": "8730e4296a0cce539e51187573990e49b2c1f897",
-      "short": "8730e42",
-      "date": "2026-07-18",
-      "subject": "Add native .fig export + Figma/dev handoff notes",
-      "body": "Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>",
-      "screens": [
-        "index.html"
-      ],
-      "round": "unreleased",
-      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/8730e4296a0cce539e51187573990e49b2c1f897"
-    },
-    {
-      "sha": "9200bc29ca21ccee5fd36aabbda78a7c53e1f265",
-      "short": "9200bc2",
-      "date": "2026-07-18",
-      "subject": "LITRO desktop redesign v2 — home, listing, hotel + specs",
-      "body": "Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>",
-      "screens": [
-        "home.html",
-        "hotel.html",
-        "index.html",
-        "listing.html",
-        "specs.html"
-      ],
-      "round": "unreleased",
-      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/9200bc29ca21ccee5fd36aabbda78a7c53e1f265"
     }
   ]
 }

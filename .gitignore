@@ -17,3 +17,17 @@ tools/dumps/
 # Stakeholder comment dumps carry reviewer names and email addresses.
 # Never commit them; they are private working files, not research.
 comments/
+
+# This repository is public and GitHub Pages serves it from `main`, so anything
+# committed here is published under mateuszkoslacz.com. The review apparatus is
+# not: `docs/audits/` carries the conversion analysis and the product owner's
+# rulings, `docs/impl-guides/` carries every finding raised against the
+# prototype, CLAUDE.md restates the conversion baseline and the funnel
+# invariants, and `.review-lineage/` is the lifecycle graph over all of it.
+# None of it had ever been pushed; keeping it untracked is the state this
+# repository was already in, made explicit rather than left to chance.
+# The prototype itself — screens, engines, review pages, the comment config
+# the published site needs — stays committed.
+docs/
+CLAUDE.md
+.review-lineage/
