@@ -1,43 +1,39 @@
-name: Refresh prototype artifacts
+name: Refresh and deploy prototype
 
-# Static screens remain plain HTML that opens from file:// with no build step.
-# This workflow only regenerates and commits their derived review artifacts after
-# a screen change has already been committed to the published branch.
+# The prototype itself is static HTML. CI regenerates the derived review
+# artifacts in the runner workspace and deploys that exact workspace once.
+# It deliberately never commits generated files back to main: a second push
+# used to cancel the deployment that triggered it and queue another Pages run.
 on:
   push:
-    # Change this when the prototype is published from a branch other than main.
     branches: [main]
-    # These are all generated outputs. The workflow's own commit must not queue
-    # another refresh run; [skip ci] and concurrency below are the other two guards.
-    paths-ignore:
-      - changelog.json
-      - usecases.built.json
-      - docs/usecases.md
-      - docs/usecases/**
-      - preview-*.png
-      - tools/dumps/**
-      - '*.fig'
-      - '**/*.fig'
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
 
+# Pages deployments are serialized. Let an active deployment finish; GitHub
+# keeps the newest queued run and discards obsolete queued runs for this group.
 concurrency:
-  group: prototype-refresh-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: pages
+  cancel-in-progress: false
 
 jobs:
-  refresh:
+  build:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
           # build-changelog.js refuses a shallow history rather than publishing
           # a changelog that silently looks complete but is truncated.
           fetch-depth: 0
 
-      - uses: actions/setup-node@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: npm
@@ -51,48 +47,32 @@ jobs:
         env:
           # ubuntu-latest supplies this Chrome binary for puppeteer-core.
           CHROME_PATH: /usr/bin/google-chrome
+          # The Figma export launches one Chrome process per frame. Serializing
+          # those processes avoids memory pressure making heavy pages cross the
+          # per-frame timeout nondeterministically.
+          JOBS: '1'
+          FRAME_TIMEOUT_MS: '300000'
+          REFRESH_DUMP_TIMEOUT_MS: '1800000'
         run: node tools/refresh.js
 
-      - name: Commit regenerated artifacts
-        # Forks and protected branches commonly expose a read-only token. Skipping
-        # this write is intentional: a maintainer can run the workflow on a writable
-        # automation branch rather than leaving the refresh job red. The committed
-        # donor at tools/.schema/canvas.fig is a tiny Figma schema fragment, not a
-        # source design export; source exports stay out of Git because they are large.
-        if: github.event.repository.fork == false && github.ref_protected == false
-        run: |
-          generated=()
-          add_if_present() {
-            # An ignored path is not "absent" — it exists on the runner and the
-            # regenerator still writes it. `git add` refuses it and, under
-            # `bash -e`, takes the whole job down with it. docs/ is ignored on
-            # purpose: this repository is public and Pages serves it from the
-            # branch, so the review apparatus stays untracked. Ask git what it
-            # will accept rather than maintaining a second list of what is
-            # ignored, so the next ignore rule does not redden this job again.
-            if git check-ignore -q -- "$1" 2>/dev/null; then
-              return
-            fi
-            if [[ -e "$1" ]] || git ls-files --error-unmatch -- "$1" >/dev/null 2>&1; then
-              generated+=("$1")
-            fi
-          }
-          add_if_present changelog.json
-          add_if_present usecases.built.json
-          add_if_present docs/usecases.md
-          add_if_present docs/usecases
-          shopt -s nullglob
-          for artifact in preview-*.png *.fig; do
-            add_if_present "$artifact"
-          done
-          if ((${#generated[@]})); then
-            git add -A -- "${generated[@]}"
-          fi
-          if git diff --cached --quiet; then
-            echo "No generated artifact changes to commit."
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "chore(prototype): refresh generated artifacts [skip ci]"
-          git push
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Include the generated, gitignored use-case documentation and
+          # captures created above. upload-pages-artifact excludes .git.
+          path: '.'
+
+  deploy:
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
