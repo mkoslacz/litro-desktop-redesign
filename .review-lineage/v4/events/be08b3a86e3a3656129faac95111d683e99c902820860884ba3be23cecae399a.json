@@ -1,0 +1,320 @@
+{
+  "event_digest": "sha256:be08b3a86e3a3656129faac95111d683e99c902820860884ba3be23cecae399a",
+  "event_id": "evt_098102bf3c67b1f148be6318",
+  "event_type": "review_ingested",
+  "expected_graph_heads": [
+    "evt_repo_e681f482607ca54b"
+  ],
+  "parents": [
+    "evt_repo_e681f482607ca54b"
+  ],
+  "payload": {
+    "artifact": {
+      "artifact_id": "artifact-conversion-review-report-v2",
+      "artifact_type": "review",
+      "based_on": [],
+      "content_digest": "sha256:2dd46e2aca9d3ec64c2072309182ed06526d04a619a4a2a4b280f5c0ebc573b6",
+      "document_ref": "repo:github.com/mkoslacz/litro-desktop-redesign@sha256:5a434da0862a4b32262d14ca7814ced700cc4e6f0bd509f46c1bbe7eb9fc38e8:docs/audits/conversion-review-report-v2.md",
+      "ref_set": [
+        {
+          "component": "prototype",
+          "content_digest": "sha256:5a434da0862a4b32262d14ca7814ced700cc4e6f0bd509f46c1bbe7eb9fc38e8",
+          "head": "sha256:5a434da0862a4b32262d14ca7814ced700cc4e6f0bd509f46c1bbe7eb9fc38e8",
+          "repo_id": "litro-desktop-redesign",
+          "tree": "tree:sha256:5a434da0862a4b32262d14ca7814ced700cc4e6f0bd509f46c1bbe7eb9fc38e8"
+        }
+      ],
+      "run_id": "run-conversion-review-v2-20260729-205415"
+    },
+    "case_operations": [
+      {
+        "case": {
+          "case_id": "case_27f761d5f45d3f6113ca1a08",
+          "fingerprint": "sha256:df248878da46d24d0be80bb1e86da8b93e24a151c6f2b8ee8d09642099f38783",
+          "history_incomplete": false,
+          "kind": "defect",
+          "title": "Party shape is neither priced nor named"
+        },
+        "case_id": "case_27f761d5f45d3f6113ca1a08",
+        "fingerprint": "sha256:df248878da46d24d0be80bb1e86da8b93e24a151c6f2b8ee8d09642099f38783",
+        "match": "new",
+        "observation": {
+          "artifact_id": "artifact-conversion-review-report-v2",
+          "case_id": "case_27f761d5f45d3f6113ca1a08",
+          "observation_id": "obs_c9e14e350131b2e04a4006c4",
+          "ref_set": [
+            {
+              "component": "prototype",
+              "content_digest": "sha256:5a434da0862a4b32262d14ca7814ced700cc4e6f0bd509f46c1bbe7eb9fc38e8",
+              "head": "sha256:5a434da0862a4b32262d14ca7814ced700cc4e6f0bd509f46c1bbe7eb9fc38e8",
+              "repo_id": "litro-desktop-redesign",
+              "tree": "tree:sha256:5a434da0862a4b32262d14ca7814ced700cc4e6f0bd509f46c1bbe7eb9fc38e8"
+            }
+          ],
+          "run_id": "run-conversion-review-v2-20260729-205415",
+          "status": "open"
+        },
+        "producer_key": "CONV-01"
+      },
+      {
+        "case": {
+          "case_id": "case_72fb3ef1b728dbc10c02e2c4",
+          "fingerprint": "sha256:01499b145f9dd10339e90289a427864e3b1eb6f696ff69bd737a2529b20a57ef",
+          "history_incomplete": false,
+          "kind": "defect",
+          "title": "Cancellation and balance deadlines are frozen literals"
+        },
+        "case_id": "case_72fb3ef1b728dbc10c02e2c4",
+        "fingerprint": "sha256:01499b145f9dd10339e90289a427864e3b1eb6f696ff69bd737a2529b20a57ef",
+        "match": "new",
+        "observation": {
+          "artifact_id": "artifact-conversion-review-report-v2",
+          "case_id": "case_72fb3ef1b728dbc10c02e2c4",
+          "observation_id": "obs_18d0597153c4da3341e87c36",
+          "ref_set": [
+            {
+              "component": "prototype",
+              "content_digest": "sha256:5a434da0862a4b32262d14ca7814ced700cc4e6f0bd509f46c1bbe7eb9fc38e8",
+              "head": "sha256:5a434da0862a4b32262d14ca7814ced700cc4e6f0bd509f46c1bbe7eb9fc38e8",
+              "repo_id": "litro-desktop-redesign",
+              "tree": "tree:sha256:5a434da0862a4b32262d14ca7814ced700cc4e6f0bd509f46c1bbe7eb9fc38e8"
+            }
+          ],
+          "run_id": "run-conversion-review-v2-20260729-205415",
+          "status": "open"
+        },
+        "producer_key": "CONV-02"
+      },
+      {
+        "case": {
+          "case_id": "case_530323c33b25d232ede31f7f",
+          "fingerprint": "sha256:4a87ed418ca35d9160728af33300c2dde20fa10a23391c1b5fb261abf6154f80",
+          "history_incomplete": false,
+          "kind": "defect",
+          "title": "Free-cancellation promise over a non-refundable rate"
+        },
+        "case_id": "case_530323c33b25d232ede31f7f",
+        "fingerprint": "sha256:4a87ed418ca35d9160728af33300c2dde20fa10a23391c1b5fb261abf6154f80",
+        "match": "new",
+        "observation": {
+          "artifact_id": "artifact-conversion-review-report-v2",
+          "case_id": "case_530323c33b25d232ede31f7f",
+          "observation_id": "obs_be05a24444c679e7c736b9bf",
+          "ref_set": [
+            {
+              "component": "prototype",
+              "content_digest": "sha256:5a434da0862a4b32262d14ca7814ced700cc4e6f0bd509f46c1bbe7eb9fc38e8",
+              "head": "sha256:5a434da0862a4b32262d14ca7814ced700cc4e6f0bd509f46c1bbe7eb9fc38e8",
+              "repo_id": "litro-desktop-redesign",
+              "tree": "tree:sha256:5a434da0862a4b32262d14ca7814ced700cc4e6f0bd509f46c1bbe7eb9fc38e8"
+            }
+          ],
+          "run_id": "run-conversion-review-v2-20260729-205415",
+          "status": "open"
+        },
+        "producer_key": "CONV-07"
+      },
+      {
+        "case": {
+          "case_id": "case_d58d8a9c4cb5a4e3876745dc",
+          "fingerprint": "sha256:51da34063868f1e623d445b79be3ea15a90abd993a86e9323e4c4ee91b256f81",
+          "history_incomplete": false,
+          "kind": "defect",
+          "title": "Homepage first viewport does not reach its own thesis"
+        },
+        "case_id": "case_d58d8a9c4cb5a4e3876745dc",
+        "fingerprint": "sha256:51da34063868f1e623d445b79be3ea15a90abd993a86e9323e4c4ee91b256f81",
+        "match": "new",
+        "observation": {
+          "artifact_id": "artifact-conversion-review-report-v2",
+          "case_id": "case_d58d8a9c4cb5a4e3876745dc",
+          "observation_id": "obs_68d1492e5e236e3a475c50da",
+          "ref_set": [
+            {
+              "component": "prototype",
+              "content_digest": "sha256:5a434da0862a4b32262d14ca7814ced700cc4e6f0bd509f46c1bbe7eb9fc38e8",
+              "head": "sha256:5a434da0862a4b32262d14ca7814ced700cc4e6f0bd509f46c1bbe7eb9fc38e8",
+              "repo_id": "litro-desktop-redesign",
+              "tree": "tree:sha256:5a434da0862a4b32262d14ca7814ced700cc4e6f0bd509f46c1bbe7eb9fc38e8"
+            }
+          ],
+          "run_id": "run-conversion-review-v2-20260729-205415",
+          "status": "open"
+        },
+        "producer_key": "CONV-10"
+      },
+      {
+        "case": {
+          "case_id": "case_8227ea4ba0c801893d6cbf84",
+          "fingerprint": "sha256:1b431cacbd4be7ced0f3ec0fc06c3a2a98c4378db0e6cb33626bba0082d6cd66",
+          "history_incomplete": false,
+          "kind": "defect",
+          "title": "Dead end caught but not diagnosed"
+        },
+        "case_id": "case_8227ea4ba0c801893d6cbf84",
+        "fingerprint": "sha256:1b431cacbd4be7ced0f3ec0fc06c3a2a98c4378db0e6cb33626bba0082d6cd66",
+        "match": "new",
+        "observation": {
+          "artifact_id": "artifact-conversion-review-report-v2",
+          "case_id": "case_8227ea4ba0c801893d6cbf84",
+          "observation_id": "obs_321a40a850c31d830def33be",
+          "ref_set": [
+            {
+              "component": "prototype",
+              "content_digest": "sha256:5a434da0862a4b32262d14ca7814ced700cc4e6f0bd509f46c1bbe7eb9fc38e8",
+              "head": "sha256:5a434da0862a4b32262d14ca7814ced700cc4e6f0bd509f46c1bbe7eb9fc38e8",
+              "repo_id": "litro-desktop-redesign",
+              "tree": "tree:sha256:5a434da0862a4b32262d14ca7814ced700cc4e6f0bd509f46c1bbe7eb9fc38e8"
+            }
+          ],
+          "run_id": "run-conversion-review-v2-20260729-205415",
+          "status": "open"
+        },
+        "producer_key": "CONV-12"
+      },
+      {
+        "case": {
+          "case_id": "case_db805a50228f9952c08db48b",
+          "fingerprint": "sha256:f31a19916c1e9ca3ca4b77adb528df34cbc85f8817010a3d70d36e32d0d63cdd",
+          "history_incomplete": false,
+          "kind": "defect",
+          "title": "Checkout states a quantity the total does not cover"
+        },
+        "case_id": "case_db805a50228f9952c08db48b",
+        "fingerprint": "sha256:f31a19916c1e9ca3ca4b77adb528df34cbc85f8817010a3d70d36e32d0d63cdd",
+        "match": "new",
+        "observation": {
+          "artifact_id": "artifact-conversion-review-report-v2",
+          "case_id": "case_db805a50228f9952c08db48b",
+          "observation_id": "obs_2980603defeb79c695a555ab",
+          "ref_set": [
+            {
+              "component": "prototype",
+              "content_digest": "sha256:5a434da0862a4b32262d14ca7814ced700cc4e6f0bd509f46c1bbe7eb9fc38e8",
+              "head": "sha256:5a434da0862a4b32262d14ca7814ced700cc4e6f0bd509f46c1bbe7eb9fc38e8",
+              "repo_id": "litro-desktop-redesign",
+              "tree": "tree:sha256:5a434da0862a4b32262d14ca7814ced700cc4e6f0bd509f46c1bbe7eb9fc38e8"
+            }
+          ],
+          "run_id": "run-conversion-review-v2-20260729-205415",
+          "status": "open"
+        },
+        "producer_key": "CONV-13"
+      },
+      {
+        "case": {
+          "case_id": "case_74ab37aae551de442a1f7835",
+          "fingerprint": "sha256:cf5fea465391d730a3c0d82c54039a498f34fdb252045906dee32627aa998405",
+          "history_incomplete": false,
+          "kind": "defect",
+          "title": "Own-inventory band shows no price"
+        },
+        "case_id": "case_74ab37aae551de442a1f7835",
+        "fingerprint": "sha256:cf5fea465391d730a3c0d82c54039a498f34fdb252045906dee32627aa998405",
+        "match": "new",
+        "observation": {
+          "artifact_id": "artifact-conversion-review-report-v2",
+          "case_id": "case_74ab37aae551de442a1f7835",
+          "observation_id": "obs_c948bc87c80f9d78a29a70b7",
+          "ref_set": [
+            {
+              "component": "prototype",
+              "content_digest": "sha256:5a434da0862a4b32262d14ca7814ced700cc4e6f0bd509f46c1bbe7eb9fc38e8",
+              "head": "sha256:5a434da0862a4b32262d14ca7814ced700cc4e6f0bd509f46c1bbe7eb9fc38e8",
+              "repo_id": "litro-desktop-redesign",
+              "tree": "tree:sha256:5a434da0862a4b32262d14ca7814ced700cc4e6f0bd509f46c1bbe7eb9fc38e8"
+            }
+          ],
+          "run_id": "run-conversion-review-v2-20260729-205415",
+          "status": "open"
+        },
+        "producer_key": "CONV-14"
+      },
+      {
+        "case": {
+          "case_id": "case_d5e903492fbe6505ec41895f",
+          "fingerprint": "sha256:afc53a1309557172c8b57ff98fb0e5d6c3baeeb21b9d58a7555a84f0f7aaef17",
+          "history_incomplete": false,
+          "kind": "defect",
+          "title": "Top-price inventory has no online path"
+        },
+        "case_id": "case_d5e903492fbe6505ec41895f",
+        "fingerprint": "sha256:afc53a1309557172c8b57ff98fb0e5d6c3baeeb21b9d58a7555a84f0f7aaef17",
+        "match": "new",
+        "observation": {
+          "artifact_id": "artifact-conversion-review-report-v2",
+          "case_id": "case_d5e903492fbe6505ec41895f",
+          "observation_id": "obs_def057ef1da8bd7930bdf92a",
+          "ref_set": [
+            {
+              "component": "prototype",
+              "content_digest": "sha256:5a434da0862a4b32262d14ca7814ced700cc4e6f0bd509f46c1bbe7eb9fc38e8",
+              "head": "sha256:5a434da0862a4b32262d14ca7814ced700cc4e6f0bd509f46c1bbe7eb9fc38e8",
+              "repo_id": "litro-desktop-redesign",
+              "tree": "tree:sha256:5a434da0862a4b32262d14ca7814ced700cc4e6f0bd509f46c1bbe7eb9fc38e8"
+            }
+          ],
+          "run_id": "run-conversion-review-v2-20260729-205415",
+          "status": "open"
+        },
+        "producer_key": "CONV-15"
+      },
+      {
+        "case": {
+          "case_id": "case_4671ca4891b259bae1474937",
+          "fingerprint": "sha256:3441e4bc710f693e6e028f369d70a5e55719d6932c25df43ded1a4183c81f620",
+          "history_incomplete": false,
+          "kind": "defect",
+          "title": "EN checkout renders money-path strings in Romanian"
+        },
+        "case_id": "case_4671ca4891b259bae1474937",
+        "fingerprint": "sha256:3441e4bc710f693e6e028f369d70a5e55719d6932c25df43ded1a4183c81f620",
+        "match": "new",
+        "observation": {
+          "artifact_id": "artifact-conversion-review-report-v2",
+          "case_id": "case_4671ca4891b259bae1474937",
+          "observation_id": "obs_4f56ebb0120c19e0677491aa",
+          "ref_set": [
+            {
+              "component": "prototype",
+              "content_digest": "sha256:5a434da0862a4b32262d14ca7814ced700cc4e6f0bd509f46c1bbe7eb9fc38e8",
+              "head": "sha256:5a434da0862a4b32262d14ca7814ced700cc4e6f0bd509f46c1bbe7eb9fc38e8",
+              "repo_id": "litro-desktop-redesign",
+              "tree": "tree:sha256:5a434da0862a4b32262d14ca7814ced700cc4e6f0bd509f46c1bbe7eb9fc38e8"
+            }
+          ],
+          "run_id": "run-conversion-review-v2-20260729-205415",
+          "status": "open"
+        },
+        "producer_key": "CONV-16"
+      }
+    ],
+    "run": {
+      "input_artifact_ids": [],
+      "ref_set": [
+        {
+          "component": "prototype",
+          "content_digest": "sha256:5a434da0862a4b32262d14ca7814ced700cc4e6f0bd509f46c1bbe7eb9fc38e8",
+          "head": "sha256:5a434da0862a4b32262d14ca7814ced700cc4e6f0bd509f46c1bbe7eb9fc38e8",
+          "repo_id": "litro-desktop-redesign",
+          "tree": "tree:sha256:5a434da0862a4b32262d14ca7814ced700cc4e6f0bd509f46c1bbe7eb9fc38e8"
+        }
+      ],
+      "run_id": "run-conversion-review-v2-20260729-205415",
+      "run_type": "review",
+      "status": "completed"
+    }
+  },
+  "project": {
+    "project_id": "litro-desktop-redesign",
+    "project_key": "project:litoralulromanesc.ro/desktop-redesign"
+  },
+  "recorded_at": "2026-07-29T19:02:52Z",
+  "schema": "review-lineage/v4",
+  "scope": [
+    {
+      "component": "prototype",
+      "repo_id": "litro-desktop-redesign"
+    }
+  ]
+}

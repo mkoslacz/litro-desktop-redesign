@@ -1,0 +1,106 @@
+{
+  "schema": "conversion-review/detached-receipt/v1",
+  "status": "complete",
+  "artifact_id": "artifact-conversion-review-report-v3",
+  "artifact_digest": "sha256:6e7bf9055a122016730521f9f7f829a9d79c5d3128c474fdcd20df14eddf072c",
+  "review_run_id": "run-conversion-review-v3-20260730-204502",
+  "document_ref": "repo:github.com/mkoslacz/litro-desktop-redesign@sha256:130bbeb67c06f31bcfef583d46b7c75889c747f1b7aa8729fb054907290e3090:docs/audits/conversion-review-report-v3.md",
+  "snapshot_digest": "sha256:130bbeb67c06f31bcfef583d46b7c75889c747f1b7aa8729fb054907290e3090",
+  "source_ref_set": [
+    {
+      "component": "prototype",
+      "content_digest": "sha256:130bbeb67c06f31bcfef583d46b7c75889c747f1b7aa8729fb054907290e3090",
+      "head": "sha256:130bbeb67c06f31bcfef583d46b7c75889c747f1b7aa8729fb054907290e3090",
+      "repo_id": "litro-desktop-redesign",
+      "tree": "tree:sha256:130bbeb67c06f31bcfef583d46b7c75889c747f1b7aa8729fb054907290e3090"
+    }
+  ],
+  "git_commit_at_audit": "c85e402 + uncommitted round-16 working-tree diff (snapshot covers it)",
+  "event_id": "evt_89c8fefc988ab0fff6448d1b",
+  "event_digest": "sha256:a2cf8377a9845757cf825a11ecdcc05e5a87dacbee64d8c2a356e63fc5b07a8d",
+  "graph_heads": [
+    "evt_89c8fefc988ab0fff6448d1b"
+  ],
+  "expected_graph_heads_at_ingress": [
+    "evt_098102bf3c67b1f148be6318"
+  ],
+  "warnings": [
+    "CODE_HEAD_CARRIED_BY_OBSERVATION"
+  ],
+  "lint": "complete, 0 errors, 20 observations, document_integrity.verified=2",
+  "case_mapping": [
+    {
+      "case_id": "case_27f761d5f45d3f6113ca1a08",
+      "match": "exact",
+      "observation_id": "obs_dfd7c81b81314299e6ae0ff7",
+      "producer_key": "CONV-01"
+    },
+    {
+      "case_id": "case_72fb3ef1b728dbc10c02e2c4",
+      "match": "exact",
+      "observation_id": "obs_2ba8164a91e886efb4bede63",
+      "producer_key": "CONV-02"
+    },
+    {
+      "case_id": "case_530323c33b25d232ede31f7f",
+      "match": "exact",
+      "observation_id": "obs_b4e7ff92b96a1352f646b4fe",
+      "producer_key": "CONV-07"
+    },
+    {
+      "case_id": "case_d58d8a9c4cb5a4e3876745dc",
+      "match": "exact",
+      "observation_id": "obs_1fbf6dce6ea305fef772d169",
+      "producer_key": "CONV-10"
+    },
+    {
+      "case_id": "case_8227ea4ba0c801893d6cbf84",
+      "match": "exact",
+      "observation_id": "obs_6ae008b5502453542e8993f5",
+      "producer_key": "CONV-12"
+    },
+    {
+      "case_id": "case_db805a50228f9952c08db48b",
+      "match": "exact",
+      "observation_id": "obs_7d98f7a32b1dfbf75f205c84",
+      "producer_key": "CONV-13"
+    },
+    {
+      "case_id": "case_74ab37aae551de442a1f7835",
+      "match": "exact",
+      "observation_id": "obs_676c75fa11d3d8929c4fb6f4",
+      "producer_key": "CONV-14"
+    },
+    {
+      "case_id": "case_d5e903492fbe6505ec41895f",
+      "match": "exact",
+      "observation_id": "obs_9a6f37d1132af2fb00ba65f9",
+      "producer_key": "CONV-15"
+    },
+    {
+      "case_id": "case_4671ca4891b259bae1474937",
+      "match": "exact",
+      "observation_id": "obs_001781ca2b9652b8805af768",
+      "producer_key": "CONV-16"
+    },
+    {
+      "case_id": "case_a39520a72d66be521667cbde",
+      "match": "new",
+      "observation_id": "obs_5a679f66d8c792afee9216e3",
+      "producer_key": "CONV-17"
+    },
+    {
+      "case_id": "case_db0c4655875eb2369a9c7c36",
+      "match": "new",
+      "observation_id": "obs_4989a728cf3ef59ecf0318bf",
+      "producer_key": "CONV-18"
+    }
+  ],
+  "state_boundary": {
+    "code": "observed at snapshot 130bbeb6 (c85e402 + dirty)",
+    "evidence": "observed+source-verified",
+    "integration": "not evidenced",
+    "deployment": "not evidenced",
+    "live_release": "not evidenced"
+  }
+}

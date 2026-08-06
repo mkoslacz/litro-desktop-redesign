@@ -1,0 +1,15 @@
+{
+  "event_digest": "sha256:3a00dcd60e7596405650ffc5d8dbf928dec7bdcb9812d59168787b7b53aabcc9",
+  "event_id": "evt_project_e681f482607ca54b",
+  "event_type": "project_registered",
+  "expected_graph_heads": [],
+  "parents": [],
+  "payload": {},
+  "project": {
+    "project_id": "litro-desktop-redesign",
+    "project_key": "project:litoralulromanesc.ro/desktop-redesign"
+  },
+  "recorded_at": "2026-07-29T19:02:52Z",
+  "schema": "review-lineage/v4",
+  "scope": []
+}

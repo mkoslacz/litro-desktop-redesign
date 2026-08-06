@@ -1,0 +1,87 @@
+{
+  "schema": "conversion-review/detached-receipt/v1",
+  "status": "complete",
+  "artifact_id": "artifact-conversion-review-report-v2",
+  "artifact_digest": "sha256:2dd46e2aca9d3ec64c2072309182ed06526d04a619a4a2a4b280f5c0ebc573b6",
+  "review_run_id": "run-conversion-review-v2-20260729-205415",
+  "document_ref": "repo:github.com/mkoslacz/litro-desktop-redesign@sha256:5a434da0862a4b32262d14ca7814ced700cc4e6f0bd509f46c1bbe7eb9fc38e8:docs/audits/conversion-review-report-v2.md",
+  "snapshot_digest": "sha256:5a434da0862a4b32262d14ca7814ced700cc4e6f0bd509f46c1bbe7eb9fc38e8",
+  "source_ref_set": [
+    {
+      "repo_id": "litro-desktop-redesign",
+      "component": "prototype",
+      "head": "sha256:5a434da0862a4b32262d14ca7814ced700cc4e6f0bd509f46c1bbe7eb9fc38e8"
+    }
+  ],
+  "git_commit_at_audit": "889ccacff9d1ffb5b7cfcd9457af1617990b9d72",
+  "event_id": "evt_098102bf3c67b1f148be6318",
+  "event_digest": "sha256:be08b3a86e3a3656129faac95111d683e99c902820860884ba3be23cecae399a",
+  "graph_heads": [
+    "evt_098102bf3c67b1f148be6318"
+  ],
+  "lint": "complete, 0 errors, 9 observations, document_integrity.verified=1",
+  "note": "findings-table columns_unreadable is expected: the conversion-review report format has no type/problem columns, so the generic partial-bootstrap reader cannot re-derive rows. Rows were admitted under this skill own producer scheme (CONV-nn + review_case_fingerprint).",
+  "case_mapping": [
+    {
+      "producer_key": "CONV-01",
+      "case_id": "case_27f761d5f45d3f6113ca1a08",
+      "observation_id": "obs_c9e14e350131b2e04a4006c4",
+      "match": "new"
+    },
+    {
+      "producer_key": "CONV-02",
+      "case_id": "case_72fb3ef1b728dbc10c02e2c4",
+      "observation_id": "obs_18d0597153c4da3341e87c36",
+      "match": "new"
+    },
+    {
+      "producer_key": "CONV-07",
+      "case_id": "case_530323c33b25d232ede31f7f",
+      "observation_id": "obs_be05a24444c679e7c736b9bf",
+      "match": "new"
+    },
+    {
+      "producer_key": "CONV-10",
+      "case_id": "case_d58d8a9c4cb5a4e3876745dc",
+      "observation_id": "obs_68d1492e5e236e3a475c50da",
+      "match": "new"
+    },
+    {
+      "producer_key": "CONV-12",
+      "case_id": "case_8227ea4ba0c801893d6cbf84",
+      "observation_id": "obs_321a40a850c31d830def33be",
+      "match": "new"
+    },
+    {
+      "producer_key": "CONV-13",
+      "case_id": "case_db805a50228f9952c08db48b",
+      "observation_id": "obs_2980603defeb79c695a555ab",
+      "match": "new"
+    },
+    {
+      "producer_key": "CONV-14",
+      "case_id": "case_74ab37aae551de442a1f7835",
+      "observation_id": "obs_c948bc87c80f9d78a29a70b7",
+      "match": "new"
+    },
+    {
+      "producer_key": "CONV-15",
+      "case_id": "case_d5e903492fbe6505ec41895f",
+      "observation_id": "obs_def057ef1da8bd7930bdf92a",
+      "match": "new"
+    },
+    {
+      "producer_key": "CONV-16",
+      "case_id": "case_4671ca4891b259bae1474937",
+      "observation_id": "obs_4f56ebb0120c19e0677491aa",
+      "match": "new"
+    }
+  ],
+  "state_boundary": {
+    "code": "observed",
+    "evidence": "observed+source-verified",
+    "integration": "not evidenced",
+    "deployment": "not evidenced",
+    "live_release": "not evidenced"
+  }
+}

@@ -1,0 +1,70 @@
+{
+ "project_id": "litro-desktop-redesign",
+ "project_key": "project:litoralulromanesc.ro/desktop-redesign",
+ "repo_id": "litro-desktop-redesign",
+ "repo_key": "github.com/mkoslacz/litro-desktop-redesign",
+ "review_run_id": "run-conversion-review-v3-20260730-204502",
+ "artifact_id": "artifact-conversion-review-report-v3",
+ "document_ref": "repo:github.com/mkoslacz/litro-desktop-redesign@sha256:130bbeb67c06f31bcfef583d46b7c75889c747f1b7aa8729fb054907290e3090:docs/audits/conversion-review-report-v3.md",
+ "expected_graph_heads": [
+  "evt_098102bf3c67b1f148be6318"
+ ],
+ "source_available": true,
+ "findings": [
+  {
+   "producer_key": "CONV-01",
+   "fingerprint": "sha256:df248878da46d24d0be80bb1e86da8b93e24a151c6f2b8ee8d09642099f38783",
+   "title": "Party shape is neither priced nor named"
+  },
+  {
+   "producer_key": "CONV-02",
+   "fingerprint": "sha256:01499b145f9dd10339e90289a427864e3b1eb6f696ff69bd737a2529b20a57ef",
+   "title": "Cancellation and balance deadlines are frozen literals"
+  },
+  {
+   "producer_key": "CONV-07",
+   "fingerprint": "sha256:4a87ed418ca35d9160728af33300c2dde20fa10a23391c1b5fb261abf6154f80",
+   "title": "Free-cancellation promise over a non-refundable rate"
+  },
+  {
+   "producer_key": "CONV-10",
+   "fingerprint": "sha256:51da34063868f1e623d445b79be3ea15a90abd993a86e9323e4c4ee91b256f81",
+   "title": "Homepage first viewport does not reach its own thesis"
+  },
+  {
+   "producer_key": "CONV-12",
+   "fingerprint": "sha256:1b431cacbd4be7ced0f3ec0fc06c3a2a98c4378db0e6cb33626bba0082d6cd66",
+   "title": "Dead end caught but not diagnosed"
+  },
+  {
+   "producer_key": "CONV-13",
+   "fingerprint": "sha256:f31a19916c1e9ca3ca4b77adb528df34cbc85f8817010a3d70d36e32d0d63cdd",
+   "title": "Checkout states a quantity the total does not cover"
+  },
+  {
+   "producer_key": "CONV-14",
+   "fingerprint": "sha256:cf5fea465391d730a3c0d82c54039a498f34fdb252045906dee32627aa998405",
+   "title": "Own-inventory band shows no price"
+  },
+  {
+   "producer_key": "CONV-15",
+   "fingerprint": "sha256:afc53a1309557172c8b57ff98fb0e5d6c3baeeb21b9d58a7555a84f0f7aaef17",
+   "title": "Top-price inventory has no online path"
+  },
+  {
+   "producer_key": "CONV-16",
+   "fingerprint": "sha256:3441e4bc710f693e6e028f369d70a5e55719d6932c25df43ded1a4183c81f620",
+   "title": "EN checkout renders money-path strings in Romanian"
+  },
+  {
+   "producer_key": "CONV-17",
+   "fingerprint": "sha256:bca2d04498256a4cd2be6942e3f14388c47aa5f87ed58c7a17966cbd1c14669c",
+   "title": "Decorative pre-applied filter chips misstate filter state and poison dead-end branch"
+  },
+  {
+   "producer_key": "CONV-18",
+   "fingerprint": "sha256:322a90958f708f18bf03b666e0e494feef9d536cef1fb84513d17225cfadda39",
+   "title": "Blanket instant-confirmation claim over mixed instant/request inventory"
+  }
+ ]
+}

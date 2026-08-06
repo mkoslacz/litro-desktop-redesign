@@ -1,0 +1,36 @@
+{
+  "event_digest": "sha256:873cf68038e5147fe08497c7576dc16b7084de8e28088430ba7b989abeef066b",
+  "event_id": "evt_repo_e681f482607ca54b",
+  "event_type": "repository_registered",
+  "expected_graph_heads": [
+    "evt_project_e681f482607ca54b"
+  ],
+  "parents": [
+    "evt_project_e681f482607ca54b"
+  ],
+  "payload": {
+    "initial_ref_set": [
+      {
+        "component": "prototype",
+        "content_digest": "sha256:5a434da0862a4b32262d14ca7814ced700cc4e6f0bd509f46c1bbe7eb9fc38e8",
+        "head": "sha256:5a434da0862a4b32262d14ca7814ced700cc4e6f0bd509f46c1bbe7eb9fc38e8",
+        "repo_id": "litro-desktop-redesign",
+        "tree": "tree:sha256:5a434da0862a4b32262d14ca7814ced700cc4e6f0bd509f46c1bbe7eb9fc38e8"
+      }
+    ],
+    "repo_id": "litro-desktop-redesign",
+    "repo_key": "github.com/mkoslacz/litro-desktop-redesign"
+  },
+  "project": {
+    "project_id": "litro-desktop-redesign",
+    "project_key": "project:litoralulromanesc.ro/desktop-redesign"
+  },
+  "recorded_at": "2026-07-29T19:02:52Z",
+  "schema": "review-lineage/v4",
+  "scope": [
+    {
+      "component": "prototype",
+      "repo_id": "litro-desktop-redesign"
+    }
+  ]
+}
