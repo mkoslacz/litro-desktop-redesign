@@ -49,7 +49,10 @@
 
   function optionBag(input) {
     if (!input) return {};
-    if (input.config || input.schema || input.store || input.user || input.signIn || input.fetchConfig || input.configUrl || input.schemaUrl || input.createFirebaseClient) return input;
+    // Every recognised key has to be listed here: an option bag naming none of
+    // them is read as a bare config object, so a new option added without a
+    // line here silently becomes configuration and never reaches the layer.
+    if (input.config || input.schema || input.store || input.user || input.signIn || input.fetchConfig || input.configUrl || input.schemaUrl || input.createFirebaseClient || input.overview) return input;
     return { config: input };
   }
 
@@ -191,6 +194,17 @@
     return fileNameOf(location.pathname);
   }
 
+  /* Page identity for a comparison between two resolved URLs. The file name
+     alone is not identity — `docs/listing-c.html` and `/listing-c.html` share
+     one — and the raw pathname is not either, because a prototype served at
+     `/litro-desktop-redesign/` is the same page as `/litro-desktop-redesign/
+     index.html`. Normalise the directory form to the index file pageName()
+     already assumes it serves, then compare whole paths. */
+  function pagePath(url) {
+    const pathname = String(url.pathname || '/');
+    return pathname.endsWith('/') ? pathname + fileNameOf(pathname) : pathname;
+  }
+
   /* A thread's anchor.page is written by whoever wrote the thread and stored in
      Firestore, so every *read* of it is untrusted input, not just the write in
      anchorFor. Resolve first and then judge, because the check has to see what
@@ -228,6 +242,18 @@
   function safePageName(page, base) {
     const url = page ? navigableUrl(page, base) : null;
     return url ? fileNameOf(url.pathname) : pageName();
+  }
+
+  /* The same judgement at the granularity belongsToThisPage now renders by.
+     The navigate-or-not decision has to agree with the render decision, or a
+     thread anchored to `docs/listing-c.html` draws no pin on `/listing-c.html`
+     (correct) and yet opening it from the overview refuses to navigate there
+     (wrong) — the reviewer lands on the wrong file with the address bar
+     rewritten to the right one. A refused or absent value still reads as the
+     page being viewed, so openThread cannot assign in a loop. */
+  function safePagePath(page, base) {
+    const url = page ? navigableUrl(page, base) : null;
+    return url ? pagePath(url) : pagePath(base);
   }
 
   function stateFromBody(config) {
@@ -549,9 +575,21 @@
       this.config = config;
       this.options = options;
       this.store = options.store || null;
+      /* An overview page reads the same store through the same layer, but owns
+         no anchors to pin against. Told so, the layer stops before every
+         thread's anchor fails to resolve and gets written back as orphaned — a
+         page that presents itself as read-only must not write. Hiding the pins
+         in CSS does not stop the write; only not rendering them does. */
+      this.overview = Boolean(options.overview);
       this.client = null;
       this.user = options.user || null;
       this.threads = [];
+      /* "A delivery has happened" is not "there are threads". An overview page
+         replaces setThreads after init() resolves and has to catch up on a
+         delivery that beat it there; asking `threads.length` instead reads an
+         empty store and a store that has not answered yet as the same state,
+         so an empty prototype sat on "Loading…" for ever. */
+      this.threadsDelivered = false;
       this.hasNextPage = false;
       this.showResolved = false;
       this.activeThread = null;
@@ -576,7 +614,15 @@
       global.addEventListener('scroll', this.positionPins, true);
     }
 
+    /* The layer's on-screen chrome — pin toolbar, detached tray, popover — is
+       addressed to a screen with anchors to pin against. An overview page has
+       none, so it builds none: not created rather than created and hidden,
+       because a `display:none` rule is a second mechanism that has to agree
+       with the first one for ever. The overview carries its own sign-in
+       control and its own error paragraph, and the layer's showError already
+       degrades to "console only" when there is no popover to open. */
     buildShell() {
+      if (this.overview) return;
       this.toolbar = document.createElement('aside');
       this.toolbar.className = 'proto-comments-tools';
       this.toolbar.setAttribute('aria-label', 'Prototype comments');
@@ -612,14 +658,24 @@
     setUser(user) {
       this.user = user || null;
       const signedIn = Boolean(this.user);
-      $('.pc-signin', this.toolbar).hidden = signedIn;
-      $('.pc-add', this.toolbar).disabled = !signedIn;
+      // No toolbar on an overview page; the store and the auth observer behind
+      // it work exactly as they do on a screen.
+      if (this.toolbar) {
+        $('.pc-signin', this.toolbar).hidden = signedIn;
+        $('.pc-add', this.toolbar).disabled = !signedIn;
+      }
       if (signedIn && this.store) this.loadThreads();
     }
 
     async loadThreads() {
       try {
-        this.setThreads(await this.store.list());
+        /* Two statements, not one. `this.setThreads(await …)` resolves the
+           method **before** awaiting, so a page that replaces `setThreads`
+           after `init()` resolves — which is what the overview page does to
+           learn about deliveries — is bypassed for the first one. Production
+           only ever won that race by the backend's own scheduling. */
+        const initial = await this.store.list();
+        this.setThreads(initial);
         this.hasNextPage = privateHasNextPage(this.store);
         this.updateLoadMoreControl();
         if (this.unsubscribe) this.unsubscribe();
@@ -655,6 +711,7 @@
         this.threads = incoming;
       }
       this.threads.sort(compareByTimestampThenId);
+      this.threadsDelivered = true;
       this.renderThreads();
       if (!this.deepLinkHandled) this.openHashThread();
     }
@@ -688,29 +745,50 @@
        pages at once.
 
        anchor.page is store input, so it is untrusted: it is judged only after
-       resolving, exactly as deepLink and needsRestore judge it. */
+       resolving, exactly as deepLink and needsRestore judge it — and compared
+       as a whole path. A file name alone makes `docs/listing-c.html` and
+       `/listing-c.html` one page, which is a second way for one thread to pin
+       itself onto two screens, and it is the comparison a prototype published
+       under a directory prefix needs: `pageBase()` carries that prefix too. */
     belongsToThisPage(thread) {
       const anchor = (thread && thread.anchor) || {};
       // Absent page: a thread stored before the field existed. deepLink already
       // reads that as "the page being viewed", so it renders here.
       if (!anchor.page) return true;
-      const url = navigableUrl(anchor.page, this.pageBase());
+      const base = this.pageBase();
+      const url = navigableUrl(anchor.page, base);
       // A value that will not resolve to a navigable same-origin URL names no
       // page of this prototype, so it is nobody's pin.
-      return Boolean(url) && fileNameOf(url.pathname) === pageName();
+      return Boolean(url) && pagePath(url) === pagePath(base);
     }
 
     renderThreads() {
       $$('.proto-comment-pin').forEach(pin => pin.remove());
+      // An overview page has no anchors, so every thread would miss, take the
+      // detached branch below and be written back as orphaned. It reads
+      // `this.threads` directly instead of being drawn on.
+      if (this.overview) return;
       const detached = [];
       this.threads.filter(thread => this.belongsToThisPage(thread)).forEach(thread => {
         const target = elementFor(thread.anchor);
+        /* A thread with no stored page renders here — deepLink and
+           safePageName read a missing page as "the page being viewed", and
+           making this one disagree would strand every thread written before
+           the field existed. What this page cannot do is claim to know whether
+           such a thread's anchor broke: it resolves on the screen it was
+           written on and misses everywhere else, so the orphan flag flapped
+           true/false with one store write per screen the reviewer walked
+           through. That is the same argument the block above makes about
+           another page's markup. The accepted cost is that a page-less thread
+           whose selector resolves on two screens renders on both and neither
+           writes. */
+        const locatable = Boolean(thread.anchor && thread.anchor.page);
         if (!target) {
           detached.push(thread);
-          if (!thread.orphaned) privateOrphanUpdate(this.store, thread.id, true).catch(() => {});
+          if (!thread.orphaned && locatable) privateOrphanUpdate(this.store, thread.id, true).catch(() => {});
           return;
         }
-        if (thread.orphaned) privateOrphanUpdate(this.store, thread.id, false).catch(() => {});
+        if (thread.orphaned && locatable) privateOrphanUpdate(this.store, thread.id, false).catch(() => {});
         if (thread.status === 'resolved' && !this.showResolved) return;
         const pin = document.createElement('button');
         pin.type = 'button';
@@ -738,10 +816,11 @@
         const target = thread && elementFor(thread.anchor);
         if (thread && target) this.positionPin(pin, target, thread.anchor);
       });
-      if (this.activeThread && !this.popover.hidden) this.positionPopover(this.activeThread);
+      if (this.activeThread && this.popover && !this.popover.hidden) this.positionPopover(this.activeThread);
     }
 
     renderDetached(threads) {
+      if (!this.tray) return;
       this.tray.hidden = threads.length === 0;
       this.tray.replaceChildren();
       if (!threads.length) return;
@@ -778,6 +857,10 @@
     }
 
     showComposer(thread, anchor, hint) {
+      // An overview builds no popover: openThread still fetches the detail and
+      // still delivers it through setThreads, which is the whole of what that
+      // page wants from this method.
+      if (!this.popover) return;
       this.activeThread = thread || null;
       this.popover.hidden = false;
       this.popover.replaceChildren();
@@ -864,40 +947,49 @@
         this.popover.style.transform = 'translate(-50%, -50%)';
         return;
       }
+      /* Clamping the anchor point is not clamping the popover: an 18px inset on
+         a point says nothing about the ~350×560 box hung off it, so a pin near
+         the right or bottom edge put most of the thread outside the viewport.
+         Measure the box, then place it — and when the side the box normally
+         opens towards has run out, open it towards the other one instead of
+         sliding it over its own pin. */
       const rect = target.getBoundingClientRect();
       const anchorX = rect.left + rect.width * (Number(thread.anchor.rx) || 0.5);
       const anchorY = rect.top + rect.height * (Number(thread.anchor.ry) || 0.5);
+      const gap = 12;
+      /* The gutter the layer keeps everywhere else — the toolbar's 18px inset,
+         and the popover's own `calc(100vw - 36px)` width. One constant, used by
+         both ends of both clamps: a zero floor (which is what the measured
+         rewrite left behind) put a corner-anchored popover flush against the
+         edge while the ceiling still inset it. */
+      const gutter = 18;
+      /* innerWidth counts a classic scrollbar as usable space, so clamping
+         against it slides the box under one. clientWidth is what the page
+         actually has. The same argument applies to the height — a horizontal
+         scrollbar and the mobile URL bar both eat innerHeight — so both ends
+         read the layout viewport, and the fallback is for a document with no
+         element, which is what a minimal harness gives. */
+      const root = document.documentElement;
+      const viewWidth = (root && root.clientWidth) || global.innerWidth;
+      const viewHeight = (root && root.clientHeight) || global.innerHeight;
 
-      // Measure popover dimensions to clamp properly. Set initial position first
-      // so getBoundingClientRect works, then adjust based on actual size.
+      // Position first so the box has a layout to measure, then correct it. The
+      // offset moves into left/top, so the transform is dropped: a translate
+      // would move the measured result back out of the viewport.
       this.popover.style.left = anchorX + 'px';
       this.popover.style.top = anchorY + 'px';
-      this.popover.style.transform = 'translate(-12px, 12px)';
-
-      const popoverRect = this.popover.getBoundingClientRect();
-      const popoverWidth = popoverRect.width;
-      const popoverHeight = popoverRect.height;
-      const offset = 12; // From translate(-12px, 12px)
-
-      // Clamp left: ensure popover stays within viewport
-      let left = anchorX - offset;
-      if (left + popoverWidth > global.innerWidth) {
-        // Not enough space on right, flip to left side
-        left = Math.max(0, anchorX - popoverWidth + offset);
-      }
-      left = Math.max(0, Math.min(left, global.innerWidth - popoverWidth));
-
-      // Clamp top: ensure popover stays within viewport
-      let top = anchorY + offset;
-      if (top + popoverHeight > global.innerHeight) {
-        // Not enough space below, flip to above
-        top = Math.max(0, anchorY - popoverHeight - offset);
-      }
-      top = Math.max(0, Math.min(top, global.innerHeight - popoverHeight));
-
-      this.popover.style.left = left + 'px';
-      this.popover.style.top = top + 'px';
       this.popover.style.transform = 'none';
+      const box = this.popover.getBoundingClientRect();
+
+      let left = anchorX - gap;
+      if (left + box.width > viewWidth - gutter) left = anchorX - box.width + gap;
+      let top = anchorY + gap;
+      if (top + box.height > viewHeight - gutter) top = anchorY - box.height - gap;
+
+      // A box too large to satisfy both insets keeps the leading one: the head
+      // of a thread is what has to be readable, and the popover scrolls.
+      this.popover.style.left = Math.max(gutter, Math.min(left, viewWidth - box.width - gutter)) + 'px';
+      this.popover.style.top = Math.max(gutter, Math.min(top, viewHeight - box.height - gutter)) + 'px';
     }
 
     /* Two kinds of link live here and they must not share a base.
@@ -943,7 +1035,8 @@
 
     needsRestore(thread) {
       const anchor = thread.anchor || {};
-      if (pageName() !== safePageName(anchor.page, this.pageBase())) return true;
+      const base = this.pageBase();
+      if (pagePath(base) !== safePagePath(anchor.page, base)) return true;
       const state = anchor.state || {};
       if (Object.keys(state).some(key => qp.get(key) !== String(state[key]))) return true;
       return Boolean(anchor.lang && qp.get('lang') !== anchor.lang)
@@ -1054,6 +1147,7 @@
       loadThreadDetail: privateLoadThreadDetail,
       navigableUrl,
       safePageName,
+      safePagePath,
       validateCommentsConfig,
     };
   }
