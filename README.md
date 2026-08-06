@@ -321,6 +321,40 @@ beside the screens, which needs a Firebase project this repository cannot create
 3. Set `stateKeys` to the axes that should form an anchor. Keep that list stable: changing its shape
    orphans existing threads.
 
+### Verifying the live comment layer
+
+Read this before writing a criterion that says "signed in, the page lists every thread" — that
+sentence has already been written into one Definition of Done that nobody could ever meet.
+
+A **live** verification — one that actually reads or writes threads against the real backend —
+needs a credential this repository does not have and will not carry. `tools/comments.js` reads the
+path to a Firebase Admin SDK service account from the environment variable
+`FIREBASE_SERVICE_ACCOUNT`; it is unset here, and no key file exists. Obtaining one is the
+operator's business and is deliberately not described here.
+
+**Without that credential a live read is unverifiable — which is not the same as assumed-good.**
+The Firestore rules admit only a reviewer who is on the allowlist with a verified Google email, so
+no automated actor can demonstrate that a signed-in session lists every thread. A round that cannot
+show it must record the criterion as unmet for want of evidence, and say so, rather than mark it
+met because nothing contradicted it.
+
+**What the injected seam does prove.** `proto-comments.js` accepts `createFirebaseClient` and
+`loadModule` through `protoComments.init()`. Driven that way the layer runs its own logic for real —
+pins render or do not, threads hydrate, orphan writes are issued or suppressed, and `updateDoc`
+calls are genuinely countable. That is enough for every claim about the layer. It is not enough for
+any claim about the backend: the seam replaces the Firebase call, so what the backend would have
+done is exactly what it cannot tell you.
+
+**What it does not prove, and one way it lies.** Injecting a plain `store` — `init({store})` — is
+*not* the same seam and is not usable for counting writes. `privateOrphanUpdate` resolves the store
+through a `STORE_PRIVATE` WeakMap that only `createFirebaseClient` populates, so an injected store
+makes every orphan write a silent no-op and every `updateDoc` count a vacuous zero — the same zero a
+correct implementation produces. A criterion measured that way passes whether or not the code works.
+
+**The allowlist is an operator decision, not the obstacle.** A reader who concludes the fix is to
+relax `comments.rules` has read this backwards: the rules decide who may write a thread, which is a
+different question from whether writing works at all.
+
 Then the workshop loop is `node tools/comments.js dump` → make the agreed change → write
 `comments/replies.json` → `node tools/comments.js apply comments/replies.json --round <N> --commit <SHA>`.
 
