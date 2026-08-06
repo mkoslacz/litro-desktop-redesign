@@ -44,6 +44,14 @@ the round that fixed the previous fourteen*. Write the rule here, not only besid
 - **Reading live threads requires an allowlisted Google sign-in** (`comments.rules`, named
   allowlist, no domain rule, no open mode). Any verification without those credentials is a
   behavioural check through the injected seam, and must say so rather than claim the live path.
+  README's *Verifying the live comment layer* section is the operational half of this rule; read it
+  before writing a criterion of the form "signed in, the page lists every thread".
+- **A criterion phrased as a universal over a queried set must also assert the set is non-empty.**
+  The empty set satisfies every universal, so "every row link is same-origin" passes hardest when
+  the page renders nothing at all. Two Definitions of Done in this repository were written against
+  a `.cm-thread` selector that matches nothing — the card class is `rp-card` — and both would have
+  recorded a pass on a blank page. Count first, then quantify. The rule is about criteria meant to
+  prove something rendered; "no card carries the commit trailer" is correctly a bare universal.
 - **This prototype and the `design-prototype` template currently disagree in two places, and the
   prototype is the one that is right.** Decided by the operator on 2026-08-06; the template moves
   when someone next touches it. A thread with no `anchor.page` keeps the permissive render and skips
