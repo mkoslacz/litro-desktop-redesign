@@ -21,6 +21,21 @@
   color: #342500; background: #FFF; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer;
 }
 .proto-comments-tools button:disabled { cursor: not-allowed; opacity: .52; }
+/* The overview link is a control in this toolbar, not a link on the page under
+   it. Left unstyled it inherits the product stylesheet — measured at
+   `--navy-500` on 16px/400 next to siblings at 12px/700 — which is exactly the
+   coupling this file's header says it exists to prevent. It states its own
+   size too: an inline anchor measured 23.19px tall on desktop and 21.75px on
+   mobile, the only control here under the 24x24 floor its four siblings clear
+   at 28px. Same shape as a button, one deliberate difference: no fill, so the
+   way out of the layer does not read as loud as the actions inside it. */
+.proto-comments-tools .pc-overview {
+  display: inline-flex; align-items: center; min-height: 28px; padding: 0 9px;
+  border: 1px solid #9C7A12; border-radius: 7px;
+  color: #342500; background: transparent; text-decoration: none;
+  font: inherit; font-size: 12px; font-weight: 700; white-space: nowrap;
+}
+.proto-comments-tools .pc-overview:hover { background: #FFF; }
 .pc-filter { display: inline-flex; align-items: center; gap: 4px; color: #5C4A17; font-size: 11px; font-weight: 600; white-space: nowrap; }
 .proto-comment-pin {
   position: fixed; width: 23px; height: 23px; margin: -11px 0 0 -11px; border: 2px solid #FFF;
