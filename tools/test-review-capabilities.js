@@ -302,6 +302,43 @@ async function testNopanel(browser, baseUrl, file) {
   }
 }
 
+async function testUsecaseCaptures(browser, baseUrl) {
+  const { page } = await newPage(browser, baseUrl);
+  try {
+    await goto(page, baseUrl + 'usecases.html?auth=in&inv=few');
+    await waitForDiscussion(page);
+    await page.waitForSelector('.uc-shot-trigger[data-ready="true"]', { timeout: 30000 });
+    const preview = await page.$eval('.uc-shot-trigger[data-ready="true"]', node => ({
+      dialog: node.getAttribute('aria-haspopup'),
+      label: node.getAttribute('aria-label'),
+      width: Math.round(node.getBoundingClientRect().width),
+      height: Math.round(node.querySelector('img').getBoundingClientRect().height),
+    }));
+    assert.equal(preview.dialog, 'dialog', 'use-case capture preview opens a dialog');
+    assert.match(preview.label, /^Open full-size capture:/, 'use-case capture preview has an English action label');
+    assert.ok(preview.width <= 236, 'use-case capture preview stays compact');
+    assert.equal(preview.height, 144, 'use-case capture preview crops to a fixed scan-friendly height');
+
+    await page.click('.uc-shot-trigger[data-ready="true"]');
+    await page.waitForSelector('#uc-capture-dialog:not([hidden])', { timeout: 10000 });
+    const dialog = await page.$eval('#uc-capture-dialog', node => ({
+      role: node.getAttribute('role'),
+      modal: node.getAttribute('aria-modal'),
+      image: node.querySelector('#uc-capture-image').currentSrc,
+      locked: document.body.classList.contains('uc-capture-open'),
+    }));
+    assert.equal(dialog.role, 'dialog');
+    assert.equal(dialog.modal, 'true');
+    assert.match(dialog.image, /\/docs\/usecases\/UC-\d+-[\w-]+\.png$/, 'dialog uses the original capture');
+    assert.equal(dialog.locked, true, 'background scrolling is locked while the capture is open');
+
+    await page.keyboard.press('Escape');
+    await page.waitForFunction(() => document.getElementById('uc-capture-dialog').hidden, { timeout: 10000 });
+  } finally {
+    await page.close();
+  }
+}
+
 async function testFileFallback(browser, file) {
   const page = await browser.newPage();
   await page.setRequestInterception(true);
@@ -337,6 +374,7 @@ function staticContracts() {
   const sheets = fs.readFileSync(path.join(ROOT, 'proto-sheets.js'), 'utf8');
   const discussion = fs.readFileSync(path.join(ROOT, 'proto-discussion.js'), 'utf8');
   const comments = fs.readFileSync(path.join(ROOT, 'proto-comments.js'), 'utf8');
+  const usecases = fs.readFileSync(path.join(ROOT, 'usecases.html'), 'utf8');
   const reviewerFiles = ['index.html', 'changelog.html', 'usecases.html', 'comments.html',
     'proto-sheets.js', 'proto-discussion.js', 'proto-comments.js'];
   assert.equal(/\bfetch\s*\(/.test(sheets), false, 'panel navigation owns no fetch path');
@@ -351,6 +389,9 @@ function staticContracts() {
   ['threadsAt', 'loadDetail', 'startThread', 'replyTo', 'resolveThread'].forEach(name => {
     assert.match(comments, new RegExp('\\b' + name + '\\s*\\('), 'shared layer exposes ' + name);
   });
+  assert.match(usecases, /setAttribute\('aria-haspopup', 'dialog'\)/, 'use-case captures provide an accessible full-size preview action');
+  assert.match(usecases, /object-fit:\s*cover/, 'use-case captures render compact cropped previews');
+  assert.match(usecases, /id="uc-capture-dialog"/, 'use-case captures retain one shared full-size dialog');
   const forbiddenReviewerChrome = /Înapoi|Schimbări|Cazuri de utilizare|Comentarii|Autentificare|Încarcă|Rezolvate|Deschise|Toate comentariile/;
   reviewerFiles.forEach(file => {
     assert.equal(forbiddenReviewerChrome.test(fs.readFileSync(path.join(ROOT, file), 'utf8')), false,
@@ -378,6 +419,9 @@ async function main() {
     await testNopanel(browser, server.baseUrl, 'home-c.html');
     await testNopanel(browser, server.baseUrl, 'm-home.html');
     console.log('PASS export mode: desktop/mobile nopanel suppression unchanged');
+
+    await testUsecaseCaptures(browser, server.baseUrl);
+    console.log('PASS use-case captures: compact previews open an accessible full-size dialog');
 
     const { page: discussionPage } = await newPage(browser, server.baseUrl);
     try {

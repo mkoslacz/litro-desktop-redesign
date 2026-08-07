@@ -29,16 +29,45 @@
     line-height: 1.6; word-break: break-word;
   }
   .uc-screens { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
-  .uc-shot {
-    display: block; width: 100%; height: auto; border-radius: 10px;
-    border: 1px solid var(--rp-line); background: var(--rp-bg);
+  .uc-shot-wrap { margin-top: 12px; }
+  .uc-shot-trigger {
+    display: block; width: min(236px, 100%); padding: 0; overflow: hidden;
+    border: 1px solid var(--rp-line); border-radius: 10px; background: var(--rp-bg);
+    box-shadow: var(--rp-shadow); color: var(--rp-navy); cursor: zoom-in; text-align: left;
   }
-  .uc-shot-wrap { margin-top: 10px; }
-  .uc-shot-caption { margin: 6px 0 0; font-size: 12.5px; color: var(--rp-muted); }
+  .uc-shot-trigger[data-ready="false"] { visibility: hidden; }
+  .uc-shot-trigger:hover, .uc-shot-trigger:focus-visible {
+    border-color: var(--rp-navy); box-shadow: 0 0 0 3px rgba(0, 75, 151, .15);
+    outline: 0;
+  }
+  .uc-shot-thumb {
+    display: block; width: 100%; height: 144px; object-fit: cover; object-position: top;
+    border-bottom: 1px solid var(--rp-line); background: var(--rp-bg);
+  }
+  .uc-shot-label { display: block; padding: 7px 9px; font-size: 12.5px; font-weight: 700; }
   .uc-shot-missing {
     padding: 14px; border-radius: 10px; border: 1px dashed var(--rp-line);
     color: var(--rp-muted); font-size: 13px; text-align: center;
   }
+  .uc-capture-dialog {
+    position: fixed; inset: 0; z-index: 20; display: grid; place-items: center;
+    padding: 24px; background: rgba(1, 43, 85, .72);
+  }
+  .uc-capture-dialog[hidden] { display: none; }
+  .uc-capture-panel {
+    position: relative; width: min(1180px, 100%); max-height: calc(100vh - 48px); overflow: auto;
+    padding: 16px; border-radius: 14px; background: var(--rp-surface); box-shadow: 0 24px 64px rgba(0, 0, 0, .28);
+  }
+  .uc-capture-panel h2 { margin: 0 42px 12px 0; font-family: 'Outfit', sans-serif; font-size: 18px; }
+  .uc-capture-close {
+    position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border: 0; border-radius: 999px;
+    background: var(--rp-bg); color: var(--rp-navy-deep); cursor: pointer; font: 700 22px/1 sans-serif;
+  }
+  .uc-capture-close:hover, .uc-capture-close:focus-visible { background: var(--rp-info-bg); outline: 2px solid var(--rp-navy); outline-offset: 1px; }
+  .uc-capture-figure { margin: 0; }
+  .uc-capture-figure img { display: block; width: 100%; height: auto; border: 1px solid var(--rp-line); border-radius: 8px; }
+  .uc-capture-caption { margin: 9px 0 0; color: var(--rp-muted); font-size: 13px; }
+  body.uc-capture-open { overflow: hidden; }
 
   /* State reference — every axis with every option and its doc string. */
   .ref-axis { margin-bottom: 22px; }
@@ -86,6 +115,18 @@
       <div id="uc-states"><p class="rp-msg">Loading…</p></div>
     </section>
   </main>
+
+  <div id="uc-capture-dialog" class="uc-capture-dialog" role="dialog" aria-modal="true"
+       aria-labelledby="uc-capture-title" hidden>
+    <section class="uc-capture-panel">
+      <button id="uc-capture-close" class="uc-capture-close" type="button" aria-label="Close capture">×</button>
+      <h2 id="uc-capture-title">Use case capture</h2>
+      <figure class="uc-capture-figure">
+        <img id="uc-capture-image" alt="">
+        <figcaption id="uc-capture-caption" class="uc-capture-caption"></figcaption>
+      </figure>
+    </section>
+  </div>
 </div>
 
 <script src="proto-comments.js"></script>
@@ -98,6 +139,11 @@
   var listEl = document.getElementById('uc-list');
   var countEl = document.getElementById('uc-count');
   var statesEl = document.getElementById('uc-states');
+  var captureDialog = document.getElementById('uc-capture-dialog');
+  var captureImage = document.getElementById('uc-capture-image');
+  var captureCaption = document.getElementById('uc-capture-caption');
+  var captureClose = document.getElementById('uc-capture-close');
+  var captureTrigger = null;
 
   function el(tag, className, text) {
     var node = document.createElement(tag);
@@ -143,6 +189,32 @@
     return 'docs/usecases/' + usecaseId + '-' + base + '.png';
   }
 
+  function closeCapture() {
+    if (captureDialog.hidden) return;
+    captureDialog.hidden = true;
+    document.body.classList.remove('uc-capture-open');
+    if (captureTrigger) captureTrigger.focus();
+    captureTrigger = null;
+  }
+
+  function openCapture(trigger, src, alt) {
+    captureTrigger = trigger;
+    captureImage.src = src;
+    captureImage.alt = alt;
+    captureCaption.textContent = alt;
+    captureDialog.hidden = false;
+    document.body.classList.add('uc-capture-open');
+    captureClose.focus();
+  }
+
+  captureClose.addEventListener('click', closeCapture);
+  captureDialog.addEventListener('click', function (event) {
+    if (event.target === captureDialog) closeCapture();
+  });
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape') closeCapture();
+  });
+
   function renderUsecase(usecase, states) {
     var item = el('article', 'rp-card uc-item');
     if (usecase.id) item.dataset.c = 'uc-' + String(usecase.id);
@@ -178,16 +250,27 @@
     }
 
     /* One capture per use case: the first screen with a file that actually
-       exists. Lazy-loaded — the full set is ~61 MB and this page renders all
-       ten use cases on one load. */
+       exists. Its small top-cropped preview keeps the document scannable;
+       clicking it opens the original full-height capture in a dialog. */
     if (screens.length) {
       var shotWrap = el('div', 'uc-shot-wrap');
       var tried = 0;
+      var name = usecase.name || usecase.id || 'Use case';
+      var trigger = el('button', 'uc-shot-trigger');
+      trigger.type = 'button';
+      trigger.dataset.ready = 'false';
+      trigger.setAttribute('aria-haspopup', 'dialog');
+      trigger.setAttribute('aria-label', 'Open full-size capture: ' + name);
       var img = document.createElement('img');
-      img.className = 'uc-shot';
+      img.className = 'uc-shot-thumb';
       img.loading = 'lazy';
       img.decoding = 'async';
-      img.alt = (usecase.name || usecase.id || 'Use case') + ' — capture';
+      img.alt = name + ' — capture thumbnail';
+      trigger.appendChild(img);
+      trigger.appendChild(el('span', 'uc-shot-label', 'Open full-size capture'));
+      trigger.addEventListener('click', function () {
+        openCapture(trigger, img.currentSrc || img.src, name + ' — full-size capture');
+      });
 
       function tryNext() {
         if (tried >= screens.length) {
@@ -202,7 +285,8 @@
         img.src = path;
       }
       img.onerror = tryNext;
-      shotWrap.appendChild(img);
+      img.onload = function () { trigger.dataset.ready = 'true'; };
+      shotWrap.appendChild(trigger);
       tryNext();
       if (tried <= screens.length) item.appendChild(shotWrap);
     }
