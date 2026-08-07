@@ -1,12 +1,13 @@
 <!doctype html>
-<html lang="ro">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Jurnal de modificări · Changelog — LITRO desktop redesign</title>
+<title>Changelog — LITRO desktop redesign</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="proto-review.css">
+<link rel="stylesheet" href="proto-discussion.css">
 <style>
   /* Commit bodies wrap long unbroken tokens (file paths, URLs) so a card never
      forces the page wider than the viewport — proto-review.css's .rp-body only
@@ -19,40 +20,35 @@
 <body class="rp-page">
 <div class="rp-wrap">
   <header class="rp-head">
-    <a class="rp-back" href="index.html">← Hub-ul de recenzie · Review hub</a>
-    <h1 class="rp-title">Jurnal de modificări <span>· Changelog</span></h1>
-    <p class="rp-lede">
-      Toate rundele de lucru, cu motivul din spatele fiecăreia — nu doar titlul commit-ului.
-      <span class="rp-en">Every round of work, with the reasoning behind it — not only the commit title.</span>
-    </p>
-    <nav class="rp-nav" aria-label="Pagini de recenzie · Review pages">
-      <a href="changelog.html" aria-current="page">Jurnal · Changelog</a>
-      <a href="usecases.html">Situații · Use cases</a>
-      <a href="comments.html">Comentarii · Comments</a>
+    <a class="rp-back" href="index.html">← Review hub</a>
+    <h1 class="rp-title">Changelog</h1>
+    <p class="rp-lede">Every round of work, with the reasoning behind it — not only the commit title.</p>
+    <nav class="rp-nav" aria-label="Review pages">
+      <a href="changelog.html" aria-current="page">Changelog</a>
+      <a href="usecases.html">Use cases</a>
+      <a href="comments.html">Comments</a>
     </nav>
   </header>
 
   <p class="rp-note rp-file-note">
-    Pagina e deschisă de pe <code>file://</code>, iar browserul nu are voie să citească
-    fișierele alăturate — deci conținutul de mai jos nu se poate încărca. Deschide adresa
-    publicată sau pornește <code>node tools/serve.js</code> și intră pe
-    <code>localhost:8080</code>.
-    <span class="rp-en">This page is open from <code>file://</code>, where the browser may not
-    read sibling files, so the content below cannot load. Use the published URL, or run
-    <code>node tools/serve.js</code> and open <code>localhost:8080</code>.</span>
+    This page is open from <code>file://</code>, where the browser may not read sibling files,
+    so the content below cannot load. Use the published URL, or run
+    <code>node tools/serve.js</code> and open <code>localhost:8080</code>.
   </p>
 
   <main class="rp-main rp-needs-url">
     <div id="cl-toolbar" class="rp-toolbar" hidden>
       <span class="rp-count" id="cl-count"></span>
     </div>
-    <nav id="cl-jump" class="rp-nav" aria-label="Sari la o rundă · Jump to a round" hidden></nav>
+    <nav id="cl-jump" class="rp-nav" aria-label="Jump to a round" hidden></nav>
     <div id="cl-root">
-      <p class="rp-msg" id="cl-status">Se încarcă jurnalul… <span class="rp-en">Loading the changelog…</span></p>
+      <p class="rp-msg" id="cl-status">Loading the changelog…</p>
     </div>
   </main>
 </div>
 
+<script src="proto-comments.js"></script>
+<script src="proto-discussion.js"></script>
 <script>
 (function () {
   'use strict';
@@ -77,21 +73,10 @@
       .replace(/^-+|-+$/g, '') || 'unreleased';
   }
 
-  /* Mirrors proto-sheets.js's round-label table (T.unreleased, proto-sheets.js:58)
-     so this page and the panel sheet never disagree on what an unpublished
-     round is called. `unreleased` is the value the build tool writes for every
-     commit that has no round tag yet — not a missing field — so it gets the
-     same bilingual label an absent field gets. Any other round name is real
-     product copy (a round title written by hand) and renders as itself. */
+  /* `unreleased` is the value the build tool writes for every commit that has
+     no round tag yet. Any other round name is data and renders unchanged. */
   function roundLabel(value) {
-    return (!value || value === 'unreleased') ? 'Nepublicat · Unreleased' : value;
-  }
-
-  /* Romanian requires "de" before the counted noun once the number reaches
-     20; below that the bare plural is correct ("9 commit-uri" vs
-     "48 de commit-uri"). */
-  function roCount(n, noun) {
-    return n + (n >= 20 ? ' de ' + noun : ' ' + noun);
+    return (!value || value === 'unreleased') ? 'Unreleased' : value;
   }
 
   /* Git trailers (co-authored-by, signed-off-by, …) are commit metadata, not
@@ -143,7 +128,7 @@
 
   function renderScreenLinks(screens) {
     var wrap = el('div', 'rp-links');
-    wrap.appendChild(document.createTextNode('Ecrane · Screens: '));
+    wrap.appendChild(document.createTextNode('Screens: '));
     var rendered = 0;
     (screens || []).forEach(function (screen) {
       var label = typeof screen === 'string' ? screen : screen && (screen.screen || screen.label);
@@ -159,9 +144,10 @@
 
   function renderEntry(entry) {
     var card = el('article', 'rp-card');
+    if (entry.sha) card.dataset.c = 'cl-' + String(entry.sha);
 
     var meta = el('div', 'rp-meta');
-    meta.appendChild(document.createTextNode((entry.date || 'Dată necunoscută') + ' · '));
+    meta.appendChild(document.createTextNode((entry.date || 'Unknown date') + ' · '));
     var short = entry.short || (entry.sha ? String(entry.sha).slice(0, 7) : 'commit');
     if (entry.url) {
       var commit = el('a', 'rp-mono', short);
@@ -174,7 +160,7 @@
     }
     card.appendChild(meta);
 
-    card.appendChild(el('h3', '', entry.subject || 'Commit fără titlu'));
+    card.appendChild(el('h3', '', entry.subject || 'Untitled commit'));
 
     if (entry.body) {
       /* The subject is already the heading above; strip a leading duplicate
@@ -197,14 +183,12 @@
   function render(data) {
     var entries = data && Array.isArray(data.entries) ? data.entries : null;
     if (!entries) {
-      status.textContent = 'Fișierul de jurnal este nevalid. ';
-      status.appendChild(el('span', 'rp-en', 'This changelog file is invalid.'));
-      return;
+      status.textContent = 'This changelog file is invalid.';
+      return false;
     }
     if (!entries.length) {
-      status.textContent = 'Încă nu există intrări în jurnal. ';
-      status.appendChild(el('span', 'rp-en', 'No changelog entries yet.'));
-      return;
+      status.textContent = 'No changelog entries yet.';
+      return false;
     }
 
     var ordered = orderedEntries(entries);
@@ -235,7 +219,7 @@
       headingLink.href = '#' + slug;
       heading.appendChild(headingLink);
       section.appendChild(heading);
-      section.appendChild(el('p', 'rp-sub', group.entries.length + (group.entries.length === 1 ? ' intrare · entry' : ' intrări · entries')));
+      section.appendChild(el('p', 'rp-sub', group.entries.length + (group.entries.length === 1 ? ' entry' : ' entries')));
 
       group.entries.forEach(function (entry) {
         section.appendChild(renderEntry(entry));
@@ -248,14 +232,21 @@
     toolbar.hidden = false;
     var limit = data.limit || ordered.length;
     count.textContent = ordered.length + (data.limited
-      ? (' din ultimele ' + roCount(limit, 'commit-uri') + ' · of the latest ' + limit + ' commits')
-      : ' intrări · entries');
+      ? (' of the latest ' + limit + ' commits')
+      : (ordered.length === 1 ? ' entry' : ' entries'));
+    return Boolean(root.querySelector('[data-c]'));
+  }
+
+  function mountDiscussion() {
+    if (!window.protoComments || !window.protoDiscussion) return;
+    window.protoComments.init({ overview: true }).then(function (layer) {
+      if (layer) window.protoDiscussion.mount(layer);
+    });
   }
 
   if (location.protocol === 'file:') return; /* .rp-needs-url hides #cl-status's parent already */
   if (typeof fetch !== 'function') {
-    status.textContent = 'Browserul nu poate încărca acest jurnal. ';
-    status.appendChild(el('span', 'rp-en', 'This browser cannot load this changelog.'));
+    status.textContent = 'This browser cannot load this changelog.';
     return;
   }
 
@@ -264,10 +255,11 @@
       if (response && response.ok === false) throw new Error('HTTP ' + response.status);
       return response.json();
     })
-    .then(render)
+    .then(function (data) {
+      if (render(data)) mountDiscussion();
+    })
     .catch(function () {
-      status.textContent = 'Jurnalul nu a putut fi încărcat. ';
-      status.appendChild(el('span', 'rp-en', 'The changelog could not be loaded.'));
+      status.textContent = 'The changelog could not be loaded.';
     });
 })();
 </script>

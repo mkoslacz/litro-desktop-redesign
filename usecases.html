@@ -1,12 +1,13 @@
 <!doctype html>
-<html lang="ro">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Situații de utilizare · Use cases — LITRO desktop redesign</title>
+<title>Use cases — LITRO desktop redesign</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="proto-review.css">
+<link rel="stylesheet" href="proto-discussion.css">
 <script>if (location.protocol === 'file:') document.documentElement.dataset.origin = 'file';</script>
 <style>
   /* Page-local additions the shared shell does not carry. Kept out of
@@ -50,54 +51,45 @@
 <body class="rp-page">
 <div class="rp-wrap">
   <header class="rp-head">
-    <a class="rp-back" href="index.html">← Hub-ul de recenzie · Review hub</a>
-    <h1 class="rp-title">Situații de utilizare <span>· Use cases</span></h1>
-    <p class="rp-lede">
-      Zece situații de produs, fiecare o combinație fixată a stărilor din panoul de demonstrație —
-      cu poveste, reguli, starea rezolvată, legături per ecran și o captură.
-      <span class="rp-en">Ten product situations, each a pinned combination of the demo-panel
-      state axes — with story, rules, the resolved state, per-screen deep links and a capture.</span>
-    </p>
-    <nav class="rp-nav" aria-label="Pagini de recenzie · Review pages">
-      <a href="changelog.html">Jurnal · Changelog</a>
-      <a href="usecases.html" aria-current="page">Situații · Use cases</a>
-      <a href="comments.html">Comentarii · Comments</a>
+    <a class="rp-back" href="index.html">← Review hub</a>
+    <h1 class="rp-title">Use cases</h1>
+    <p class="rp-lede">Ten product situations, each a pinned combination of the demo-panel state
+      axes — with story, rules, the resolved state, per-screen deep links and a capture.</p>
+    <nav class="rp-nav" aria-label="Review pages">
+      <a href="changelog.html">Changelog</a>
+      <a href="usecases.html" aria-current="page">Use cases</a>
+      <a href="comments.html">Comments</a>
     </nav>
   </header>
 
   <p class="rp-note rp-file-note">
-    Pagina e deschisă de pe <code>file://</code>, iar browserul nu are voie să citească
-    fișierele alăturate — deci conținutul de mai jos nu se poate încărca. Deschide adresa
-    publicată sau pornește <code>node tools/serve.js</code> și intră pe
-    <code>localhost:8080</code>.
-    <span class="rp-en">This page is open from <code>file://</code>, where the browser may not
-    read sibling files, so the content below cannot load. Use the published URL, or run
-    <code>node tools/serve.js</code> and open <code>localhost:8080</code>.</span>
+    This page is open from <code>file://</code>, where the browser may not read sibling files,
+    so the content below cannot load. Use the published URL, or run
+    <code>node tools/serve.js</code> and open <code>localhost:8080</code>.
   </p>
 
   <p class="rp-note">
-    Versiunea pentru dezvoltatori, cu context suplimentar de implementare, rămâne
-    <a href="docs/usecases.md">docs/usecases.md</a> — pagina de aici nu o duplică, ci o citează.
-    <span class="rp-en">The developer-facing version, with implementation context, stays
+    The developer-facing version, with implementation context, stays
     <a href="docs/usecases.md">docs/usecases.md</a> — this page cites it rather than
-    duplicating its role.</span>
+    duplicating its role.
   </p>
 
   <main class="rp-main rp-needs-url">
     <section class="rp-section">
-      <h2>Situații <span class="rp-sub" id="uc-count"></span></h2>
-      <div id="uc-list" class="rp-scroll"><p class="rp-msg">Se încarcă… · Loading…</p></div>
+      <h2>Use cases <span class="rp-sub" id="uc-count"></span></h2>
+      <div id="uc-list" class="rp-scroll"><p class="rp-msg">Loading…</p></div>
     </section>
 
     <section class="rp-section">
-      <h2>Referința completă a stărilor</h2>
-      <p class="rp-sub">Fiecare axă a panoului, fiecare opțiune, cu explicația ei · Every panel
-        axis, every option, with its explanation</p>
-      <div id="uc-states"><p class="rp-msg">Se încarcă… · Loading…</p></div>
+      <h2>Complete state reference</h2>
+      <p class="rp-sub">Every panel axis and every option, with its explanation</p>
+      <div id="uc-states"><p class="rp-msg">Loading…</p></div>
     </section>
   </main>
 </div>
 
+<script src="proto-comments.js"></script>
+<script src="proto-discussion.js"></script>
 <script>
 (function () {
   'use strict';
@@ -153,6 +145,7 @@
 
   function renderUsecase(usecase, states) {
     var item = el('article', 'rp-card uc-item');
+    if (usecase.id) item.dataset.c = 'uc-' + String(usecase.id);
 
     var head = el('div', 'uc-head');
     head.appendChild(el('span', 'uc-id', usecase.id || 'UC'));
@@ -194,13 +187,12 @@
       img.className = 'uc-shot';
       img.loading = 'lazy';
       img.decoding = 'async';
-      img.alt = (usecase.name || usecase.id || 'Use case') + ' — captură · capture';
+      img.alt = (usecase.name || usecase.id || 'Use case') + ' — capture';
 
       function tryNext() {
         if (tried >= screens.length) {
           shotWrap.textContent = '';
           shotWrap.appendChild(el('p', 'uc-shot-missing',
-            'Captura lipsește din această clonă locală (fișierele docs/usecases/ pot fi absente pe o clonă proaspătă). · ' +
             'Capture missing from this local clone (docs/usecases/ files may be absent on a fresh clone).'));
           return;
         }
@@ -228,7 +220,7 @@
       var line = el('p', 'ref-option');
       var strong = el('strong', '', (opt.label || value) + ': ');
       line.appendChild(strong);
-      line.appendChild(document.createTextNode(opt.doc || 'Fără documentație. · No documentation supplied.'));
+      line.appendChild(document.createTextNode(opt.doc || 'No documentation supplied.'));
       axis.appendChild(line);
     });
     return axis;
@@ -240,31 +232,39 @@
 
     if (!usecases) {
       listEl.textContent = '';
-      listEl.appendChild(el('p', 'rp-msg', 'Fișierul de situații este nevalid. · This use-case file is invalid.'));
+      listEl.appendChild(el('p', 'rp-msg', 'This use-case file is invalid.'));
     } else if (!usecases.length) {
       listEl.textContent = '';
-      listEl.appendChild(el('p', 'rp-msg', 'Încă nu există situații declarate. · No use cases yet.'));
+      listEl.appendChild(el('p', 'rp-msg', 'No use cases yet.'));
       countEl.textContent = '';
     } else {
       listEl.textContent = '';
       usecases.forEach(function (usecase) { listEl.appendChild(renderUsecase(usecase, states)); });
-      countEl.textContent = usecases.length + ' situații · use cases';
+      countEl.textContent = usecases.length + (usecases.length === 1 ? ' use case' : ' use cases');
     }
 
     var stateKeys = Object.keys(states);
     if (!stateKeys.length) {
       statesEl.textContent = '';
-      statesEl.appendChild(el('p', 'rp-msg', 'Nicio axă de stare declarată. · No state axes declared.'));
+      statesEl.appendChild(el('p', 'rp-msg', 'No state axes declared.'));
     } else {
       statesEl.textContent = '';
       stateKeys.forEach(function (key) { statesEl.appendChild(renderStateAxis(key, states[key])); });
     }
+    return Boolean(listEl.querySelector('[data-c]'));
+  }
+
+  function mountDiscussion() {
+    if (!window.protoComments || !window.protoDiscussion) return;
+    window.protoComments.init({ overview: true }).then(function (layer) {
+      if (layer) window.protoDiscussion.mount(layer);
+    });
   }
 
   if (location.protocol === 'file:') return; /* shell's .rp-file-note explains this */
   if (typeof fetch !== 'function') {
     listEl.textContent = '';
-    listEl.appendChild(el('p', 'rp-msg', 'Browserul nu poate încărca această pagină. · This browser cannot load this page.'));
+    listEl.appendChild(el('p', 'rp-msg', 'This browser cannot load this page.'));
     statesEl.textContent = '';
     return;
   }
@@ -274,10 +274,12 @@
       if (response && response.ok === false) throw new Error('HTTP ' + response.status);
       return response.json();
     })
-    .then(render)
+    .then(function (data) {
+      if (render(data)) mountDiscussion();
+    })
     .catch(function () {
       listEl.textContent = '';
-      listEl.appendChild(el('p', 'rp-msg', 'Foaia nu a putut fi încărcată. · This page could not be loaded.'));
+      listEl.appendChild(el('p', 'rp-msg', 'This page could not be loaded.'));
       statesEl.textContent = '';
     });
 })();
