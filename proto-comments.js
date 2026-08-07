@@ -344,6 +344,36 @@
     }) || null;
   }
 
+  function discussionAnchor(target, event, config) {
+    if (target && target.nodeType === 1) return anchorFor(target, event || null, config);
+    if (target && target.anchor) return target.anchor;
+    if (plainObject(target)) return Object.assign({
+      page: pageName(),
+      viewport: config.viewport || document.body.dataset.viewport || (/^m[-.]/.test(pageName()) ? 'mobile' : 'desktop'),
+      lang: document.documentElement.lang || config.lang || 'und',
+      state: stateFromBody(config),
+    }, target);
+    if (typeof target !== 'string' || !target.trim()) return null;
+    const key = target.trim();
+    const selector = key.indexOf('[data-c') === 0 ? key : '[data-c="' + escapeCss(key) + '"]';
+    let element = null;
+    try { element = $(selector); } catch (error) { return null; }
+    if (element) return anchorFor(element, event || null, config);
+    return {
+      page: pageName(),
+      selector: selector,
+      selectorKind: 'data',
+    };
+  }
+
+  function discussionBody(message) {
+    return text(plainObject(message) ? message.body : message);
+  }
+
+  function threadId(thread) {
+    return plainObject(thread) ? thread.id : thread;
+  }
+
   function messageData(message) {
     return {
       id: message.id,
@@ -641,12 +671,12 @@
          CLAUDE.md, "Two link kinds, and they must not share a base").
          Assigned via the .href property rather than folded into the
          innerHTML string above, so nothing built from location.href can
-         break out of the markup. RO/EN pair per CLAUDE.md funnel invariant
-         #11; the four controls above predate that rule and are unchanged. */
+         break out of the markup. Reviewer chrome is always English, independent
+         of the product screen's language. */
       const overview = document.createElement('a');
       overview.className = 'pc-overview';
       overview.href = new URL(OVERVIEW_PAGE, this.pageBase()).href;
-      overview.textContent = document.documentElement.lang === 'en' ? 'Open the comments' : 'Deschide comentariile';
+      overview.textContent = 'Open comments';
       this.toolbar.appendChild(overview);
       this.tray = document.createElement('aside');
       this.tray.className = 'proto-comments-tray';
@@ -732,6 +762,53 @@
       this.threadsDelivered = true;
       this.renderThreads();
       if (!this.deepLinkHandled) this.openHashThread();
+    }
+
+    /* Document discussions are another presentation over this layer, not a
+       second backend. This small facade keeps their reads and writes on the
+       same authenticated store while hiding Firebase-specific details. */
+    threadsAt(target) {
+      const anchor = discussionAnchor(target, null, this.config);
+      if (!anchor || !anchor.selector) return [];
+      return this.threads.filter(thread => this.belongsToThisPage(thread)
+        && thread.anchor && thread.anchor.selector === anchor.selector);
+    }
+
+    async loadDetail(thread) {
+      const id = threadId(thread);
+      if (!id) return null;
+      const current = plainObject(thread) ? thread : this.threads.find(item => item.id === id);
+      const detail = await privateLoadThreadDetail(this.store, id);
+      if (detail) this.setThreads([detail], true);
+      return detail || current || null;
+    }
+
+    async startThread(target, message, event) {
+      if (!this.user) throw new Error('COMMENT_REVIEWER_SIGN_IN_REQUIRED');
+      const anchor = discussionAnchor(target, event || null, this.config);
+      const body = discussionBody(message);
+      if (!anchor || !anchor.selector) throw new Error('COMMENT_ANCHOR_REQUIRED');
+      if (!body) throw new Error('COMMENT_BODY_REQUIRED');
+      return this.store.add(
+        { createdBy: actor(this.user), anchor: anchor },
+        { author: actor(this.user), body: body, agent: false },
+      );
+    }
+
+    async replyTo(thread, message) {
+      if (!this.user) throw new Error('COMMENT_REVIEWER_SIGN_IN_REQUIRED');
+      const id = threadId(thread);
+      const body = discussionBody(message);
+      if (!id) throw new Error('COMMENT_THREAD_REQUIRED');
+      if (!body) throw new Error('COMMENT_BODY_REQUIRED');
+      return this.store.reply(id, { author: actor(this.user), body: body, agent: false });
+    }
+
+    async resolveThread(thread) {
+      if (!this.user) throw new Error('COMMENT_REVIEWER_SIGN_IN_REQUIRED');
+      const id = threadId(thread);
+      if (!id) throw new Error('COMMENT_THREAD_REQUIRED');
+      return this.store.resolve(id, actor(this.user));
     }
 
     async loadOlderThreads() {

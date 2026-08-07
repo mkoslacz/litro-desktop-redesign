@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="ro">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Comentarii · Comments — LITRO desktop redesign</title>
+<title>Comments — LITRO desktop redesign</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="proto-review.css">
@@ -12,65 +12,52 @@
 <body class="rp-page">
 <div class="rp-wrap">
   <header class="rp-head">
-    <a class="rp-back" href="index.html">← Hub-ul de recenzie · Review hub</a>
-    <h1 class="rp-title">Comentarii <span>· Comments</span></h1>
+    <a class="rp-back" href="index.html">← Review hub</a>
+    <h1 class="rp-title">Comments</h1>
     <p class="rp-lede">
-      Toate firele de discuție într-un singur loc, grupate pe ecran — răspunsul la întrebarea cu
-      care începe orice rundă de atelier: câte fire sunt deschise și ce spun.
-      <span class="rp-en">Every comment thread in one place, grouped by screen — the question every
-      workshop round starts with: how many threads are open, and what do they say.</span>
+      Every comment thread in one place, grouped by screen — the question every workshop round
+      starts with: how many threads are open, and what do they say.
     </p>
-    <nav class="rp-nav" aria-label="Pagini de recenzie · Review pages">
-      <a href="changelog.html">Jurnal · Changelog</a>
-      <a href="usecases.html">Situații · Use cases</a>
-      <a href="comments.html" aria-current="page">Comentarii · Comments</a>
+    <nav class="rp-nav" aria-label="Review pages">
+      <a href="changelog.html">Changelog</a>
+      <a href="usecases.html">Use cases</a>
+      <a href="comments.html" aria-current="page">Comments</a>
     </nav>
   </header>
 
   <p class="rp-note rp-file-note">
-    Pagina e deschisă de pe <code>file://</code>, iar browserul nu are voie să citească
-    fișierele alăturate — deci conținutul de mai jos nu se poate încărca. Deschide adresa
-    publicată sau pornește <code>node tools/serve.js</code> și intră pe
-    <code>localhost:8080</code>.
-    <span class="rp-en">This page is open from <code>file://</code>, where the browser may not
-    read sibling files, so the content below cannot load. Use the published URL, or run
-    <code>node tools/serve.js</code> and open <code>localhost:8080</code>.</span>
+    This page is open from <code>file://</code>, where the browser may not read sibling files, so
+    the content below cannot load. Use the published URL, or run
+    <code>node tools/serve.js</code> and open <code>localhost:8080</code>.
   </p>
 
   <main class="rp-main rp-needs-url">
     <p class="rp-note rp-note-warn" id="cm-unconfigured" hidden>
-      Stratul de comentarii nu e configurat pentru acest prototip (lipsește sau e invalid
-      <code>comments.config.json</code>), sau proiectul Firebase nu răspunde. Pagina nu are ce
-      să afișeze până atunci — vezi README, secțiunea „Stakeholder comments”.
-      <span class="rp-en">The comment layer is not configured for this prototype (missing or
-      invalid <code>comments.config.json</code>), or the Firebase project is not responding.
-      There is nothing to show until then — see README, "Stakeholder comments".</span>
+      The comment layer is not configured for this prototype (missing or invalid
+      <code>comments.config.json</code>), or the Firebase project is not responding. There is
+      nothing to show until then — see README, “Stakeholder comments”.
     </p>
 
     <p class="rp-note" id="cm-signedout" hidden>
-      Nu ești autentificat. Firele de discuție sunt private pentru recenzenții acceptați —
-      autentifică-te cu contul Google din lista de acces ca să le vezi, exact ca la pinurile de
-      pe ecrane.
-      <span class="rp-en">You are not signed in. Comment threads are private to accepted
-      reviewers — sign in with the Google account on the allowlist to see them, exactly like the
-      pins on the screens.</span>
+      You are not signed in. Comment threads are private to approved reviewers — sign in with the
+      Google account on the allowlist to see them, exactly like the pins on the screens.
       <br><br>
-      <button type="button" class="rp-btn" id="cm-signin">Autentificare Google · Sign in with Google</button>
+      <button type="button" class="rp-btn" id="cm-signin">Sign in with Google</button>
     </p>
 
     <p class="rp-note rp-note-warn" id="cm-error" hidden></p>
 
-    <p class="rp-msg" id="cm-loading">Se încarcă firele de discuție… · Loading comment threads…</p>
+    <p class="rp-msg" id="cm-loading">Loading comment threads…</p>
 
     <div class="rp-toolbar" id="cm-toolbar" hidden>
-      <button type="button" class="rp-chip" data-filter="all" aria-pressed="true">Toate · All</button>
-      <button type="button" class="rp-chip" data-filter="open" aria-pressed="false">Deschise · Open</button>
-      <button type="button" class="rp-chip" data-filter="resolved" aria-pressed="false">Rezolvate · Resolved</button>
+      <button type="button" class="rp-chip" data-filter="all" aria-pressed="true">All</button>
+      <button type="button" class="rp-chip" data-filter="open" aria-pressed="false">Open</button>
+      <button type="button" class="rp-chip" data-filter="resolved" aria-pressed="false">Resolved</button>
       <span class="rp-count" id="cm-count"></span>
     </div>
 
     <div id="cm-groups"></div>
-    <p class="rp-msg" id="cm-empty" hidden>Niciun fir de discuție. · No comment threads yet.</p>
+    <p class="rp-msg" id="cm-empty" hidden>No comment threads yet.</p>
   </main>
 </div>
 
@@ -102,7 +89,7 @@
 
   function fmtDate(value) {
     var date = new Date(value);
-    return isNaN(date.getTime()) ? String(value || 'unknown') : date.toLocaleString();
+    return isNaN(date.getTime()) ? String(value || 'unknown') : date.toLocaleString('en-GB');
   }
 
   function personLabel(person) {
@@ -116,7 +103,7 @@
   // (comments.html itself, which owns no anchors at all).
   function groupKey(thread) {
     var page = thread && thread.anchor && thread.anchor.page;
-    return page || 'Pagină necunoscută · Unknown page';
+    return page || 'Unknown page';
   }
 
   // The file a page reference names, with any query or hash stripped and the
@@ -185,7 +172,7 @@
     });
     var openCount = threads.filter(function (thread) { return thread.status !== 'resolved'; }).length;
     var resolvedCount = threads.length - openCount;
-    countEl.textContent = openCount + ' deschise · open, ' + resolvedCount + ' rezolvate · resolved (' + threads.length + ' total)';
+    countEl.textContent = openCount + ' open, ' + resolvedCount + ' resolved (' + threads.length + ' total)';
     toolbarEl.hidden = false;
     emptyEl.hidden = visible.length !== 0;
 
@@ -228,8 +215,8 @@
     card.className = 'rp-card';
 
     var title = document.createElement('h3');
-    title.innerHTML = (thread.status === 'resolved' ? '<span class="rp-tag rp-tag-done">rezolvat · resolved</span> ' : '<span class="rp-tag rp-tag-open">deschis · open</span> ')
-      + esc(anchor.label || 'Comentariu fără etichetă · Unlabelled comment');
+    title.innerHTML = (thread.status === 'resolved' ? '<span class="rp-tag rp-tag-done">resolved</span> ' : '<span class="rp-tag rp-tag-open">open</span> ')
+      + esc(anchor.label || 'Unlabelled comment');
     card.appendChild(title);
 
     var meta = document.createElement('p');
@@ -237,7 +224,7 @@
     meta.innerHTML = esc(personLabel(thread.createdBy)) + ' · ' + esc(fmtDate(thread.createdAt))
       + (anchor.viewport ? ' · ' + esc(anchor.viewport) : '')
       + (anchor.lang ? ' · ' + esc(anchor.lang) : '')
-      + (thread.orphaned ? ' · <span title="Ancora nu mai găsește elementul pe ecran. · The anchor no longer finds its element on the screen.">pin desprins · detached</span>' : '');
+      + (thread.orphaned ? ' · <span title="The anchor no longer finds its element on the screen.">detached pin</span>' : '');
     card.appendChild(meta);
 
     var body = document.createElement('p');
@@ -245,9 +232,9 @@
     if (first) {
       body.textContent = first.body;
     } else if (messages) {
-      body.textContent = '(fir fără mesaje · thread has no messages)';
+      body.textContent = '(thread has no messages)';
     } else {
-      body.textContent = 'Se încarcă textul… · Loading text…';
+      body.textContent = 'Loading text…';
       body.style.opacity = '.6';
     }
     card.appendChild(body);
@@ -257,7 +244,7 @@
       repliesWrap.style.marginTop = '10px';
       var repliesLabel = document.createElement('p');
       repliesLabel.className = 'rp-sub';
-      repliesLabel.textContent = replies.length + ' răspuns(uri) · repl' + (replies.length === 1 ? 'y' : 'ies');
+      repliesLabel.textContent = replies.length + ' repl' + (replies.length === 1 ? 'y' : 'ies');
       repliesWrap.appendChild(repliesLabel);
       replies.forEach(function (message) {
         var reply = document.createElement('p');
@@ -275,12 +262,12 @@
     if (link) {
       var a = document.createElement('a');
       a.href = link;
-      a.textContent = 'Deschide pinul · Open the pin (' + (anchor.page || 'pagină necunoscută · unknown page') + ')';
+      a.textContent = 'Open the pin (' + (anchor.page || 'unknown page') + ')';
       links.appendChild(a);
     } else {
       var span = document.createElement('span');
       span.className = 'rp-meta';
-      span.textContent = 'Legătura nu se poate construi (pagina ancorei lipsește sau e invalidă). · Link could not be built (the anchor page is missing or invalid).';
+      span.textContent = 'Link could not be built (the anchor page is missing or invalid).';
       links.appendChild(span);
     }
     /* The absolute form of the SAME link, for handing to somebody who is not on
@@ -297,9 +284,9 @@
       copy.type = 'button';
       copy.className = 'rp-chip cm-copy';
       copy.dataset.share = share;
-      copy.textContent = 'Copiază linkul · Copy link';
+      copy.textContent = 'Copy link';
       copy.onclick = function () {
-        var done = function (ok) { copy.textContent = ok ? 'Copiat · Copied' : share; };
+        var done = function (ok) { copy.textContent = ok ? 'Copied' : share; };
         try {
           if (navigator.clipboard && navigator.clipboard.writeText) {
             navigator.clipboard.writeText(share).then(function () { done(true); }, function () { done(false); });
@@ -361,7 +348,7 @@
     hydrateDepth += 1;
     Promise.all(pending.map(function (thread) {
       // Release the in-flight marker, or a thread whose detail fetch failed
-      // once is never retried and its card stays on "Se încarcă textul…" even
+      // once is never retried and its card stays on "Loading text…" even
       // on a later delivery that would have succeeded. Left set on success,
       // where the messages array is the guard.
       var failed = function (error) {
@@ -435,11 +422,11 @@
     /* Unconditional on a delivery having happened, and render *and* hydrate.
        Guarding on `layer.threads.length` read an empty store and a store that
        has not answered yet as the same state: an empty prototype sat on
-       "Se încarcă firele de discuție…" for ever instead of showing the empty
+       "Loading comment threads…" for ever instead of showing the empty
        state. threadsDelivered is the flag that tells the two apart. Hydrating
        here as well as rendering matters because a delivery that landed before
        wire() replaced setThreads would otherwise leave every card on
-       "Se încarcă textul…" — render alone reflects half of it. Re-rendering a
+       "Loading text…" — render alone reflects half of it. Re-rendering a
        delivery the patched setThreads already handled is harmless:
        replaceChildren makes render idempotent and the hydrating map makes
        hydrate idempotent. */

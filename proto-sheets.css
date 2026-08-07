@@ -1,112 +1,66 @@
 /* ============================================================
-   PANEL CONTENT SHEETS — changelog, product use cases, comments
-   Styling for proto-sheets.js. Scaffolding, like the panel it hangs off:
-   deliberately unlike the product, so nothing here reads as a proposal.
-
-   Two skins, because the two panels are two skins: the desktop panel
-   (proto.css) is a white card in the left rail, the mobile panel
-   (litro-m.css) is a dark pill bottom-right. proto-m.js marks its box
-   .pt-dark; everything below defaults to light and overrides for dark.
+   PANEL REVIEW NAVIGATION — changelog, use cases, comments
+   Shared by the desktop and mobile demo panels.
    ============================================================ */
 
-.proto-tools .pt-sheets { margin-top: 10px; padding-top: 9px; border-top: 1px solid var(--gray-200); }
-.proto-tools .pt-sheet-row { display: block; margin-top: 6px; }
-
-/* The toggle is a full-width button, not a segmented control: a sheet is
-   content to open, not a state to choose between. */
-.proto-tools .pt-sheet-toggle {
-  display: block; width: 100%; box-sizing: border-box; text-align: left;
-  padding: 6px 8px; border: 1px solid var(--gray-300); border-radius: 8px;
-  background: #fff; font: inherit; font-size: 11.5px; font-weight: 700;
-  color: var(--gray-700); cursor: pointer;
+.proto-tools .pt-review-pages {
+  margin-top: 10px;
+  padding-top: 9px;
+  border-top: 1px solid var(--gray-200);
 }
-.proto-tools .pt-sheet-toggle:hover { background: var(--gray-200); }
-.proto-tools .pt-sheet-toggle::after { content: '⌄'; float: right; color: var(--gray-600); }
-.proto-tools .pt-sheet-toggle[aria-expanded="true"] { border-color: var(--navy-500); color: var(--navy-500); }
 
-.proto-tools .pt-sheet {
-  margin-top: 6px; max-height: 46vh; overflow-y: auto; overscroll-behavior: contain;
-  padding: 8px; border: 1px solid var(--gray-300); border-radius: 8px;
-  background: var(--gray-200); font-size: 11px; line-height: 1.45; color: var(--gray-700);
+.proto-tools .pt-review-page-row { margin-top: 6px; }
+
+.proto-tools .pt-review-page-link {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--gray-300);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--gray-700);
+  font: inherit;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-align: left;
+  text-decoration: none;
 }
-.proto-tools .pt-sheet[hidden] { display: none; }
 
-/* The way out to the full review page (proto-review.css). Outside the sheet
-   box, so it stays put while the sheet redraws — and stays readable when the
-   sheet can only say that it needs the published URL. */
-.proto-tools .pt-sheet-page {
-  display: block; margin-top: 5px; font-size: 11px; font-weight: 700;
-  color: var(--navy-500); text-decoration: underline; text-underline-offset: 2px;
+.proto-tools .pt-review-page-link::after {
+  content: '\2192';
+  float: right;
+  color: var(--gray-600);
 }
-.proto-tools .pt-sheet-page[hidden] { display: none; }
-.proto-tools .pt-sheet-message { margin: 0; color: var(--gray-600); }
-.proto-tools .pt-sheet-heading {
-  margin: 9px 0 4px; font-size: 10px; font-weight: 800; letter-spacing: .06em;
-  text-transform: uppercase; color: var(--gray-600);
+
+.proto-tools .pt-review-page-link:hover,
+.proto-tools .pt-review-page-link:focus-visible {
+  border-color: var(--navy-500);
+  background: var(--gray-200);
+  color: var(--navy-500);
 }
-.proto-tools .pt-sheet-heading:first-child { margin-top: 0; }
-.proto-tools .pt-sheet a { color: var(--navy-500); text-decoration: underline; text-underline-offset: 2px; }
-.proto-tools .pt-sheet-links { margin-top: 3px; color: var(--gray-600); }
-
-/* ---- changelog entry ---- */
-.proto-tools .pt-change { padding: 6px 0; border-top: 1px solid var(--gray-300); }
-.proto-tools .pt-sheet-heading + .pt-change,
-.proto-tools .pt-change:first-child { border-top: 0; }
-.proto-tools .pt-change-meta { font-size: 11px; }
-.proto-tools .pt-commit { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 10.5px; }
-
-/* ---- use case ---- */
-.proto-tools .pt-usecase { padding: 7px 0; border-top: 1px solid var(--gray-300); }
-.proto-tools .pt-usecase:first-child { border-top: 0; }
-.proto-tools .pt-usecase-title { margin: 0 0 3px; font-size: 11.5px; font-weight: 700; }
-.proto-tools .pt-usecase-id {
-  display: inline-block; padding: 1px 5px; border-radius: 4px;
-  background: var(--navy-500); color: #fff;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 10px;
-}
-.proto-tools .pt-usecase-state { margin: 0 0 4px; color: var(--gray-600); }
-.proto-tools .pt-usecase-open { display: inline-block; font-weight: 700; }
-.proto-tools .pt-usecase-notes { margin-top: 4px; }
-.proto-tools .pt-usecase-notes summary { cursor: pointer; font-weight: 600; color: var(--gray-600); }
-.proto-tools .pt-usecase-notes p { margin: 4px 0; }
-.proto-tools .pt-usecase-rules { margin: 4px 0 0; padding-left: 16px; }
-.proto-tools .pt-usecase-docs { display: block; margin-top: 9px; font-weight: 700; }
-
-/* ---- what each demo state means ---- */
-.proto-tools .pt-state-reference { margin-top: 10px; padding-top: 7px; border-top: 1px solid var(--gray-300); }
-.proto-tools .pt-state-reference-item { margin-bottom: 7px; }
-.proto-tools .pt-state-reference-item p { margin: 2px 0 3px; color: var(--gray-600); }
-.proto-tools .pt-state-doc { margin-top: 2px; }
 
 /* ===== dark skin — the mobile panel ===== */
-.proto-tools.pt-dark .pt-sheets { border-top-color: rgba(255, 255, 255, .18); }
-.proto-tools.pt-dark .pt-sheet-toggle {
-  background: rgba(255, 255, 255, .08); border-color: rgba(255, 255, 255, .28); color: #fff;
-}
-.proto-tools.pt-dark .pt-sheet-toggle:hover { background: rgba(255, 255, 255, .16); }
-.proto-tools.pt-dark .pt-sheet-toggle::after { color: rgba(255, 255, 255, .6); }
-.proto-tools.pt-dark .pt-sheet-toggle[aria-expanded="true"] { border-color: var(--orange-500); color: var(--orange-500); }
-.proto-tools.pt-dark .pt-sheet {
-  background: rgba(0, 0, 0, .28); border-color: rgba(255, 255, 255, .18); color: rgba(255, 255, 255, .92);
-  /* the mobile panel is bottom-anchored and much narrower than the screen */
-  max-height: 40vh; white-space: normal; max-width: 74vw;
-}
-.proto-tools.pt-dark .pt-sheet-message,
-.proto-tools.pt-dark .pt-sheet-heading,
-.proto-tools.pt-dark .pt-sheet-links,
-.proto-tools.pt-dark .pt-usecase-state,
-.proto-tools.pt-dark .pt-state-reference-item p,
-.proto-tools.pt-dark .pt-usecase-notes summary { color: rgba(255, 255, 255, .66); }
-.proto-tools.pt-dark .pt-sheet a,
-.proto-tools.pt-dark .pt-sheet-page { color: var(--orange-500); }
-.proto-tools.pt-dark .pt-change,
-.proto-tools.pt-dark .pt-usecase,
-.proto-tools.pt-dark .pt-state-reference { border-top-color: rgba(255, 255, 255, .18); }
-.proto-tools.pt-dark .pt-usecase-id { background: var(--orange-500); }
-/* the panel collapses to a pill; a sheet must not survive the collapse */
-.proto-tools.pt-dark.mini .pt-sheets { display: none; }
+.proto-tools.pt-dark .pt-review-pages { border-top-color: rgba(255, 255, 255, .18); }
 
-/* ===== export mode ===== */
-/* ?nopanel=1 never builds the panel, so a sheet cannot reach a Figma frame.
-   This is the belt-and-braces line for a page that renders one anyway. */
-body[data-export] .pt-sheets { display: none; }
+.proto-tools.pt-dark .pt-review-page-link {
+  border-color: rgba(255, 255, 255, .28);
+  background: rgba(255, 255, 255, .08);
+  color: #fff;
+}
+
+.proto-tools.pt-dark .pt-review-page-link::after { color: rgba(255, 255, 255, .6); }
+
+.proto-tools.pt-dark .pt-review-page-link:hover,
+.proto-tools.pt-dark .pt-review-page-link:focus-visible {
+  border-color: var(--orange-500);
+  background: rgba(255, 255, 255, .16);
+  color: var(--orange-500);
+}
+
+/* The mobile panel collapses to a pill. */
+.proto-tools.pt-dark.mini .pt-review-pages { display: none; }
+
+/* ?nopanel=1 normally prevents panel construction; keep export captures clean
+   if a caller mounts review navigation manually. */
+body[data-export] .pt-review-pages { display: none; }

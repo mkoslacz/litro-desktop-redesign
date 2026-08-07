@@ -9,19 +9,19 @@
    litro.css, which is handoff material for developers and would make a
    reviewer read these pages as a proposal.
 
-   The panel sheets (proto-sheets.js) stay the preview; each of them links
-   here. This file is the only stylesheet the three pages load.
+   The demo panel links to these full pages; it does not duplicate their
+   contents. This file is the only stylesheet the three pages load.
 
    ------------------------------------------------------------
    THE SHELL — copy this into each page, change the three marked spots
    ------------------------------------------------------------
 
      <!doctype html>
-     <html lang="ro">
+     <html lang="en">
      <head>
      <meta charset="utf-8">
      <meta name="viewport" content="width=device-width,initial-scale=1">
-     <title>Jurnal de modificări · Changelog — LITRO desktop redesign</title>
+     <title>Changelog — LITRO desktop redesign</title>
      <link rel="preconnect" href="https://fonts.googleapis.com">
      <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
      <link rel="stylesheet" href="proto-review.css">
@@ -30,24 +30,20 @@
      <body class="rp-page">
      <div class="rp-wrap">
        <header class="rp-head">
-         <a class="rp-back" href="index.html">← Hub-ul de recenzie · Review hub</a>
-         <h1 class="rp-title">Jurnal de modificări <span>· Changelog</span></h1>
-         <p class="rp-lede">Ce s-a schimbat de la o rundă la alta. · What changed between rounds.</p>
-         <nav class="rp-nav" aria-label="Pagini de recenzie · Review pages">
-           <a href="changelog.html" aria-current="page">Jurnal · Changelog</a>
-           <a href="usecases.html">Situații · Use cases</a>
-           <a href="comments.html">Comentarii · Comments</a>
+         <a class="rp-back" href="index.html">← Review hub</a>
+         <h1 class="rp-title">Changelog</h1>
+         <p class="rp-lede">What changed between rounds.</p>
+         <nav class="rp-nav" aria-label="Review pages">
+           <a href="changelog.html" aria-current="page">Changelog</a>
+           <a href="usecases.html">Use cases</a>
+           <a href="comments.html">Comments</a>
          </nav>
        </header>
 
        <p class="rp-note rp-file-note">
-         Pagina e deschisă de pe <code>file://</code>, iar browserul nu are voie să citească
-         fișierele alăturate — deci conținutul de mai jos nu se poate încărca. Deschide adresa
-         publicată sau pornește <code>node tools/serve.js</code> și intră pe
-         <code>localhost:8080</code>.
-         <span class="rp-en">This page is open from <code>file://</code>, where the browser may not
-         read sibling files, so the content below cannot load. Use the published URL, or run
-         <code>node tools/serve.js</code> and open <code>localhost:8080</code>.</span>
+         This page is open from <code>file://</code>, where the browser may not read sibling files,
+         so the content below cannot load. Use the published URL, or run
+         <code>node tools/serve.js</code> and open <code>localhost:8080</code>.
        </p>
 
        <main class="rp-main rp-needs-url"> …the page… </main>
@@ -80,13 +76,9 @@
    LANGUAGE
    ------------------------------------------------------------
 
-   Shell chrome is labelled in both languages the prototype ships, in the same
-   idiom as proto-sheets.js: "Jurnal · Changelog". There is no RO/EN switch on
-   these pages, so the shell renders identically for both audiences — a
-   reviewer and a stakeholder are rarely the same reader, and neither should
-   have to meet the other's language to find the page. Content pulled out of
-   changelog.json / usecases.built.json / Firestore keeps whatever language it
-   was written in.
+   Reviewer chrome is always English and does not follow the language of a
+   product screen. Content loaded from changelog.json, usecases.built.json, or
+   Firestore keeps the language in which it was authored.
    ============================================================ */
 
 :root {
@@ -163,8 +155,8 @@
 .rp-note-warn {
   background: var(--rp-warn-bg); border-color: var(--rp-warn-line); color: var(--rp-warn-ink);
 }
-/* The English half of a bilingual note reads as a translation, not as a
-   second paragraph of instructions. */
+/* Legacy bilingual notes may still use this helper while review-page copy is
+   migrated; it is presentation only and never changes authored data. */
 .rp-en { display: block; margin-top: 6px; opacity: .75; }
 
 .rp-msg { margin: 0; padding: 18px 0; color: var(--rp-muted); font-size: 15px; }
