@@ -5,6 +5,7 @@
 .proto-comments-tools,
 .proto-comments-tray,
 .proto-comments-popover,
+.proto-comments-selection,
 .proto-comment-pin {
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
   z-index: 9100;
@@ -43,6 +44,19 @@
   font-size: 13px; line-height: 1; cursor: pointer;
 }
 .proto-comment-pin.resolved { color: #184C2A; background: #B7E5C1; }
+.proto-comment-pin.deleting { color: #3D3D3D; background: #D8D8D8; cursor: wait; }
+.proto-comments-selection {
+  position: fixed; top: 18px; left: 50%; display: flex; align-items: center; gap: 18px;
+  width: min(760px, calc(100vw - 36px)); box-sizing: border-box; padding: 16px 18px;
+  transform: translateX(-50%); color: #FFF; background: #171717; border: 3px solid #FFD33D;
+  border-radius: 12px; box-shadow: 0 14px 42px rgba(0,0,0,.38); z-index: 9200;
+}
+.proto-comments-selection[hidden] { display: none; }
+.proto-comments-selection strong { flex: 1; font-size: 18px; line-height: 1.35; }
+.proto-comments-selection button {
+  min-height: 36px; padding: 0 14px; border: 2px solid #FFF; border-radius: 8px;
+  color: #FFF; background: transparent; font: inherit; font-size: 13px; font-weight: 800; cursor: pointer;
+}
 .proto-comments-tray {
   position: fixed; right: 18px; top: 18px; width: min(300px, calc(100vw - 36px)); padding: 12px;
   color: #4A1720; background: #FFF1F3; border: 1px solid #E5A9B3; border-radius: 12px;
@@ -68,18 +82,25 @@
 .proto-comments-popover textarea { box-sizing: border-box; width: 100%; resize: vertical; padding: 8px; border: 1px solid #BFBFBF; border-radius: 8px; color: #202020; font: inherit; font-size: 13px; }
 .proto-comments-popover footer { display: flex; justify-content: flex-end; gap: 7px; margin-top: 8px; }
 .proto-comments-popover .pc-resolve { border-color: #467F55; color: #154222; background: #EAF8ED; }
+.proto-comments-popover .pc-delete { border-color: #9D1C2C; color: #7D1220; background: #FFF0F2; }
+.pc-deleting { margin: 8px 0; color: #5A4A14; font-size: 13px; line-height: 1.4; }
 .pc-error { margin: 0; color: #8D1826; font-size: 13px; line-height: 1.4; }
 body[data-commenting="1"] * { cursor: crosshair !important; }
 body[data-commenting="1"] .proto-comments-tools,
 body[data-commenting="1"] .proto-comments-tray,
-body[data-commenting="1"] .proto-comments-popover { cursor: default !important; }
+body[data-commenting="1"] .proto-comments-popover,
+body[data-commenting="1"] .proto-comments-selection,
+body[data-commenting="1"] .proto-comments-selection * { cursor: default !important; }
 .proto-comment-target { outline: 3px solid #F3B81E !important; outline-offset: 3px; }
 @media (max-width: 700px) {
   .proto-comments-tools { right: 12px; bottom: 12px; flex-wrap: wrap; justify-content: flex-end; }
   .proto-comments-tray { top: 12px; right: 12px; }
+  .proto-comments-selection { top: 12px; gap: 10px; padding: 13px; }
+  .proto-comments-selection strong { font-size: 16px; }
 }
 /* Export mode needs a belt-and-braces declaration even though init returns early. */
 body[data-export="1"] .proto-comments-tools,
 body[data-export="1"] .proto-comments-tray,
 body[data-export="1"] .proto-comments-popover,
+body[data-export="1"] .proto-comments-selection,
 body[data-export="1"] .proto-comment-pin { display: none !important; }

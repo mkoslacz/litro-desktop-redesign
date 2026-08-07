@@ -23,6 +23,19 @@ const COMMENTS_CONFIG_FILE = 'comments.config.json';
 const COMMENTS_CONFIG_SCHEMA_FILE = 'comments.config.schema.json';
 const THREAD_PAGE_SIZE = 50;
 const DETAIL_CONCURRENCY = 4;
+const ANCHOR_FIELDS = Object.freeze([
+  'page', 'viewport', 'lang', 'state', 'selector', 'selectorKind', 'rx', 'ry', 'label', 'text',
+]);
+const ANCHOR_LIMITS = Object.freeze({
+  label: 240,
+  lang: 35,
+  page: 512,
+  selector: 1024,
+  stateEntries: 32,
+  stateKey: 64,
+  stateValue: 512,
+  text: 4000,
+});
 const DEFAULT_RETRIEVAL_SCOPE = Object.freeze({
   deadlineMs: 30_000,
   maxBufferedItems: 600,
@@ -139,6 +152,60 @@ function parseArgs(argv) {
 
 function plainObject(value) {
   return value && typeof value === 'object' && !Array.isArray(value);
+}
+
+function anchorError(detail) {
+  fail(`COMMENTS_ANCHOR_INVALID: ${detail}`);
+}
+
+function boundedAnchorString(value, field, limit, required) {
+  if (typeof value !== 'string') anchorError(`${field} must be a string.`);
+  const normalized = required ? value.trim() : value;
+  if (required && !normalized) anchorError(`${field} must be non-empty.`);
+  if (normalized.length > limit) anchorError(`${field} exceeds ${limit} characters.`);
+  return normalized;
+}
+
+function validateCommentAnchor(value) {
+  if (!plainObject(value)) anchorError('anchor must be an object.');
+  const keys = Object.keys(value);
+  if (keys.length !== ANCHOR_FIELDS.length || keys.some(key => !ANCHOR_FIELDS.includes(key))) {
+    anchorError('anchor must contain exactly the canonical fields.');
+  }
+  if (!plainObject(value.state)) anchorError('state must be an object.');
+  const stateKeys = Object.keys(value.state);
+  if (stateKeys.length > ANCHOR_LIMITS.stateEntries) anchorError('state has too many entries.');
+  const state = {};
+  for (const key of stateKeys) {
+    if (!key || key.length > ANCHOR_LIMITS.stateKey) {
+      anchorError('state keys must be bounded non-empty strings.');
+    }
+    state[key] = boundedAnchorString(value.state[key], `state.${key}`, ANCHOR_LIMITS.stateValue, false);
+  }
+  if (!Number.isFinite(value.rx) || value.rx < 0 || value.rx > 1) {
+    anchorError('rx must be a finite number in 0..1.');
+  }
+  if (!Number.isFinite(value.ry) || value.ry < 0 || value.ry > 1) {
+    anchorError('ry must be a finite number in 0..1.');
+  }
+  if (!['desktop', 'mobile'].includes(value.viewport)) {
+    anchorError('viewport must be desktop or mobile.');
+  }
+  if (!['data', 'id', 'path'].includes(value.selectorKind)) {
+    anchorError('selectorKind must be data, id, or path.');
+  }
+  return {
+    page: boundedAnchorString(value.page, 'page', ANCHOR_LIMITS.page, true),
+    viewport: value.viewport,
+    lang: boundedAnchorString(value.lang, 'lang', ANCHOR_LIMITS.lang, true),
+    state,
+    selector: boundedAnchorString(value.selector, 'selector', ANCHOR_LIMITS.selector, true),
+    selectorKind: value.selectorKind,
+    rx: value.rx,
+    ry: value.ry,
+    label: boundedAnchorString(value.label, 'label', ANCHOR_LIMITS.label, true),
+    text: boundedAnchorString(value.text, 'text', ANCHOR_LIMITS.text, false),
+  };
 }
 
 function configError(detail) {
@@ -816,8 +883,9 @@ function createCommentsStore(config, credentialPath, dependencies = {}) {
   }
 
   async function add(thread) {
-    const ref = thread && thread.id ? threads.doc(String(thread.id)) : threads.doc();
     const data = { ...(thread || {}) };
+    data.anchor = validateCommentAnchor(data.anchor);
+    const ref = thread && thread.id ? threads.doc(String(thread.id)) : threads.doc();
     delete data.id;
     await ref.set(data);
     return ref.id;
@@ -840,6 +908,7 @@ function createCommentsStore(config, credentialPath, dependencies = {}) {
       if (!threadSnapshot.exists) return { state: 'unknown', threadId };
 
       const thread = serialiseFirestore(threadSnapshot.data());
+      if (thread.status === 'deleting') return { state: 'deleting', threadId };
       const newestMessage = messageSnapshot.empty ? null : serialiseFirestore(messageSnapshot.docs[0].data());
       const newestAt = (newestMessage && toIso(newestMessage.createdAt)) || toIso(thread.createdAt);
       const staleness = resolutionStaleness(newestAt, generatedAt);
@@ -1326,6 +1395,12 @@ async function runApply(options, config, store) {
       summary.skipped.push({ entry: index + 1, threadId: entry.threadId, reason: 'thread does not exist.' });
     } else if (result.state === 'stale') {
       summary.skipped.push({ entry: index + 1, threadId: entry.threadId, reason: result.detail });
+    } else if (result.state === 'deleting') {
+      summary.skipped.push({
+        entry: index + 1,
+        threadId: entry.threadId,
+        reason: 'thread deletion is in progress; replies and resolution are blocked.',
+      });
     } else {
       summary.skipped.push({
         entry: index + 1,
@@ -1378,6 +1453,8 @@ if (require.main === module) {
 }
 
 module.exports = {
+  ANCHOR_FIELDS,
+  ANCHOR_LIMITS,
   COMMENTS_CONFIG_FILE,
   COMMENTS_CONFIG_SCHEMA_FILE,
   CREDENTIAL_HELP,
@@ -1399,5 +1476,11 @@ module.exports = {
   run,
   serviceAccountPath,
   validateCommentsConfig,
+  validateCommentAnchor,
   validateReplyEntry,
+  __test: {
+    ANCHOR_FIELDS,
+    ANCHOR_LIMITS,
+    validateCommentAnchor,
+  },
 };

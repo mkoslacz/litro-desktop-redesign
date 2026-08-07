@@ -62,6 +62,12 @@
   const PAGEKIND = () => /^m-home/.test(RO_FILE) ? 'home' : PAGE();
   const STICKY_KEY = { home: 'stickyHome', listing: 'stickyList', hotel: 'stickyHotel' };
   const STICKY_URL = [['sthome', 'stickyHome'], ['stlist', 'stickyList'], ['sthotel', 'stickyHotel']];
+  const STICKY_PARAM = { stickyHome: 'sthome', stickyList: 'stlist', stickyHotel: 'sthotel' };
+  const setUrlState = (key, value) => { document.body.dataset[key] = String(value); };
+  const setStickyState = (param, key, value) => {
+    document.body.dataset[key] = value;
+    setUrlState(param, value);
+  };
 
   const RESORTS = [
     ['Mamaia', 319], ['Mamaia Nord', 58], ['Eforie Nord', 184], ['Eforie Sud', 76], ['Costinești', 97],
@@ -499,20 +505,33 @@
     if (qp.get('session')) document.body.dataset.session = qp.get('session');
     if (!document.body.dataset.rooms) document.body.dataset.rooms = 'on';
     if (!document.body.dataset.session) document.body.dataset.session = 'site';
+    if (!document.body.dataset.auth) { let a; try { a = localStorage.getItem('litroAuth'); } catch (e) { } document.body.dataset.auth = a || 'out'; }
+    if (!document.body.dataset.density) {
+      let d; try { d = localStorage.getItem('litroDensity'); } catch (e) { }
+      document.body.dataset.density = d || 'a';
+    }
+    setUrlState('inv', ['many', 'some', 'few', 'zero'].indexOf(qp.get('inv')) >= 0 ? qp.get('inv') : 'many');
     /* bara lipită: trei comutatoare independente + cardul fixat pe carusel;
        aceleași chei ca pe desktop, deci starea trece și între vederi */
     STICKY_URL.forEach(([p, key]) => {
       let v = qp.get(p);
       if (!v) { try { v = localStorage.getItem('litro-' + key); } catch (e) { } }
-      document.body.dataset[key] = v === 'off' ? 'off' : 'on';
+      setStickyState(p, key, v === 'off' ? 'off' : 'on');
     });
     let pin = qp.get('pin');
     if (!pin) { try { pin = localStorage.getItem('litro-pin'); } catch (e) { } }
     document.body.dataset.pin = ['off', 'inline', 'banner'].indexOf(pin) >= 0 ? pin : 'inline';
+    let stf = qp.get('stf');
+    if (!stf) { try { stf = localStorage.getItem('litro-stickyFilters'); } catch (e) { } }
+    document.body.dataset.stickyFilters = stf === 'off' ? 'off' : 'on';
+    setUrlState('stf', document.body.dataset.stickyFilters);
     /* rezultate pe pagină (?per=10|20|30), citit înainte de ieșirea pentru export */
     let per = qp.get('per');
     if (!per) { try { per = localStorage.getItem('litro-perPage'); } catch (e) { } }
     if (PAGE_SIZES.indexOf(+per) >= 0) PAGE_SIZE = +per;
+    setUrlState('per', PAGE_SIZE);
+    setUrlState('assets', document.body.dataset.assets ||
+      (window.LITRO_ASSETS ? LITRO_ASSETS.get() : (qp.get('assets') === 'prod' ? 'prod' : 'proto')));
     applySession();
     /* ?nopanel=1 — modul de export în Figma: fără panoul de demo, iar barele fixe
        intră în fluxul paginii (altfel ar cădea la mijlocul ramei, unde e marginea
@@ -522,11 +541,6 @@
       if (!document.body.dataset.auth) document.body.dataset.auth = 'out';
       if (!document.body.dataset.density) document.body.dataset.density = 'a';
       return;
-    }
-    if (!document.body.dataset.auth) { let a; try { a = localStorage.getItem('litroAuth'); } catch (e) { } document.body.dataset.auth = a || 'out'; }
-    if (!document.body.dataset.density) {
-      let d; try { d = localStorage.getItem('litroDensity'); } catch (e) { }
-      document.body.dataset.density = d || 'a';
     }
     const isListing = PAGE() === 'listing';
     const roFile = RO_FILE, enFile = roFile.replace('.html', '-en.html');
@@ -570,8 +584,8 @@
       html += '<div class="pt-row"><span class="pt-lbl">' + t('Rezultate pe pagină', 'Results per page') + '</span>' +
         seg('pt-per', PAGE_SIZES.map(v => btn('data-per="' + v + '"', v, PAGE_SIZE === v)).join('')) + '</div>';
       html += '<div class="pt-row"><span class="pt-lbl">' + t('Inventar demo', 'Demo inventory') + '</span>' +
-        seg('pt-inv', [['99', '1236', t('Mult', 'Many')], ['4', '4', t('Mediu', 'Some')], ['2', '2', t('Puțin', 'Few')], ['0', '0', 'Zero']]
-          .map(([cap, cnt, l], i) => btn('data-cap="' + cap + '" data-count="' + cnt + '"', l, i === 0)).join('')) + '</div>';
+        seg('pt-inv', [['many', '99', '1236', t('Mult', 'Many')], ['some', '4', '4', t('Mediu', 'Some')], ['few', '2', '2', t('Puțin', 'Few')], ['zero', '0', '0', 'Zero']]
+          .map(([mode, cap, cnt, l]) => btn('data-inv="' + mode + '" data-cap="' + cap + '" data-count="' + cnt + '"', l, document.body.dataset.inv === mode)).join('')) + '</div>';
     }
     /* trei comutatoare independente pentru bara de căutare lipită — se văd pe orice pagină,
        dar e evidențiat rândul care schimbă pagina deschisă acum */
@@ -592,7 +606,7 @@
     document.body.appendChild(box);
 
     $$('.pt-st', box).forEach(sg => $$('.pt-b', sg).forEach(b => b.onclick = () => {
-      document.body.dataset[sg.dataset.key] = b.dataset.v;
+      setStickyState(STICKY_PARAM[sg.dataset.key], sg.dataset.key, b.dataset.v);
       try { localStorage.setItem('litro-' + sg.dataset.key, b.dataset.v); } catch (e) { }
       $$('.pt-b', sg).forEach(x => x.classList.toggle('on', x === b));
       if (stickySync) stickySync();
@@ -614,6 +628,7 @@
     });
     $$('.pt-per .pt-b', box).forEach(b => b.onclick = () => {
       PAGE_SIZE = +b.dataset.per;
+      setUrlState('per', PAGE_SIZE);
       try { localStorage.setItem('litro-perPage', b.dataset.per); } catch (e) { }
       $$('.pt-per .pt-b', box).forEach(x => x.classList.toggle('on', x === b));
       if (listingRepaint) listingRepaint();
@@ -633,6 +648,7 @@
       $$('.pt-den .pt-b', box).forEach(x => x.classList.toggle('on', x === b));
     });
     $$('.pt-inv .pt-b', box).forEach(b => b.onclick = () => {
+      setUrlState('inv', b.dataset.inv);
       $$('.pt-inv .pt-b', box).forEach(x => x.classList.toggle('on', x === b));
       if (onInventory) onInventory(+b.dataset.cap, +b.dataset.count, b.textContent.trim());
     });
@@ -1355,7 +1371,7 @@
       toast(t('Inventar demo: ', 'Demo inventory: ') + label, 'ok');
     };
     const INV = { many: [99, 1236], some: [4, 4], few: [2, 2], zero: [0, 0] };
-    const inv = INV[qp.get('inv')] || INV.many;   // ?inv=… fixează starea pentru export
+    const inv = INV[document.body.dataset.inv] || INV.many;   // ?inv=… fixează starea pentru export
     demoCap = inv[0]; demoCount = inv[1];
 
     initCallback();

@@ -50,6 +50,12 @@
   const PAGEKIND = () => /^home/.test(FILE) ? 'home' : (document.body.dataset.page || '');
   const STICKY_KEY = { home: 'stickyHome', listing: 'stickyList', hotel: 'stickyHotel' };
   const STICKY_URL = [['sthome', 'stickyHome'], ['stlist', 'stickyList'], ['sthotel', 'stickyHotel']];
+  const STICKY_PARAM = { stickyHome: 'sthome', stickyList: 'stlist', stickyHotel: 'sthotel' };
+  const setUrlState = (key, value) => { document.body.dataset[key] = String(value); };
+  const setStickyState = (param, key, value) => {
+    document.body.dataset[key] = value;
+    setUrlState(param, value);
+  };
   let stickySync = null;      // setat de bara lipită; comutatoarele din panou îl re-rulează
   let ssUserPaint = null;     // eticheta „musafir / Ana" din bara lipită
 
@@ -780,12 +786,15 @@
     if (q.get('session')) document.body.dataset.session = q.get('session');
     if (!document.body.dataset.rooms) document.body.dataset.rooms = 'on';
     if (!document.body.dataset.session) document.body.dataset.session = 'site';
+    if (!document.body.dataset.auth) { let a; try { a = localStorage.getItem('litroAuth'); } catch (e) { } document.body.dataset.auth = a || 'out'; }
+    if (!document.body.dataset.density) document.body.dataset.density = 'a';
+    setUrlState('inv', ['many', 'some', 'few', 'zero'].indexOf(q.get('inv')) >= 0 ? q.get('inv') : 'many');
     /* bara lipită: trei comutatoare independente (home / listing / hotel) + cardul fixat
        pe carusel. Se țin minte între pagini, ca să poți compara aceeași stare peste tot. */
     STICKY_URL.forEach(([p, key]) => {
       let v = q.get(p);
       if (!v) { try { v = localStorage.getItem('litro-' + key); } catch (e) { } }
-      document.body.dataset[key] = v === 'off' ? 'off' : 'on';
+      setStickyState(p, key, v === 'off' ? 'off' : 'on');
     });
     let pin = q.get('pin');
     if (!pin) { try { pin = localStorage.getItem('litro-pin'); } catch (e) { } }
@@ -794,11 +803,15 @@
     let stf = q.get('stf');
     if (!stf) { try { stf = localStorage.getItem('litro-stickyFilters'); } catch (e) { } }
     document.body.dataset.stickyFilters = stf === 'off' ? 'off' : 'on';
+    setUrlState('stf', document.body.dataset.stickyFilters);
     /* rezultate pe pagină (?per=10|20|30) — citit înainte de ieșirea pentru export,
        ca o ramă de Figma să poată fi capturată cu orice lungime de pagină */
     let per = q.get('per');
     if (!per) { try { per = localStorage.getItem('litro-perPage'); } catch (e) { } }
     if (PAGE_SIZES.indexOf(+per) >= 0) PAGE_SIZE = +per;
+    setUrlState('per', PAGE_SIZE);
+    setUrlState('assets', document.body.dataset.assets ||
+      (window.LITRO_ASSETS ? LITRO_ASSETS.get() : (q.get('assets') === 'prod' ? 'prod' : 'proto')));
     applySession();
     /* ?nopanel=1 — folosit la exportul în Figma, ca panoul de demo să nu ajungă în ramă */
     if (q.get('nopanel')) {
@@ -811,7 +824,6 @@
     const langLinks = ls ? $$('a', ls).map(a => ({ t: a.textContent.trim(), href: a.getAttribute('href'), on: a.classList.contains('on') })) : [];
     const hasListing = !!$('.listing-grid');
     const isHotel = document.body.dataset.page === 'hotel';
-    if (!document.body.dataset.auth) { let a; try { a = localStorage.getItem('litroAuth'); } catch (e) { } document.body.dataset.auth = a || 'out'; }   // implicit: nemembru → se văd bannerele „autentifică-te pentru FRIENDS"
     const box = el('div', 'proto-tools');
     let html = '<div class="pt-h">' + (EN() ? 'Prototype · settings' : 'Prototip · setări') + '</div>';
     if (langLinks.length) {
@@ -891,7 +903,7 @@
     box.innerHTML = html;
     document.body.appendChild(box);
     $$('.pt-st', box).forEach(seg => $$('.pt-b', seg).forEach(b => b.onclick = () => {
-      document.body.dataset[seg.dataset.key] = b.dataset.v;
+      setStickyState(STICKY_PARAM[seg.dataset.key], seg.dataset.key, b.dataset.v);
       try { localStorage.setItem('litro-' + seg.dataset.key, b.dataset.v); } catch (e) { }
       $$('.pt-b', seg).forEach(x => x.classList.toggle('on', x === b));
       if (stickySync) stickySync();
@@ -903,11 +915,13 @@
     });
     $$('.pt-filt .pt-b', box).forEach(b => b.onclick = () => {
       document.body.dataset.stickyFilters = b.dataset.v;
+      setUrlState('stf', b.dataset.v);
       try { localStorage.setItem('litro-stickyFilters', b.dataset.v); } catch (e) { }
       $$('.pt-filt .pt-b', box).forEach(x => x.classList.toggle('on', x === b));
     });
     $$('.pt-per .pt-b', box).forEach(b => b.onclick = () => {
       PAGE_SIZE = +b.dataset.per;
+      setUrlState('per', PAGE_SIZE);
       try { localStorage.setItem('litro-perPage', b.dataset.per); } catch (e) { }
       $$('.pt-per .pt-b', box).forEach(x => x.classList.toggle('on', x === b));
       if (listingRepaint) listingRepaint();
@@ -1626,11 +1640,13 @@
       $$('.invdemo [data-cap]').forEach(x => x.classList.remove('on'));
       invFirst.classList.add('on');
       demoCap = +invFirst.dataset.cap; demoCount = +invFirst.dataset.count;
+      setUrlState('inv', ({ 99: 'many', 4: 'some', 2: 'few', 0: 'zero' })[demoCap] || 'many');
     }
     $$('.invdemo [data-cap]').forEach(b => b.onclick = () => {
       $$('.invdemo [data-cap]').forEach(x => x.classList.remove('on'));
       b.classList.add('on');
       demoCap = +b.dataset.cap; demoCount = +b.dataset.count;
+      setUrlState('inv', ({ 99: 'many', 4: 'some', 2: 'few', 0: 'zero' })[demoCap] || 'many');
       $$('.pfilter.on').forEach(p => p.classList.remove('on'));       // curăță filtrele pt. o demonstrație curată
       $$('.fbox:not(.avail) .cb.on').forEach(c => c.classList.remove('on'));
       applyFilters(); syncChips();

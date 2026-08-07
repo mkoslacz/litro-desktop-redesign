@@ -219,6 +219,14 @@
 .rp-links { margin-top: 10px; font-size: 13.5px; }
 .rp-links a { color: var(--rp-navy); text-decoration: underline; text-underline-offset: 2px; }
 .rp-links a + a { margin-left: 10px; }
+.rp-links .cm-copy,
+.rp-links .cm-delete { margin-left: 10px; }
+.rp-links .cm-delete {
+  border-color: #9D1C2C;
+  color: #7D1220;
+  background: #FFF0F2;
+}
+.rp-card.cm-deleting { border-style: dashed; background: var(--rp-warn-bg); }
 
 .rp-tag {
   display: inline-block; padding: 1px 7px; border-radius: 5px;
@@ -227,6 +235,7 @@
 }
 .rp-tag-open { background: var(--rp-orange); }
 .rp-tag-done { background: #0B5E38; }
+.rp-tag-deleting { background: #6B5A22; }
 
 /* The primary affordance is the hub's orange button, so a review page and the
    hub offer the same-looking way out to a screen. */

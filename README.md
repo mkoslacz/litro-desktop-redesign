@@ -18,11 +18,12 @@ inside that sandbox.
 | `litro-m.css` `proto-m.js` | Mobile stylesheet + mobile interaction engine (see below) |
 | `litro-final.fig` | **The handoff file** — 38 editable frames: desktop + mobile, RO + EN, plus every state variant. Generated from `prototype.json`; never hand-edited |
 | `prototype.json` | Declares every exported frame — a page plus the query params that pin its state. A new state is a line here, not an edited script |
-| `changelog.json` | Generated from Git by `tools/build-changelog.js`; read in the panel's *Jurnal de modificări* sheet |
-| `usecases.json` | **Hand-written source**: what every demo state means, plus ten declared product situations |
-| `usecases.built.json` `docs/usecases.md` `docs/usecases/` | Generated from it — panel payload, developer documentation, and one capture per use-case screen |
-| `proto-sheets.js` `proto-sheets.css` | The two read-only panel sheets (changelog + use cases), shared by the desktop and mobile engines |
-| `proto-comments.js` `proto-comments.css` `proto-comments-boot.js` | Stakeholder comment layer — pins, threads, replies, resolve. Dormant until `comments.config.json` exists |
+| `changelog.html` `changelog.json` | Direct changelog review page plus its Git-generated data |
+| `usecases.html` `usecases.json` | Direct use-case review page plus the **hand-written source** for every demo state and situation |
+| `usecases.built.json` `docs/usecases.md` `docs/usecases/` | Generated use-case data, developer documentation, and one capture per screen |
+| `comments.html` | Direct all-threads review page, backed by the same comment layer as screen pins and document discussions |
+| `proto-sheets.js` `proto-sheets.css` | The three direct review-page links in the desktop/mobile demo panel; no inline sheet or fetched preview |
+| `proto-comments.js` `proto-comments.css` `proto-comments-boot.js` | Active stakeholder comment layer — anchor-first authoring, pins, threads, replies, resolve and owner deletion |
 | `comments.config.example.json` `comments.config.schema.json` `comments.rules` | Comment-layer configuration contract and the Firestore security rules to deploy |
 | `litro-mobile-web.fig` `litro-desktop-redesign.fig` `litro-c-flow-en.fig` | Earlier partial exports, superseded by `litro-final.fig` |
 | `specs.html` | Measurement spec for developers (component by component, all values in px) |
@@ -275,51 +276,44 @@ much is left and where you are, and infinite scroll additionally buries the foot
 impossible to return to. The pager hides itself below 31 results, so a filtered set of three does not
 get decoration it does not need.
 
-## The two panel sheets — changelog and use cases
+## Direct review pages — changelog, use cases and comments
 
-At the foot of the demo panel are two things that are *content*, not switches: they explain the
-prototype rather than change it, so they are collapsed by default and fetched only when opened.
+The demo panel links straight to three full review pages. It does not open inline sheets and does
+not fetch review payloads. **Changelog** shows the Git-generated date, subject, affected screens and
+commit; **Use cases** shows the declared workshop situations and compact captures; **Comments** is
+the all-threads overview. Changelog and use-case rows carry stable `data-c` anchors and mount inline
+discussion views over the same comment client used by screen pins.
 
-**Jurnal de modificări** is generated from Git by `tools/build-changelog.js`: date, subject, the
-screens the commit touched (as links) and the commit SHA linking to GitHub. It exists because a
-stakeholder comparing today's screen against yesterday's screenshot needs to know which one they
-are holding. Note the ordering constraint — *a file cannot contain the SHA of the commit that
-writes it*, so the changelog is generated **after** the content commit and committed on top. The
-refresh workflow does that automatically; by hand it is two commits.
-
-**Situații de utilizare** is generated from the hand-written `usecases.json`, which is the real
-deliverable here. It documents what each demo state *means* as a product situation — guest vs
-member, full inventory vs zero, each card density — and declares ten scenarios that pin a complete
-state, each with a deep link that opens it. Two validation rules keep it honest and
-`tools/build-usecases.js` fails the build on either: **every axis and every option carries a `doc`**,
-and **every option appears in at least one declared use case**. Twelve axes and twenty-nine options
-are covered today. The matrix is deliberately declared rather than exhaustive — twelve axes make
-thousands of combinations and almost none is a real situation.
-
-Both sheets need `fetch`, which a browser refuses to do for a sibling file over `file://`. From a
-local copy they say so; run `node tools/serve.js` or use the published URL.
+`usecases.json` remains the hand-written source for the state matrix. `tools/build-usecases.js`
+requires documentation for every axis and option and requires every option to appear in a declared
+use case. Twelve axes and twenty-nine options are covered. `changelog.json`, `usecases.built.json`
+and captures are regenerated artifacts; the direct review-page shells and their panel links remain
+stable.
 
 ## Stakeholder comments
 
-An optional workshop layer: an allowlisted Google-signed-in reviewer drops a **pin on the element
-being discussed**, writes a thread, replies, and resolves it — live for everyone in the room. A
-comment anchors to the **view**, not just the element: page, viewport, language and the demo state
-it was written in, so a thread opened on "member + zero inventory" reopens in that state. If the
-element moves, the layer falls back to the visible text; if that fails too, the thread goes to the
-detached tray rather than being silently lost.
+The active workshop layer lets an explicitly allowlisted, verified Google account drop a **pin on
+the element being discussed**, write a thread, reply and resolve it. **Add comment is anchor-first:**
+it shows target-selection guidance and no composer until the reviewer clicks a valid screen target.
+The resulting ten-field anchor records the full page path, viewport, language, selector, coordinates,
+label, text and all twelve URL-addressable workshop axes. A deep link therefore reopens the same
+desktop/mobile state before locating the target. If the element moves, the layer falls back to its
+visible text; if that fails too, the thread moves to the detached tray.
 
-**The layer is installed but dormant.** It stays a quiet no-op until `comments.config.json` exists
-beside the screens, which needs a Firebase project this repository cannot create. To turn it on:
+`comments.config.json` activates the layer and names the Firebase project. The browser web config is
+public by design; access is protected by the exact `allowed/{verified-email}` record and
+`comments.rules`, never by a domain wildcard. Keep `stateKeys` stable and complete. A missing config,
+`file://` or `?nopanel=1` remains a quiet, comment-free mode.
 
-1. Create the Firebase project, enable **Authentication → Google**, deploy `comments.rules` to
-   Firestore, and add the published Pages domain to the Google provider's **authorized domains**.
-   Skipping that last step looks exactly like an OAuth popup that closes for no reason.
-2. Copy `comments.config.example.json` to `comments.config.json` and fill in `prototypeId`, the
-   Firebase **web** config and `allowedEmailDomains`. The web config is public by design — the
-   Firestore rules and the allowlist are what protect the threads. The file takes only the fields in
-   `comments.config.schema.json`: never a service account, a private key or any JavaScript.
-3. Set `stateKeys` to the axes that should form an anchor. Keep that list stable: changing its shape
-   orphans existing threads.
+`comments.config.example.json` is safe to copy: it contains only public web-config placeholders and
+the active twelve state keys, never reviewer addresses or secrets. Reviewer provisioning belongs in
+Firestore, outside that file: create one exact `allowed/{verified-email}` document per reviewer and
+set `user: "owner"` only on accounts that may delete complete threads.
+
+Owner deletion is also capability-based. Only an exact allowlist record with `user: "owner"` gets
+the control. Deletion persists `open|resolved → deleting`, makes the thread read-only, removes
+messages in bounded batches, deletes the parent last and keeps the UI until the authoritative
+thread-document listener observes that it disappeared. Retrying a partial `deleting` thread is safe.
 
 ### Verifying the live comment layer
 
@@ -340,10 +334,10 @@ met because nothing contradicted it.
 
 **What the injected seam does prove.** `proto-comments.js` accepts `createFirebaseClient` and
 `loadModule` through `protoComments.init()`. Driven that way the layer runs its own logic for real —
-pins render or do not, threads hydrate, orphan writes are issued or suppressed, and `updateDoc`
-calls are genuinely countable. That is enough for every claim about the layer. It is not enough for
-any claim about the backend: the seam replaces the Firebase call, so what the backend would have
-done is exactly what it cannot tell you.
+anchor-first authoring, cleanup, pins, threads, capabilities, deletion retries and authoritative UI
+removal all run through the production facade. `npm --prefix tools run test:review` covers desktop
+and mobile with that injected client. It is not a live Firebase verification: the seam replaces the
+Firebase call, so it cannot prove deployed rules, OAuth configuration or backend behaviour.
 
 **What it does not prove, and one way it lies.** Injecting a plain `store` — `init({store})` — is
 *not* the same seam and is not usable for counting writes. `privateOrphanUpdate` resolves the store
@@ -354,6 +348,18 @@ correct implementation produces. A criterion measured that way passes whether or
 **The allowlist is an operator decision, not the obstacle.** A reader who concludes the fix is to
 relax `comments.rules` has read this backwards: the rules decide who may write a thread, which is a
 different question from whether writing works at all.
+
+Before inviting reviewers, deploy the current rules from this configured checkout with
+`firebase deploy --only firestore:rules`, then run a manual smoke against the published URL with two
+verified Google accounts:
+
+1. Give the ordinary account an exact `allowed/{email}` record without `user: "owner"`. Confirm it
+   can add/reply/resolve but sees no delete control and cannot authorize deletion.
+2. Give the owner account the exact record with `user: "owner"`. Confirm deletion enters the
+   read-only `deleting` state, survives a retry and disappears only after the live document is gone.
+3. Confirm both accounts can reopen a newly created desktop and mobile comment through its deep
+   link with all twelve workshop switches restored. Record the deployed rules revision and smoke
+   result separately; the injected suite must never be reported as this live check.
 
 Then the workshop loop is `node tools/comments.js dump` → make the agreed change → write
 `comments/replies.json` → `node tools/comments.js apply comments/replies.json --round <N> --commit <SHA>`.
@@ -384,11 +390,11 @@ script. Two things that will waste an afternoon if forgotten:
   export-mode CSS, or it is captured at the bottom edge of the capture window and lands in the
   middle of the exported frame.
 
-`.github/workflows/prototype-refresh.yml` runs the same thing in CI after a screen commit and pushes
-the regenerated artifacts back. Its three loop guards — `paths-ignore`, the `[skip ci]` marker on the
-bot commit, and `concurrency` — must stay together; removing any one makes the workflow retrigger on
-its own commit. It installs from `tools/package-lock.json`, which is why the root `.gitignore`
-entries for `package.json` are anchored with a leading slash.
+`.github/workflows/prototype-refresh.yml` first runs the focused injected review suite, then refreshes
+the derived files in the runner workspace and publishes that generated workspace as the Pages
+artifact. It deliberately does **not** push generated files back to the repository. The workflow
+installs from `tools/package-lock.json`, which is why the root `.gitignore` entries for `package.json`
+are anchored with a leading slash.
 
 ## Design decisions that are business rules, not taste
 

@@ -7,6 +7,5 @@
     "projectId": "replace-with-project-id",
     "appId": "replace-with-firebase-app-id"
   },
-  "allowedEmailDomains": ["your-company.example"],
-  "stateKeys": ["auth", "session", "density", "inv"]
+  "stateKeys": ["auth", "session", "inv", "density", "per", "rooms", "stf", "sthome", "stlist", "sthotel", "pin", "assets"]
 }

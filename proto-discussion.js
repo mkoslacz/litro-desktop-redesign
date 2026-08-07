@@ -121,7 +121,7 @@
         });
     }
 
-    function resolveButton(record, thread) {
+  function resolveButton(record, thread) {
       var button = el('button', 'pd-resolve', 'Resolve');
       button.type = 'button';
       button.addEventListener('click', function () {
@@ -135,19 +135,42 @@
             if (!disposed) refresh(true);
           });
       });
-      return button;
-    }
+    return button;
+  }
+
+  function deleteButton(layer, record, thread) {
+    var button = el('button', 'pd-delete', thread.status === 'deleting' ? 'Retry deletion' : 'Delete thread');
+    button.type = 'button';
+    button.addEventListener('click', function () {
+      button.disabled = true;
+      record.notice = '';
+      Promise.resolve(layer.deleteThread(thread))
+        .catch(function () { record.notice = 'Deletion did not finish. Retry deletion.'; })
+        .finally(function () {
+          button.disabled = false;
+          if (!disposed) refresh(true);
+        });
+    });
+    return button;
+  }
 
     function threadView(record, thread, index) {
-      var view = el('article', 'pd-thread' + (thread.status === 'resolved' ? ' is-resolved' : ''));
+      var deleting = thread.status === 'deleting';
+      var view = el(
+        'article',
+        'pd-thread' + (thread.status === 'resolved' ? ' is-resolved' : '') + (deleting ? ' is-deleting' : '')
+      );
       view.dataset.threadId = thread.id || '';
 
       var head = el('header', 'pd-thread-head');
       var link = el('a', 'pd-thread-link', 'Thread ' + (index + 1));
       link.href = '#c=' + encodeURIComponent(thread.id || '');
-      var status = el('span', 'pd-status', thread.status === 'resolved' ? 'Resolved' : 'Open');
+      var status = el('span', 'pd-status', thread.status === 'resolved' ? 'Resolved' : (deleting ? 'Deleting' : 'Open'));
       head.append(link, status);
-      if (thread.status !== 'resolved') head.appendChild(resolveButton(record, thread));
+      if (!deleting && thread.status !== 'resolved') head.appendChild(resolveButton(record, thread));
+      if (typeof layer.canDelete === 'function' && layer.canDelete(thread)) {
+        head.appendChild(deleteButton(layer, record, thread));
+      }
       view.appendChild(head);
 
       if (Array.isArray(thread.messages)) {
@@ -163,7 +186,9 @@
         requestDetail(record, thread);
       }
 
-      if (thread.status !== 'resolved') {
+      if (deleting) {
+        view.appendChild(el('p', 'pd-delete-state', 'Deletion is incomplete. This thread is read-only.'));
+      } else if (thread.status !== 'resolved') {
         view.appendChild(composer(
           'Reply',
           'Write a reply',
@@ -244,6 +269,9 @@
     }
 
     refresh(true);
+    var stopCapabilities = typeof layer.onCapabilitiesChanged === 'function'
+      ? layer.onCapabilitiesChanged(function () { refresh(true); })
+      : function () {};
     var timer = global.setInterval(refresh, REFRESH_MS);
     global.addEventListener('hashchange', focusDeepLink);
 
@@ -251,6 +279,7 @@
       refresh: function () { refresh(true); },
       destroy: function () {
         disposed = true;
+        stopCapabilities();
         global.clearInterval(timer);
         global.removeEventListener('hashchange', focusDeepLink);
         records.forEach(function (record) { record.section.remove(); });

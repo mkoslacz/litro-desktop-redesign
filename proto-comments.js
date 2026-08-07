@@ -7,8 +7,9 @@
    config keeps behaving
    as a plain, file://-openable static page.
 
-   The browser store deliberately exposes only five operations:
-   list, subscribe, add, reply and resolve. Firebase is the default
+   The browser store deliberately exposes a small operations surface:
+   list, subscribe, add, reply and resolve. Complete deletion stays behind
+   the layer's owner capability instead of becoming a caller-supplied role.
    implementation; replacing createFirebaseClient is the swap seam.
    ============================================================ */
 (function (global) {
@@ -22,6 +23,20 @@
   const OVERVIEW_PAGE = 'comments.html';
   const THREAD_PAGE_SIZE = 50;
   const DETAIL_CONCURRENCY = 4;
+  const DELETE_BATCH_SIZE = 400;
+  const ANCHOR_FIELDS = Object.freeze([
+    'page', 'viewport', 'lang', 'state', 'selector', 'selectorKind', 'rx', 'ry', 'label', 'text',
+  ]);
+  const ANCHOR_LIMITS = Object.freeze({
+    label: 240,
+    lang: 35,
+    page: 512,
+    selector: 1024,
+    stateEntries: 32,
+    stateKey: 64,
+    stateValue: 512,
+    text: 4000,
+  });
   const STORE_PRIVATE = new WeakMap();
   const $ = (selector, root) => (root || document).querySelector(selector);
   const $$ = (selector, root) => Array.from((root || document).querySelectorAll(selector));
@@ -53,7 +68,7 @@
     // Every recognised key has to be listed here: an option bag naming none of
     // them is read as a bare config object, so a new option added without a
     // line here silently becomes configuration and never reaches the layer.
-    if (input.config || input.schema || input.store || input.user || input.signIn || input.fetchConfig || input.configUrl || input.schemaUrl || input.createFirebaseClient || input.overview) return input;
+    if (input.config || input.schema || input.store || input.user || input.signIn || input.fetchConfig || input.configUrl || input.schemaUrl || input.createFirebaseClient || input.overview || input.confirmDelete || input.capabilities) return input;
     return { config: input };
   }
 
@@ -67,6 +82,72 @@
 
   function plainObject(value) {
     return value && typeof value === 'object' && !Array.isArray(value);
+  }
+
+  function anchorError(detail) {
+    throw new Error('COMMENTS_ANCHOR_INVALID: ' + detail);
+  }
+
+  function boundedAnchorString(value, field, limit, required) {
+    if (typeof value !== 'string') anchorError(field + ' must be a string.');
+    const normalized = required ? value.trim() : value;
+    if (required && !normalized) anchorError(field + ' must be non-empty.');
+    if (normalized.length > limit) anchorError(field + ' exceeds ' + limit + ' characters.');
+    return normalized;
+  }
+
+  /* The Rules-enforceable core is the exact top-level shape, bounded strings,
+     enum values, a bounded map and finite in-range coordinates. Rules cannot
+     universally type-check values under dynamic map keys, so this trusted
+     boundary deliberately adds the state key/value string contract. */
+  function validateCommentAnchor(value) {
+    if (!plainObject(value)) anchorError('anchor must be an object.');
+    const keys = Object.keys(value);
+    if (keys.length !== ANCHOR_FIELDS.length || keys.some(key => ANCHOR_FIELDS.indexOf(key) === -1)) {
+      anchorError('anchor must contain exactly the canonical fields.');
+    }
+    if (!plainObject(value.state)) anchorError('state must be an object.');
+    const stateKeys = Object.keys(value.state);
+    if (stateKeys.length > ANCHOR_LIMITS.stateEntries) anchorError('state has too many entries.');
+    const state = {};
+    stateKeys.forEach(key => {
+      if (!key || key.length > ANCHOR_LIMITS.stateKey) {
+        anchorError('state keys must be bounded non-empty strings.');
+      }
+      state[key] = boundedAnchorString(value.state[key], 'state.' + key, ANCHOR_LIMITS.stateValue, false);
+    });
+    if (!Number.isFinite(value.rx) || value.rx < 0 || value.rx > 1) {
+      anchorError('rx must be a finite number in 0..1.');
+    }
+    if (!Number.isFinite(value.ry) || value.ry < 0 || value.ry > 1) {
+      anchorError('ry must be a finite number in 0..1.');
+    }
+    if (['desktop', 'mobile'].indexOf(value.viewport) === -1) {
+      anchorError('viewport must be desktop or mobile.');
+    }
+    if (['data', 'id', 'path'].indexOf(value.selectorKind) === -1) {
+      anchorError('selectorKind must be data, id, or path.');
+    }
+    return {
+      page: boundedAnchorString(value.page, 'page', ANCHOR_LIMITS.page, true),
+      viewport: value.viewport,
+      lang: boundedAnchorString(value.lang, 'lang', ANCHOR_LIMITS.lang, true),
+      state,
+      selector: boundedAnchorString(value.selector, 'selector', ANCHOR_LIMITS.selector, true),
+      selectorKind: value.selectorKind,
+      rx: value.rx,
+      ry: value.ry,
+      label: boundedAnchorString(value.label, 'label', ANCHOR_LIMITS.label, true),
+      text: boundedAnchorString(value.text, 'text', ANCHOR_LIMITS.text, false),
+    };
+  }
+
+  function readableAnchorState(anchor) {
+    const source = plainObject(anchor && anchor.state) ? anchor.state : {};
+    return Object.keys(source).reduce((result, key) => {
+      if (typeof source[key] === 'string') result[key] = source[key];
+      return result;
+    }, {});
   }
 
   function schemaObject(schema, label) {
@@ -279,17 +360,29 @@
       parts.unshift(tag + ':nth-of-type(' + (siblings.indexOf(node) + 1) + ')');
       node = node.parentElement;
     }
-    return 'body > ' + parts.join(' > ');
+    return parts.length ? 'body > ' + parts.join(' > ') : 'body';
   }
 
   function selectorFor(element) {
-    if (element.hasAttribute && element.hasAttribute('data-c')) {
-      const value = element.getAttribute('data-c');
-      if (value) return { selector: '[data-c="' + escapeCss(value) + '"]', selectorKind: 'data' };
-      return { selector: '[data-c]', selectorKind: 'data' };
+    /* Stable data-derived markers outrank a child's own id or positional path.
+       The returned element is the element the selector really names; anchor
+       coordinates must be measured against that same box. */
+    let marked = element;
+    while (marked && marked.nodeType === 1) {
+      if (marked.hasAttribute && marked.hasAttribute('data-c')) {
+        const value = marked.getAttribute('data-c');
+        if (value && value.trim()) {
+          return {
+            element: marked,
+            selector: '[data-c="' + escapeCss(value) + '"]',
+            selectorKind: 'data',
+          };
+        }
+      }
+      marked = marked.parentElement;
     }
-    if (element.id) return { selector: '#' + escapeCss(element.id), selectorKind: 'id' };
-    return { selector: nthPath(element), selectorKind: 'path' };
+    if (element.id) return { element, selector: '#' + escapeCss(element.id), selectorKind: 'id' };
+    return { element, selector: nthPath(element), selectorKind: 'path' };
   }
 
   function labelFor(element) {
@@ -309,13 +402,15 @@
   }
 
   function anchorFor(element, event, config) {
-    const rect = element.getBoundingClientRect();
+    if (!element || element.nodeType !== 1) anchorError('target must be an element.');
     const selector = selectorFor(element);
+    const anchored = selector.element;
+    const rect = anchored.getBoundingClientRect();
     const clientX = event && event.clientX != null ? event.clientX : rect.left + rect.width / 2;
     const clientY = event && event.clientY != null ? event.clientY : rect.top + rect.height / 2;
     const viewport = config.viewport || document.body.dataset.viewport || (/^m[-.]/.test(pageName()) ? 'mobile' : 'desktop');
-    return {
-      page: pageName(),
+    return validateCommentAnchor({
+      page: pagePath(new URL(location.href)),
       viewport: viewport === 'mobile' ? 'mobile' : 'desktop',
       lang: document.documentElement.lang || config.lang || 'und',
       state: stateFromBody(config),
@@ -323,9 +418,14 @@
       selectorKind: selector.selectorKind,
       rx: rect.width ? Math.max(0, Math.min(1, (clientX - rect.left) / rect.width)) : 0.5,
       ry: rect.height ? Math.max(0, Math.min(1, (clientY - rect.top) / rect.height)) : 0.5,
-      label: labelFor(element),
-      text: text(element.innerText || element.textContent),
-    };
+      label: labelFor(anchored),
+      text: text(anchored.innerText || anchored.textContent).slice(0, ANCHOR_LIMITS.text),
+    });
+  }
+
+  function anchorCoordinate(value) {
+    const coordinate = Number(value);
+    return Number.isFinite(coordinate) && coordinate >= 0 && coordinate <= 1 ? coordinate : 0.5;
   }
 
   function elementFor(anchor) {
@@ -346,24 +446,24 @@
 
   function discussionAnchor(target, event, config) {
     if (target && target.nodeType === 1) return anchorFor(target, event || null, config);
-    if (target && target.anchor) return target.anchor;
-    if (plainObject(target)) return Object.assign({
-      page: pageName(),
+    if (target && target.anchor) return validateCommentAnchor(target.anchor);
+    if (plainObject(target)) return validateCommentAnchor(Object.assign({
+      page: pagePath(new URL(location.href)),
       viewport: config.viewport || document.body.dataset.viewport || (/^m[-.]/.test(pageName()) ? 'mobile' : 'desktop'),
       lang: document.documentElement.lang || config.lang || 'und',
       state: stateFromBody(config),
-    }, target);
+      label: target.selector || 'Discussion',
+      text: '',
+      rx: 0.5,
+      ry: 0.5,
+    }, target));
     if (typeof target !== 'string' || !target.trim()) return null;
     const key = target.trim();
     const selector = key.indexOf('[data-c') === 0 ? key : '[data-c="' + escapeCss(key) + '"]';
     let element = null;
     try { element = $(selector); } catch (error) { return null; }
     if (element) return anchorFor(element, event || null, config);
-    return {
-      page: pageName(),
-      selector: selector,
-      selectorKind: 'data',
-    };
+    return null;
   }
 
   function discussionBody(message) {
@@ -387,6 +487,24 @@
   function compareByTimestampThenId(left, right) {
     return String(iso(left.createdAt) || '').localeCompare(String(iso(right.createdAt) || ''))
       || String(left.id || '').localeCompare(String(right.id || ''));
+  }
+
+  function isAuthoritativeDeletionSnapshot(snapshot) {
+    return Boolean(
+      snapshot
+      && typeof snapshot.exists === 'function'
+      && snapshot.exists() === false
+      /* A cache-only absence is not proof that a server accepted the delete:
+         an offline client can temporarily know neither a document nor the
+         rejection that restores it. Firestore snapshots always carry metadata;
+         the metadata-less branch keeps the helper usable with small test
+         doubles while production requires both server data and no pending
+         local mutation. */
+      && (!snapshot.metadata || (
+        snapshot.metadata.hasPendingWrites !== true
+        && snapshot.metadata.fromCache !== true
+      ))
+    );
   }
 
   function threadSummary(snapshot) {
@@ -434,6 +552,35 @@
     const auth = authApi.getAuth(app);
     const db = dbApi.getFirestore(app);
     const threads = dbApi.collection(db, 'prototypes', config.prototypeId, 'threads');
+    const authoritativeObservers = new Set();
+    const threadWatchers = new Map();
+
+    function stopThreadWatcher(threadId) {
+      const unsubscribe = threadWatchers.get(threadId);
+      if (unsubscribe) unsubscribe();
+      threadWatchers.delete(threadId);
+    }
+
+    function resetThreadWatchers() {
+      Array.from(threadWatchers.keys()).forEach(stopThreadWatcher);
+    }
+
+    function watchThreadDocument(snapshot) {
+      if (!snapshot || !snapshot.id || !snapshot.ref || threadWatchers.has(snapshot.id)) return;
+      const unsubscribe = dbApi.onSnapshot(
+        snapshot.ref,
+        { includeMetadataChanges: true },
+        current => {
+          if (!isAuthoritativeDeletionSnapshot(current)) return;
+          stopThreadWatcher(snapshot.id);
+          authoritativeObservers.forEach(observer => observer(snapshot.id));
+        },
+        error => {
+          authoritativeObservers.forEach(observer => observer(null, error));
+        },
+      );
+      threadWatchers.set(snapshot.id, unsubscribe);
+    }
 
     function pageQuery(cursor) {
       const constraints = [
@@ -464,6 +611,7 @@
     async function loadSummaryPage(cursor) {
       const snapshot = await dbApi.getDocs(pageQuery(cursor));
       const docs = snapshot.docs || [];
+      docs.forEach(watchThreadDocument);
       return {
         threads: docs.map(threadSummary).sort(compareByTimestampThenId),
         nextCursor: docs.length === THREAD_PAGE_SIZE ? cursorFor(docs[docs.length - 1]) : null,
@@ -485,6 +633,7 @@
         return dbApi.onSnapshot(pageQuery(null), async snapshot => {
           try {
             const docs = snapshot.docs || [];
+            docs.forEach(watchThreadDocument);
             const firstPageCursor = docs.length === THREAD_PAGE_SIZE ? cursorFor(docs[docs.length - 1]) : null;
             if (!loadedBeyondFirstPage) nextCursor = firstPageCursor;
             onChange(docs.map(threadSummary).sort(compareByTimestampThenId));
@@ -494,6 +643,7 @@
         }, onError);
       },
       add: async function add(thread, message) {
+        const anchor = validateCommentAnchor(thread && thread.anchor);
         const threadRef = dbApi.doc(threads);
         const messageRef = dbApi.doc(dbApi.collection(threadRef, 'messages'));
         const now = new Date().toISOString();
@@ -505,7 +655,7 @@
           resolvedAt: null,
           resolvedBy: null,
           orphaned: false,
-          anchor: thread.anchor,
+          anchor,
           updatedAt: now,
         });
         batch.set(messageRef, {
@@ -541,9 +691,10 @@
       },
     };
 
-    // The five-method adapter stays public. This private detail persists the
-    // layer-owned orphan marker without making a sixth backend contract method.
-    STORE_PRIVATE.set(commentsStore, {
+    // Role lookup, complete deletion and authoritative document watches stay
+    // private. Callers receive one layer-owned capability and cannot forge a
+    // role by passing it into a public store method.
+    const capabilities = {
       hasNextPage: () => nextCursor !== null,
       loadNextPage: async () => {
         if (!nextCursor) return [];
@@ -556,14 +707,55 @@
         const snapshot = await dbApi.getDoc(dbApi.doc(threads, threadId));
         return snapshot.exists() ? readThread(snapshot) : null;
       }),
+      readOwnerRole: async user => {
+        if (!user || user.emailVerified !== true || typeof user.email !== 'string' || !user.email) return false;
+        const snapshot = await dbApi.getDoc(dbApi.doc(db, 'allowed', user.email));
+        return snapshot.exists() && snapshot.data().user === 'owner';
+      },
+      deleteThread: async threadId => {
+        const threadRef = dbApi.doc(threads, threadId);
+        let snapshot = await dbApi.getDoc(threadRef);
+        if (!snapshot.exists()) {
+          stopThreadWatcher(threadId);
+          return { state: 'already-deleted' };
+        }
+        if (snapshot.data().status !== 'deleting') {
+          if (['open', 'resolved'].indexOf(snapshot.data().status) === -1) {
+            throw new Error('COMMENTS_THREAD_DELETE_STATE_INVALID');
+          }
+          await dbApi.updateDoc(threadRef, { status: 'deleting', updatedAt: new Date().toISOString() });
+        }
+        const messages = dbApi.collection(threadRef, 'messages');
+        while (true) {
+          const page = await dbApi.getDocs(
+            dbApi.query(messages, dbApi.orderBy(dbApi.documentId()), dbApi.limit(DELETE_BATCH_SIZE))
+          );
+          const docs = page.docs || [];
+          if (!docs.length) break;
+          const batch = dbApi.writeBatch(db);
+          docs.forEach(message => batch.delete(message.ref));
+          await batch.commit();
+        }
+        snapshot = await dbApi.getDoc(threadRef);
+        if (!snapshot.exists()) return { state: 'already-deleted' };
+        await dbApi.deleteDoc(threadRef);
+        return { state: 'awaiting-authoritative-snapshot' };
+      },
+      subscribeAuthoritative: observer => {
+        authoritativeObservers.add(observer);
+        return () => authoritativeObservers.delete(observer);
+      },
+      resetThreadWatchers,
       setOrphaned: (threadId, orphaned) => dbApi.updateDoc(dbApi.doc(threads, threadId), {
         orphaned: Boolean(orphaned),
         updatedAt: new Date().toISOString(),
       }),
-    });
+    };
+    STORE_PRIVATE.set(commentsStore, capabilities);
 
     return {
       store: commentsStore,
+      capabilities,
       observeUser: callback => authApi.onAuthStateChanged(auth, callback),
       signIn: async function signIn() {
         const provider = new authApi.GoogleAuthProvider();
@@ -586,19 +778,51 @@
     return details ? details.setOrphaned(threadId, orphaned) : Promise.resolve();
   }
 
-  function privateHasNextPage(store) {
-    const details = STORE_PRIVATE.get(store);
-    return Boolean(details && details.hasNextPage());
+  function privateHasNextPage(store, injected) {
+    const details = injected || STORE_PRIVATE.get(store);
+    return Boolean(details && typeof details.hasNextPage === 'function' && details.hasNextPage());
   }
 
-  function privateLoadNextPage(store) {
-    const details = STORE_PRIVATE.get(store);
-    return details ? details.loadNextPage() : Promise.resolve([]);
+  function privateLoadNextPage(store, injected) {
+    const details = injected || STORE_PRIVATE.get(store);
+    return details && typeof details.loadNextPage === 'function' ? details.loadNextPage() : Promise.resolve([]);
   }
 
-  function privateLoadThreadDetail(store, threadId) {
-    const details = STORE_PRIVATE.get(store);
-    return details ? details.loadThreadDetail(threadId) : Promise.resolve(null);
+  function privateLoadThreadDetail(store, threadId, injected) {
+    const details = injected || STORE_PRIVATE.get(store);
+    return details && typeof details.loadThreadDetail === 'function'
+      ? details.loadThreadDetail(threadId)
+      : Promise.resolve(null);
+  }
+
+  function privateCapabilities(store, injected) {
+    return injected || STORE_PRIVATE.get(store) || null;
+  }
+
+  function privateReadOwnerRole(store, user, injected) {
+    const details = privateCapabilities(store, injected);
+    return details && typeof details.readOwnerRole === 'function'
+      ? details.readOwnerRole(user)
+      : Promise.resolve(false);
+  }
+
+  function privateDeleteThread(store, threadId, injected) {
+    const details = privateCapabilities(store, injected);
+    return details && typeof details.deleteThread === 'function'
+      ? details.deleteThread(threadId)
+      : Promise.reject(new Error('COMMENTS_DELETE_UNAVAILABLE'));
+  }
+
+  function privateSubscribeAuthoritative(store, observer, injected) {
+    const details = privateCapabilities(store, injected);
+    return details && typeof details.subscribeAuthoritative === 'function'
+      ? details.subscribeAuthoritative(observer)
+      : () => {};
+  }
+
+  function privateResetThreadWatchers(store, injected) {
+    const details = privateCapabilities(store, injected);
+    if (details && typeof details.resetThreadWatchers === 'function') details.resetThreadWatchers();
   }
 
   class CommentLayer {
@@ -613,6 +837,7 @@
          in CSS does not stop the write; only not rendering them does. */
       this.overview = Boolean(options.overview);
       this.client = null;
+      this.capabilities = options.capabilities || null;
       this.user = options.user || null;
       this.threads = [];
       /* "A delivery has happened" is not "there are threads". An overview page
@@ -625,11 +850,23 @@
       this.showResolved = false;
       this.activeThread = null;
       this.unsubscribe = null;
+      this.authUnsubscribe = null;
+      this.authoritativeUnsubscribe = null;
       this.deepLinkHandled = false;
       this.toolbar = null;
       this.tray = null;
       this.popover = null;
+      this.selectionPrompt = null;
+      this.selectionClick = null;
+      this.selectionKeydown = null;
+      this.authGeneration = 0;
+      this.owner = false;
+      this.ownerResolved = false;
+      this.capabilityListeners = new Set();
+      this.deletionOperations = new Map();
+      this.deletionErrors = new Map();
       this.positionPins = this.positionPins.bind(this);
+      this.destroy = this.destroy.bind(this);
     }
 
     async start() {
@@ -637,12 +874,25 @@
       if (!this.store) {
         this.client = await (this.options.createFirebaseClient || createFirebaseClient)(this.config);
         this.store = this.client.store;
-        this.client.observeUser(user => this.setUser(user));
+        this.capabilities = this.client.capabilities || this.capabilities;
+        this.authUnsubscribe = this.client.observeUser(user => this.setUser(user));
       } else {
         this.setUser(this.user);
       }
+      this.authoritativeUnsubscribe = privateSubscribeAuthoritative(
+        this.store,
+        (threadId, error) => {
+          if (error) {
+            this.showError('Live comment deletion could not be observed. Reload and try again.', error);
+            return;
+          }
+          if (threadId) this.removeThread(threadId);
+        },
+        this.capabilities,
+      );
       global.addEventListener('resize', this.positionPins);
       global.addEventListener('scroll', this.positionPins, true);
+      global.addEventListener('pagehide', this.destroy);
     }
 
     /* The layer's on-screen chrome — pin toolbar, detached tray, popover — is
@@ -684,10 +934,18 @@
       this.popover = document.createElement('section');
       this.popover.className = 'proto-comments-popover';
       this.popover.hidden = true;
-      document.body.append(this.toolbar, this.tray, this.popover);
+      this.selectionPrompt = document.createElement('aside');
+      this.selectionPrompt.className = 'proto-comments-selection';
+      this.selectionPrompt.hidden = true;
+      this.selectionPrompt.setAttribute('role', 'status');
+      this.selectionPrompt.setAttribute('aria-live', 'assertive');
+      this.selectionPrompt.innerHTML = '<strong>Click the place on the page where you want to add the comment</strong>'
+        + '<button type="button" class="pc-cancel-selection">Cancel</button>';
+      document.body.append(this.toolbar, this.tray, this.popover, this.selectionPrompt);
       $('.pc-signin', this.toolbar).onclick = () => this.signIn();
       $('.pc-add', this.toolbar).onclick = () => this.beginSelection();
       $('.pc-more', this.toolbar).onclick = () => this.loadOlderThreads();
+      $('.pc-cancel-selection', this.selectionPrompt).onclick = () => this.cleanupSelection();
       $('input', this.toolbar).onchange = event => {
         this.showResolved = event.target.checked;
         this.renderThreads();
@@ -704,7 +962,17 @@
     }
 
     setUser(user) {
+      const generation = ++this.authGeneration;
+      this.cleanupSelection();
+      if (this.unsubscribe) this.unsubscribe();
+      this.unsubscribe = null;
+      privateResetThreadWatchers(this.store, this.capabilities);
       this.user = user || null;
+      this.owner = false;
+      this.ownerResolved = false;
+      this.activeThread = null;
+      if (this.popover) this.popover.hidden = true;
+      this.notifyCapabilities();
       const signedIn = Boolean(this.user);
       // No toolbar on an overview page; the store and the auth observer behind
       // it work exactly as they do on a screen.
@@ -712,10 +980,35 @@
         $('.pc-signin', this.toolbar).hidden = signedIn;
         $('.pc-add', this.toolbar).disabled = !signedIn;
       }
-      if (signedIn && this.store) this.loadThreads();
+      if (!signedIn) {
+        this.setThreads([]);
+        return;
+      }
+      if (this.store) this.loadThreads(generation);
+      if (this.user.emailVerified !== true || typeof this.user.email !== 'string' || !this.user.email) {
+        this.ownerResolved = true;
+        this.notifyCapabilities();
+        return;
+      }
+      const candidate = this.user;
+      const lookup = account => privateReadOwnerRole(this.store, account, this.capabilities);
+      Promise.resolve().then(() => lookup(candidate)).then(isOwner => {
+        if (generation !== this.authGeneration) return;
+        this.owner = isOwner === true;
+        this.ownerResolved = true;
+        this.notifyCapabilities();
+        this.renderThreads();
+      }, () => {
+        if (generation !== this.authGeneration) return;
+        this.owner = false;
+        this.ownerResolved = true;
+        this.notifyCapabilities();
+        this.renderThreads();
+      });
     }
 
-    async loadThreads() {
+    async loadThreads(generation) {
+      if (generation == null) generation = this.authGeneration;
       try {
         /* Two statements, not one. `this.setThreads(await …)` resolves the
            method **before** awaiting, so a page that replaces `setThreads`
@@ -723,18 +1016,50 @@
            learn about deliveries — is bypassed for the first one. Production
            only ever won that race by the backend's own scheduling. */
         const initial = await this.store.list();
+        if (generation !== this.authGeneration) return;
         this.setThreads(initial);
-        this.hasNextPage = privateHasNextPage(this.store);
+        this.hasNextPage = privateHasNextPage(this.store, this.capabilities);
         this.updateLoadMoreControl();
         if (this.unsubscribe) this.unsubscribe();
         this.unsubscribe = this.store.subscribe(threads => {
+          if (generation !== this.authGeneration) return;
           this.setThreads(threads, true);
-          this.hasNextPage = privateHasNextPage(this.store);
+          this.hasNextPage = privateHasNextPage(this.store, this.capabilities);
           this.updateLoadMoreControl();
-        }, error => this.showError(error && error.message || 'Subscription error', error));
+        }, error => {
+          if (generation === this.authGeneration) {
+            this.showError(error && error.message || 'Subscription error', error);
+          }
+        });
       } catch (error) {
+        if (generation !== this.authGeneration) return;
         this.showError('Comments are unavailable. Confirm that this account is allowed to review this prototype.', error);
       }
+    }
+
+    destroy() {
+      ++this.authGeneration;
+      this.cleanupSelection();
+      if (this.unsubscribe) this.unsubscribe();
+      if (this.authUnsubscribe) this.authUnsubscribe();
+      if (this.authoritativeUnsubscribe) this.authoritativeUnsubscribe();
+      this.unsubscribe = null;
+      this.authUnsubscribe = null;
+      this.authoritativeUnsubscribe = null;
+      privateResetThreadWatchers(this.store, this.capabilities);
+      global.removeEventListener('resize', this.positionPins);
+      global.removeEventListener('scroll', this.positionPins, true);
+      global.removeEventListener('pagehide', this.destroy);
+    }
+
+    onCapabilitiesChanged(listener) {
+      this.capabilityListeners.add(listener);
+      listener();
+      return () => this.capabilityListeners.delete(listener);
+    }
+
+    notifyCapabilities() {
+      this.capabilityListeners.forEach(listener => listener());
     }
 
     updateLoadMoreControl() {
@@ -764,6 +1089,63 @@
       if (!this.deepLinkHandled) this.openHashThread();
     }
 
+    removeThread(threadId) {
+      const before = this.threads.length;
+      this.threads = this.threads.filter(thread => thread.id !== threadId);
+      this.deletionErrors.delete(threadId);
+      if (this.activeThread && this.activeThread.id === threadId) {
+        this.activeThread = null;
+        if (this.popover) this.popover.hidden = true;
+      }
+      if (this.threads.length !== before) {
+        this.renderThreads();
+        this.notifyCapabilities();
+      }
+    }
+
+    canDelete(thread) {
+      return Boolean(
+        this.ownerResolved && this.owner && thread && thread.id
+        && ['open', 'resolved', 'deleting'].indexOf(thread.status) !== -1
+      );
+    }
+
+    deleteThread(thread) {
+      const current = thread && this.threads.find(item => item.id === thread.id) || thread;
+      if (!this.canDelete(current)) return Promise.reject(new Error('COMMENTS_DELETE_FORBIDDEN'));
+      if (this.deletionOperations.has(current.id)) return this.deletionOperations.get(current.id);
+      const confirmDelete = this.options.confirmDelete || (message => {
+        return typeof global.confirm === 'function' ? global.confirm(message) : false;
+      });
+      const label = current.anchor && current.anchor.label || current.id;
+      if (current.status !== 'deleting'
+        && !confirmDelete('Delete the entire comment thread “' + label + '”? This cannot be undone.')) {
+        return Promise.resolve(false);
+      }
+      this.deletionErrors.delete(current.id);
+      const deleting = Object.assign({}, current, { status: 'deleting' });
+      this.setThreads([deleting], true);
+      const operation = privateDeleteThread(this.store, current.id, this.capabilities).then(result => {
+        /* A missing document observed by the deletion read is already an
+           authoritative final state. Otherwise the document watcher owns UI
+           removal; a completed delete request alone is not proof that the
+           subscribed client has observed disappearance. */
+        if (result && result.state === 'already-deleted') this.removeThread(current.id);
+        return true;
+      }).catch(error => {
+        this.deletionErrors.set(current.id, 'Deletion did not finish. Retry deletion.');
+        this.setThreads([deleting], true);
+        throw error;
+      }).finally(() => {
+        this.deletionOperations.delete(current.id);
+        this.notifyCapabilities();
+      });
+      this.deletionOperations.set(current.id, operation);
+      this.notifyCapabilities();
+      if (this.activeThread && this.activeThread.id === current.id) this.showComposer(deleting);
+      return operation;
+    }
+
     /* Document discussions are another presentation over this layer, not a
        second backend. This small facade keeps their reads and writes on the
        same authenticated store while hiding Firebase-specific details. */
@@ -778,7 +1160,7 @@
       const id = threadId(thread);
       if (!id) return null;
       const current = plainObject(thread) ? thread : this.threads.find(item => item.id === id);
-      const detail = await privateLoadThreadDetail(this.store, id);
+      const detail = await privateLoadThreadDetail(this.store, id, this.capabilities);
       if (detail) this.setThreads([detail], true);
       return detail || current || null;
     }
@@ -790,13 +1172,14 @@
       if (!anchor || !anchor.selector) throw new Error('COMMENT_ANCHOR_REQUIRED');
       if (!body) throw new Error('COMMENT_BODY_REQUIRED');
       return this.store.add(
-        { createdBy: actor(this.user), anchor: anchor },
+        { createdBy: actor(this.user), anchor: validateCommentAnchor(anchor) },
         { author: actor(this.user), body: body, agent: false },
       );
     }
 
     async replyTo(thread, message) {
       if (!this.user) throw new Error('COMMENT_REVIEWER_SIGN_IN_REQUIRED');
+      if (thread && thread.status === 'deleting') throw new Error('COMMENTS_THREAD_DELETING');
       const id = threadId(thread);
       const body = discussionBody(message);
       if (!id) throw new Error('COMMENT_THREAD_REQUIRED');
@@ -806,6 +1189,7 @@
 
     async resolveThread(thread) {
       if (!this.user) throw new Error('COMMENT_REVIEWER_SIGN_IN_REQUIRED');
+      if (thread && thread.status === 'deleting') throw new Error('COMMENTS_THREAD_DELETING');
       const id = threadId(thread);
       if (!id) throw new Error('COMMENT_THREAD_REQUIRED');
       return this.store.resolve(id, actor(this.user));
@@ -813,9 +1197,9 @@
 
     async loadOlderThreads() {
       try {
-        const older = await privateLoadNextPage(this.store);
+        const older = await privateLoadNextPage(this.store, this.capabilities);
         this.setThreads(older, true);
-        this.hasNextPage = privateHasNextPage(this.store);
+        this.hasNextPage = privateHasNextPage(this.store, this.capabilities);
         this.updateLoadMoreControl();
       } catch (error) {
         this.showError('Older comments could not be loaded. Try again.', error);
@@ -887,10 +1271,12 @@
         if (thread.status === 'resolved' && !this.showResolved) return;
         const pin = document.createElement('button');
         pin.type = 'button';
-        pin.className = 'proto-comment-pin' + (thread.status === 'resolved' ? ' resolved' : '');
+        pin.className = 'proto-comment-pin'
+          + (thread.status === 'resolved' ? ' resolved' : '')
+          + (thread.status === 'deleting' ? ' deleting' : '');
         pin.dataset.threadId = thread.id;
         pin.setAttribute('aria-label', 'Open comment: ' + (thread.anchor && thread.anchor.label || 'comment'));
-        pin.textContent = thread.status === 'resolved' ? '✓' : '●';
+        pin.textContent = thread.status === 'resolved' ? '✓' : (thread.status === 'deleting' ? '…' : '●');
         pin.onclick = () => this.openThread(thread).catch(error => this.showError('This comment could not be opened.', error));
         document.body.appendChild(pin);
         this.positionPin(pin, target, thread.anchor);
@@ -901,8 +1287,8 @@
 
     positionPin(pin, target, anchor) {
       const rect = target.getBoundingClientRect();
-      pin.style.left = (rect.left + rect.width * (Number(anchor.rx) || 0.5)) + 'px';
-      pin.style.top = (rect.top + rect.height * (Number(anchor.ry) || 0.5)) + 'px';
+      pin.style.left = (rect.left + rect.width * anchorCoordinate(anchor.rx)) + 'px';
+      pin.style.top = (rect.top + rect.height * anchorCoordinate(anchor.ry)) + 'px';
     }
 
     positionPins() {
@@ -938,40 +1324,84 @@
 
     beginSelection() {
       if (!this.user) return;
+      this.cleanupSelection();
+      if (this.popover) this.popover.hidden = true;
+      this.activeThread = null;
       document.body.dataset.commenting = '1';
-      this.showComposer(null, null, 'Click the place this comment is about.');
-      const select = event => {
-        if (event.target.closest('.proto-comments-tools, .proto-comments-tray, .proto-comments-popover, .proto-comment-pin')) return;
+      if (this.selectionPrompt) this.selectionPrompt.hidden = false;
+      this.selectionClick = event => {
+        const target = event.target;
+        if (!target || typeof target.closest !== 'function') return;
+        if (target.closest('.proto-comments-tools, .proto-comments-tray, .proto-comments-popover, .proto-comments-selection, .proto-comment-pin, .pd-discussion')) return;
         event.preventDefault();
         event.stopPropagation();
-        document.body.removeAttribute('data-commenting');
-        document.removeEventListener('click', select, true);
-        this.showComposer(null, anchorFor(event.target, event, this.config));
+        try {
+          const anchor = validateCommentAnchor(anchorFor(target, event, this.config));
+          this.cleanupSelection();
+          this.showComposer(null, anchor);
+        } catch (error) {
+          this.cleanupSelection();
+          this.showError('This place cannot be used for a comment. Choose another target.', error);
+        }
       };
-      document.addEventListener('click', select, true);
+      this.selectionKeydown = event => {
+        if (event.key === 'Escape') this.cleanupSelection();
+      };
+      document.addEventListener('click', this.selectionClick, true);
+      document.addEventListener('keydown', this.selectionKeydown, true);
     }
 
-    showComposer(thread, anchor, hint) {
+    cleanupSelection() {
+      if (document.body && typeof document.body.removeAttribute === 'function') {
+        document.body.removeAttribute('data-commenting');
+      }
+      if (this.selectionPrompt) this.selectionPrompt.hidden = true;
+      if (this.selectionClick && typeof document.removeEventListener === 'function') {
+        document.removeEventListener('click', this.selectionClick, true);
+      }
+      if (this.selectionKeydown && typeof document.removeEventListener === 'function') {
+        document.removeEventListener('keydown', this.selectionKeydown, true);
+      }
+      this.selectionClick = null;
+      this.selectionKeydown = null;
+    }
+
+    showComposer(thread, anchor) {
       // An overview builds no popover: openThread still fetches the detail and
       // still delivers it through setThreads, which is the whole of what that
       // page wants from this method.
       if (!this.popover) return;
+      if (!thread) anchor = validateCommentAnchor(anchor);
       this.activeThread = thread || null;
       this.popover.hidden = false;
       this.popover.replaceChildren();
       const heading = document.createElement('strong');
-      heading.textContent = thread ? (thread.anchor && thread.anchor.label || 'Comment') : (hint || 'New comment');
+      heading.textContent = thread ? (thread.anchor && thread.anchor.label || 'Comment') : 'New comment';
       const close = document.createElement('button');
       close.type = 'button';
       close.className = 'pc-close';
       close.textContent = '×';
       close.setAttribute('aria-label', 'Close comment');
-      close.onclick = () => { this.popover.hidden = true; this.activeThread = null; };
+      close.onclick = () => {
+        this.cleanupSelection();
+        this.popover.hidden = true;
+        this.activeThread = null;
+      };
       const header = document.createElement('header');
       header.append(heading, close);
       this.popover.appendChild(header);
 
       if (thread) this.renderMessages(thread);
+      if (thread && thread.status === 'deleting') {
+        const deleting = document.createElement('p');
+        deleting.className = 'pc-deleting';
+        deleting.textContent = this.deletionErrors.get(thread.id)
+          || 'This thread is being deleted and cannot accept replies.';
+        this.popover.appendChild(deleting);
+        if (this.canDelete(thread)) this.popover.appendChild(this.deleteButton(thread, 'Retry deletion'));
+        this.positionPopover(thread);
+        return;
+      }
       const box = document.createElement('textarea');
       box.placeholder = thread ? 'Reply to this comment' : 'Describe what should change';
       box.rows = 3;
@@ -984,7 +1414,10 @@
         submit.disabled = true;
         try {
           if (thread) await this.store.reply(thread.id, { author: actor(this.user), body: body, agent: false });
-          else await this.store.add({ createdBy: actor(this.user), anchor: anchor }, { author: actor(this.user), body: body, agent: false });
+          else await this.store.add(
+            { createdBy: actor(this.user), anchor: validateCommentAnchor(anchor) },
+            { author: actor(this.user), body: body, agent: false }
+          );
           box.value = '';
           if (!thread) this.popover.hidden = true;
         } catch (error) {
@@ -1008,6 +1441,7 @@
         };
         actions.appendChild(resolve);
       }
+      if (thread && this.canDelete(thread)) actions.appendChild(this.deleteButton(thread, 'Delete thread'));
       this.popover.append(box, actions);
       if (thread) this.positionPopover(thread);
       else {
@@ -1016,6 +1450,26 @@
         this.popover.style.transform = 'translate(-50%, -50%)';
       }
       box.focus();
+    }
+
+    deleteButton(thread, label) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'pc-delete';
+      button.textContent = label;
+      button.disabled = this.deletionOperations.has(thread.id);
+      button.onclick = async () => {
+        button.disabled = true;
+        try {
+          await this.deleteThread(thread);
+        } catch (error) {
+          this.showComposer(this.threads.find(item => item.id === thread.id) || thread);
+          note('thread deletion failed: ' + ((error && error.message) || String(error)));
+        } finally {
+          if (this.threads.some(item => item.id === thread.id)) button.disabled = false;
+        }
+      };
+      return button;
     }
 
     renderMessages(thread) {
@@ -1049,8 +1503,8 @@
          opens towards has run out, open it towards the other one instead of
          sliding it over its own pin. */
       const rect = target.getBoundingClientRect();
-      const anchorX = rect.left + rect.width * (Number(thread.anchor.rx) || 0.5);
-      const anchorY = rect.top + rect.height * (Number(thread.anchor.ry) || 0.5);
+      const anchorX = rect.left + rect.width * anchorCoordinate(thread.anchor.rx);
+      const anchorY = rect.top + rect.height * anchorCoordinate(thread.anchor.ry);
       const gap = 12;
       /* The gutter the layer keeps everywhere else — the toolbar's 18px inset,
          and the popover's own `calc(100vw - 36px)` width. One constant, used by
@@ -1111,9 +1565,10 @@
 
     deepLink(thread, base) {
       const anchor = thread.anchor || {};
+      const state = readableAnchorState(anchor);
       const root = base || this.pageBase();
       const carried = global.protoTools && typeof global.protoTools.carryQS === 'function'
-        ? global.protoTools.carryQS(Object.keys(anchor.state || {}))
+        ? global.protoTools.carryQS(Object.keys(state))
         : '';
       // The whole reference is validated, not anchor.page alone: what reaches
       // location.assign is the resolved concatenation. A refused anchor falls
@@ -1121,7 +1576,7 @@
       // from the store, so the fallback cannot be steered.
       const url = navigableUrl((anchor.page || pageName()) + carried, root)
         || new URL(pageName() + carried, root);
-      Object.keys(anchor.state || {}).sort().forEach(key => url.searchParams.set(key, anchor.state[key]));
+      Object.keys(state).sort().forEach(key => url.searchParams.set(key, state[key]));
       if (anchor.lang) url.searchParams.set('lang', anchor.lang);
       if (anchor.viewport) url.searchParams.set('viewport', anchor.viewport);
       url.hash = 'c=' + encodeURIComponent(thread.id);
@@ -1132,7 +1587,7 @@
       const anchor = thread.anchor || {};
       const base = this.pageBase();
       if (pagePath(base) !== safePagePath(anchor.page, base)) return true;
-      const state = anchor.state || {};
+      const state = readableAnchorState(anchor);
       if (Object.keys(state).some(key => qp.get(key) !== String(state[key]))) return true;
       return Boolean(anchor.lang && qp.get('lang') !== anchor.lang)
         || Boolean(anchor.viewport && qp.get('viewport') !== anchor.viewport);
@@ -1158,7 +1613,7 @@
         target.classList.add('proto-comment-target');
         global.setTimeout(() => target.classList.remove('proto-comment-target'), 1600);
       }
-      const detail = (await privateLoadThreadDetail(this.store, thread.id)) || thread;
+      const detail = (await privateLoadThreadDetail(this.store, thread.id, this.capabilities)) || thread;
       if (detail !== thread) this.setThreads([detail], true);
       this.showComposer(detail);
     }
@@ -1174,6 +1629,7 @@
     }
 
     showError(message, cause) {
+      this.cleanupSelection();
       note(message);
       // The reviewer gets the sentence; the console gets the cause. Swallowing it
       // made a Firestore rule rejection and a missing document look identical.
@@ -1188,7 +1644,10 @@
       close.className = 'pc-close';
       close.textContent = '×';
       close.setAttribute('aria-label', 'Close error');
-      close.onclick = () => { this.popover.hidden = true; };
+      close.onclick = () => {
+        this.cleanupSelection();
+        this.popover.hidden = true;
+      };
       const header = document.createElement('header');
       header.appendChild(close);
       const error = document.createElement('p');
@@ -1230,19 +1689,36 @@
   const api = { init: init };
   if (global.__PROTO_COMMENTS_TESTING__) {
     api.__test = {
+      ANCHOR_FIELDS,
+      ANCHOR_LIMITS,
       COMMENTS_CONFIG_FILE,
       COMMENTS_CONFIG_SCHEMA_FILE,
       CommentLayer,
+      DELETE_BATCH_SIZE,
       DETAIL_CONCURRENCY,
       THREAD_PAGE_SIZE,
+      anchorCoordinate,
+      anchorFor,
       createFirebaseClient,
+      deleteThread: privateDeleteThread,
       hasNextPage: privateHasNextPage,
+      isAuthoritativeDeletionSnapshot,
       loadCommentsConfig,
       loadNextPage: privateLoadNextPage,
       loadThreadDetail: privateLoadThreadDetail,
       navigableUrl,
+      optionBag,
+      readableAnchorState,
+      readOwnerRole: privateReadOwnerRole,
+      registerStoreCapabilities: (store, capabilities) => {
+        STORE_PRIVATE.set(store, capabilities);
+        return store;
+      },
       safePageName,
       safePagePath,
+      selectorFor,
+      subscribeAuthoritative: privateSubscribeAuthoritative,
+      validateCommentAnchor,
       validateCommentsConfig,
     };
   }

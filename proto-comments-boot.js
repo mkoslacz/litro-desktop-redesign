@@ -14,10 +14,13 @@
    registered after theirs and therefore runs after it.
 
    Everything else is configuration, read from comments.config.json as data:
-   which state keys form the anchor, which Google-signed-in domains may
-   comment, and which Firebase project stores the threads. Without that file
-   the layer is an intentional quiet no-op, and so is any page opened from
-   file:// — see README, "Stakeholder comments".                           */
+   which state keys form the anchor and which Firebase project stores the
+   threads. Reviewer admission is deliberately not a config field: deploy
+   comments.rules and provision one exact `allowed/{verified-email}` document
+   per reviewer; only a record with `user: "owner"` grants deletion. Neither
+   the web config nor that allowlist record contains a service-account secret.
+   Without comments.config.json the layer is an intentional quiet no-op, and
+   so is any page opened from file:// — see README, "Stakeholder comments". */
 
 (function () {
   'use strict';

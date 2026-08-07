@@ -48,6 +48,11 @@
   background: #f7f9fb;
 }
 
+.pd-thread.is-deleting {
+  border-style: dashed;
+  background: var(--rp-warn-bg);
+}
+
 .pd-thread.is-highlighted {
   outline: 3px solid rgba(21, 105, 215, .22);
   outline-offset: 2px;
@@ -68,7 +73,8 @@
   background: #fff;
 }
 
-.pd-resolve {
+.pd-resolve,
+.pd-delete {
   margin-left: auto;
 }
 
@@ -106,6 +112,12 @@
   font-size: 13px;
 }
 
+.pd-delete-state {
+  margin: 10px 0 0;
+  color: var(--rp-warn-ink);
+  font-size: 13px;
+}
+
 .pd-composer {
   display: grid;
   gap: 7px;
@@ -132,7 +144,8 @@
 }
 
 .pd-submit,
-.pd-resolve {
+.pd-resolve,
+.pd-delete {
   padding: 7px 11px;
   border: 1px solid var(--rp-line);
   border-radius: 7px;
@@ -142,8 +155,15 @@
   cursor: pointer;
 }
 
+.pd-delete {
+  border-color: #9D1C2C;
+  color: #7D1220;
+  background: #FFF0F2;
+}
+
 .pd-submit:disabled,
-.pd-resolve:disabled {
+.pd-resolve:disabled,
+.pd-delete:disabled {
   cursor: wait;
   opacity: .55;
 }
@@ -158,7 +178,8 @@
     flex-wrap: wrap;
   }
 
-  .pd-resolve {
+  .pd-resolve,
+  .pd-delete {
     margin-left: 0;
   }
 }

@@ -212,10 +212,14 @@
     var share = shareHref(layer, thread);
 
     var card = document.createElement('article');
-    card.className = 'rp-card';
+    card.className = 'rp-card' + (thread.status === 'deleting' ? ' cm-deleting' : '');
 
     var title = document.createElement('h3');
-    title.innerHTML = (thread.status === 'resolved' ? '<span class="rp-tag rp-tag-done">resolved</span> ' : '<span class="rp-tag rp-tag-open">open</span> ')
+    title.innerHTML = (thread.status === 'resolved'
+      ? '<span class="rp-tag rp-tag-done">resolved</span> '
+      : thread.status === 'deleting'
+        ? '<span class="rp-tag rp-tag-deleting">deleting</span> '
+        : '<span class="rp-tag rp-tag-open">open</span> ')
       + esc(anchor.label || 'Unlabelled comment');
     card.appendChild(title);
 
@@ -298,6 +302,22 @@
         }
       };
       links.appendChild(copy);
+    }
+    if (typeof layer.canDelete === 'function' && layer.canDelete(thread)) {
+      var remove = document.createElement('button');
+      remove.type = 'button';
+      remove.className = 'rp-chip cm-delete';
+      remove.textContent = thread.status === 'deleting' ? 'Retry deletion' : 'Delete thread';
+      remove.onclick = function () {
+        remove.disabled = true;
+        Promise.resolve(layer.deleteThread(thread)).catch(function (error) {
+          showError('Deletion did not finish. Retry deletion.');
+          if (window.console && console.error) console.error('[comments.html] deletion failed:', thread.id, error);
+        }).finally(function () {
+          remove.disabled = false;
+        });
+      };
+      links.appendChild(remove);
     }
     card.appendChild(links);
 
@@ -413,6 +433,12 @@
         render(layer);
       };
     });
+
+    if (typeof layer.onCapabilitiesChanged === 'function') {
+      layer.onCapabilitiesChanged(function () {
+        if (layer.threadsDelivered) render(layer);
+      });
+    }
 
     // The layer applies its initial state through the same setUser/setThreads
     // hooks once start() finishes wiring auth and the store, so the current
