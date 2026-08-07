@@ -27,6 +27,7 @@
 - The fresh command `node tools/test-review-capabilities.js` printed `PASS static contracts: one comment facade, no panel sheets/fetch, English reviewer chrome`, then stopped at `listen EPERM: operation not permitted 127.0.0.1`. A separate fresh Chromium launch was also denied by the sandbox. These are environment limits on that dynamic rerun, not evidence that the live effect passed or failed.
 - A server already bound outside that sandbox was independently inspected through the Codex in-app Browser at `127.0.0.1:8097`. This produced the current DOM readings for `OP-02` and `OP-03`, and only the signed-out structural reading for `OP-01`.
 - The public URL answered HTTP 200, with `Last-Modified: Thu, 06 Aug 2026 14:41:26 GMT`; that header does not identify a deployed Git SHA and does not substitute for the required signed-in Firebase operation.
+- A subsequent read-only source check retrieved the public `proto-sheets.js` and found the pre-upgrade `pt-sheets` / lazy `fetch` implementation. The published URL is therefore older than `IMPL-02` and cannot be used to measure `OP-01` against the verified code. This strengthens `EFF-01`'s deployment boundary; it does not create a new code finding.
 - No Firebase sign-in, Firestore read/write, Admin CLI, Firebase rule/configuration change, deployment, or credential access occurred.
 
 ## Excluded from measurement
