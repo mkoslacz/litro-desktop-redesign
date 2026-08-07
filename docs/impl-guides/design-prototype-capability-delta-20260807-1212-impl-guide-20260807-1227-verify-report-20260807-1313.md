@@ -168,6 +168,10 @@ No new target-scope `IV-nn` finding was emitted.
 
 None for `OP-01`–`OP-03`. A live Firebase check would be a separate, credentialed operational verification, not another implementation card for this guide.
 
+## Lossless-check status
+
+`python3 /Users/mkoslacz/Workspaces/claude/claude-skills/impl-verify/references/finding_guard.py check --root . --base HEAD` reported that the base comparison could reach only 2 of 21 lifecycle artifacts. The repository ignores `docs/` by default, and this new report is therefore currently untracked and invisible to Git-based immutability/Handoff guards. Per the operator's no-commit boundary, this verifier did not force-add or commit it. The integrator must force-stage the intended lifecycle artifacts and rerun the guard before treating the handoff as covered by the no-loss guarantee.
+
 ## Handoff
 
 - Source: `docs/impl-guides/design-prototype-capability-delta-20260807-1212-impl-guide-20260807-1227.md`, `docs/impl-guides/design-prototype-capability-delta-20260807-1212-impl-guide-20260807-1227-implementation-report-20260807-1305.md`, `docs/audits/design-prototype-capability-delta-20260807-1212.md`
