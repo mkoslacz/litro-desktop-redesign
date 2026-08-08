@@ -1,9 +1,149 @@
 {
-  "generatedAt": "2026-08-06T14:26:32.068Z",
+  "generatedAt": "2026-08-08T06:06:39.062Z",
   "repository": "https://github.com/mkoslacz/litro-desktop-redesign",
   "limited": true,
   "limit": 50,
   "entries": [
+    {
+      "sha": "1dfc50ce1a07fb61d4f15b2a19edcade42db27de",
+      "short": "1dfc50c",
+      "date": "2026-08-07",
+      "subject": "feat: enforce anchor-first workshop comments",
+      "body": "",
+      "screens": [
+        "comments.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/1dfc50ce1a07fb61d4f15b2a19edcade42db27de"
+    },
+    {
+      "sha": "9d162358f7b15b8492d185f64bd73d97c0400f3b",
+      "short": "9d16235",
+      "date": "2026-08-07",
+      "subject": "feat: compact use-case captures",
+      "body": "",
+      "screens": [
+        "usecases.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/9d162358f7b15b8492d185f64bd73d97c0400f3b"
+    },
+    {
+      "sha": "8b263c653c427f02ef4e0489e2ba629f55289aaf",
+      "short": "8b263c6",
+      "date": "2026-08-07",
+      "subject": "docs: record stale published capability build",
+      "body": "",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/8b263c653c427f02ef4e0489e2ba629f55289aaf"
+    },
+    {
+      "sha": "a5813e4729af613b738ee2ad966b2e519273ef9a",
+      "short": "a5813e4",
+      "date": "2026-08-07",
+      "subject": "outcome: measure review capability upgrade [OP-01..OP-03]",
+      "body": "",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/a5813e4729af613b738ee2ad966b2e519273ef9a"
+    },
+    {
+      "sha": "d5bf30b04edeb909c60a0f0755251d4b4ec893b5",
+      "short": "d5bf30b",
+      "date": "2026-08-07",
+      "subject": "docs: record verification guard boundary",
+      "body": "",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/d5bf30b04edeb909c60a0f0755251d4b4ec893b5"
+    },
+    {
+      "sha": "2afc1383607331ccd77b34fb235bdf5e69fa8dfd",
+      "short": "2afc138",
+      "date": "2026-08-07",
+      "subject": "verify: review capability upgrade [OP-01..OP-03]",
+      "body": "",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/2afc1383607331ccd77b34fb235bdf5e69fa8dfd"
+    },
+    {
+      "sha": "3affc92cce26440582136bc5a82cf4c1cafd0afe",
+      "short": "3affc92",
+      "date": "2026-08-07",
+      "subject": "test: cover review capability upgrade [IMPL-04]",
+      "body": "",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/3affc92cce26440582136bc5a82cf4c1cafd0afe"
+    },
+    {
+      "sha": "eb75e95b9d811765ec4afcf971918e0c487c24be",
+      "short": "eb75e95",
+      "date": "2026-08-07",
+      "subject": "feat: add inline review discussions [IMPL-01]",
+      "body": "",
+      "screens": [
+        "changelog.html",
+        "usecases.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/eb75e95b9d811765ec4afcf971918e0c487c24be"
+    },
+    {
+      "sha": "4af2641a3b73a1b2e2ea2485a8891b5be646d45f",
+      "short": "4af2641",
+      "date": "2026-08-07",
+      "subject": "feat: upgrade review navigation and chrome [IMPL-02, IMPL-03]",
+      "body": "",
+      "screens": [
+        "comments.html",
+        "index.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/4af2641a3b73a1b2e2ea2485a8891b5be646d45f"
+    },
+    {
+      "sha": "aaa7f17eccc3b8977458850321b26660eeda04ad",
+      "short": "aaa7f17",
+      "date": "2026-08-07",
+      "subject": "plan: upgrade prototype review capabilities [OP-01..OP-03]",
+      "body": "",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/aaa7f17eccc3b8977458850321b26660eeda04ad"
+    },
+    {
+      "sha": "da2fc37fa155ab88ea9091dbf47963698ae2b6c6",
+      "short": "da2fc37",
+      "date": "2026-08-06",
+      "subject": "fix: bypass the orphaned Pages queue",
+      "body": "",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/da2fc37fa155ab88ea9091dbf47963698ae2b6c6"
+    },
+    {
+      "sha": "baee2af9b2cdade39d5bddc369a569b0b14c0a29",
+      "short": "baee2af",
+      "date": "2026-08-06",
+      "subject": "fix: exclude build dependencies from Pages",
+      "body": "",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/baee2af9b2cdade39d5bddc369a569b0b14c0a29"
+    },
+    {
+      "sha": "5670ef0b27e5d91096201136a329f7fcee8dbf43",
+      "short": "5670ef0",
+      "date": "2026-08-06",
+      "subject": "fix: deploy the refreshed prototype once",
+      "body": "",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/5670ef0b27e5d91096201136a329f7fcee8dbf43"
+    },
     {
       "sha": "b412c311349c997ba9b760ae1c2ac592eec9e129",
       "short": "b412c31",
@@ -582,181 +722,6 @@
       ],
       "round": "unreleased",
       "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/db770af0045ede41689fa3b5e1456ccbceb60a9b"
-    },
-    {
-      "sha": "056d6163f8517f8e4fe5f4f011da8a31a42408b6",
-      "short": "056d616",
-      "date": "2026-07-24",
-      "subject": "Hotel: drop the top sticky Book-now bar (bottom booking bar duplicates it) + fix guest count adults/kids",
-      "body": "- Remove the scroll-triggered top .stickybar on the hotel page; the bottom\n  .booking-bar already carries name + price + CTA.\n- Fix guestsTxt() RO branch (was infinite recursion) so the guest count reads\n  '2 adulți + 2 copii' / '4 adulți' (and EN '2 adults + 2 children' / '4 adults'),\n  updating live from the guest picker.\n- i18n the guest picker (Adults/Children/Rooms/Done + ages) and the checkout\n  guest summary row; no more '+ 0 copii' when there are no kids.\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>",
-      "screens": [],
-      "round": "unreleased",
-      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/056d6163f8517f8e4fe5f4f011da8a31a42408b6"
-    },
-    {
-      "sha": "80996489947946e8c162b71403b65e7b54512e56",
-      "short": "8099648",
-      "date": "2026-07-24",
-      "subject": "Add homepage variant D — C base with the offer listing right under search (B idea, C listing)",
-      "body": "home-d.html / home-d-en.html: variant C top (tiles carousel + integrated search\nhero) followed immediately by the refreshed C listing (room-carousel expanders,\nfilters, conditional date banner, inventory demo). RO/EN switch on both.\nproto.js: i18n the injected \"See all room types\" / \"Hide room types\" labels.\nindex.html: Homepage · D card (RO/EN) + note.\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>",
-      "screens": [
-        "home-d-en.html",
-        "home-d.html",
-        "index.html"
-      ],
-      "round": "unreleased",
-      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/80996489947946e8c162b71403b65e7b54512e56"
-    },
-    {
-      "sha": "efc9c5334d04c65c82d0df84e5d19b6653aaa0ff",
-      "short": "efc9c53",
-      "date": "2026-07-23",
-      "subject": "index: RO/EN switch on every C-flow card (not just homepage)",
-      "body": "Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>",
-      "screens": [
-        "index.html"
-      ],
-      "round": "unreleased",
-      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/efc9c5334d04c65c82d0df84e5d19b6653aaa0ff"
-    },
-    {
-      "sha": "5a30623b64cab91b167109a0de2d01fcb13276c1",
-      "short": "5a30623",
-      "date": "2026-07-23",
-      "subject": "English version of the full C flow (all 5 screens) + RO/EN switch on every screen",
-      "body": "- Added English pages: home-c-en, listing-c-en, hotel-en, checkout-en,\n  thankyou-en (full translations of the C-flow screens).\n- RO/EN language switch in the header of every C-flow screen (RO and EN),\n  each linking to its own counterpart.\n- proto.js is language-aware: on <html lang=\"en\"> pages, navigation (search,\n  cards, booking, checkout, thank-you, logo/breadcrumbs) routes to the \"-en\"\n  pages, and the most visible dynamic strings (dates, guests, result count,\n  date-banner \"from/hotels\", \"Add room\", price notes, credits, listing H1)\n  render in English.\n- index.html: the C-flow entry now offers RO + EN for the homepage.\n- Removed the variant switcher from listing-c (kept from earlier); C is primary.\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>",
-      "screens": [
-        "checkout-en.html",
-        "checkout.html",
-        "home-c-en.html",
-        "hotel-en.html",
-        "hotel.html",
-        "listing-c-en.html",
-        "listing-c.html",
-        "thankyou-en.html",
-        "thankyou.html"
-      ],
-      "round": "unreleased",
-      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/5a30623b64cab91b167109a0de2d01fcb13276c1"
-    },
-    {
-      "sha": "b75c182f0ff7cd5be98e3745989ca9225f405524",
-      "short": "b75c182",
-      "date": "2026-07-23",
-      "subject": "Make C the primary variant (archive A/B, drop variant switcher) + English C homepage + loyalty band after 2nd result",
-      "body": "- Removed the variant switcher (vswitch) from home-c and listing-c; the C flow\n  is the primary one. index.html now leads with the C flow (RO·EN) and keeps\n  A/B under an \"Arhivă\" section. home-c search/tiles + listingHref now route to\n  listing-c (the C listing), not the archived listing-b.\n- English homepage: home-c-en.html (full translation of home-c) with a RO/EN\n  language switch in the header on both pages; a small inline script restores\n  English date/guests labels the shared proto.js would otherwise repaint in RO.\n- Loyalty \"FRIENDS\" band: restored (was hidden during compaction) and now\n  repositioned by proto.js to sit after the SECOND visible result, so a peek of\n  the 2nd card stays above the fold.\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>",
-      "screens": [
-        "home-c-en.html",
-        "home-c.html",
-        "index.html",
-        "listing-b.html",
-        "listing-c.html"
-      ],
-      "round": "unreleased",
-      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/b75c182f0ff7cd5be98e3745989ca9225f405524"
-    },
-    {
-      "sha": "e9f8ee8317e1a050c2ebd9ecd9b39884b4a179d2",
-      "short": "e9f8ee8",
-      "date": "2026-07-23",
-      "subject": "Hotel top CTA scrolls to room picker; tighter listing top shows a peek of the 2nd card",
-      "body": "- Hotel booking card \"Rezervă acum\" now smooth-scrolls to the room selection\n  (first .room-card, 80px offset) instead of going straight to checkout — the\n  bottom booking bar remains the path to checkout after picking rooms.\n- Listing B/C: tightened the whole top (header/search/breadcrumb/title/filters/\n  date-banner paddings) and densified the cards (hid the between-cards loyalty\n  band and the per-card review quote) so a piece of the second result is visible\n  above the fold — verified ~65px peek at a 1440x820 viewport.\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>",
-      "screens": [
-        "listing-b.html",
-        "listing-c.html"
-      ],
-      "round": "unreleased",
-      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/e9f8ee8317e1a050c2ebd9ecd9b39884b4a179d2"
-    },
-    {
-      "sha": "d27057bf3106295e46d6a3409881830d7873e63e",
-      "short": "d27057b",
-      "date": "2026-07-23",
-      "subject": "Hotel: title chips on one row; booking CTA in the first view",
-      "body": "- Merged the program badges + offer chips into a single non-wrapping row\n  (shortened the two badge labels so all six fit one line).\n- Restructured the booking card so \"Rezervă acum\" sits right under the price\n  (room + price + CTA first; perks, credits, resort-tax and the FRIENDS band\n  moved below it) — the CTA is now above the fold on a laptop viewport.\n  proto.js: reprice selector .bk-price .credits → .credits (credits moved out).\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>",
-      "screens": [
-        "hotel.html"
-      ],
-      "round": "unreleased",
-      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/d27057bf3106295e46d6a3409881830d7873e63e"
-    },
-    {
-      "sha": "036befcd80930ba9552e249b6124f59c434385e7",
-      "short": "036befc",
-      "date": "2026-07-23",
-      "subject": "Hotel page: no top search bar, tighter title chips, reviews+location right after room picker",
-      "body": "- Removed the search bar from the top of the hotel page (kept hidden in the DOM\n  only as the calendar/guests source for the inline stay-bar editor).\n- Title chips (offer chips + program badges) are smaller and kept to one row.\n- Section order: room picker → Recenziile oaspeților → Locație → the 3 promo\n  bands → Politici generale → Reguli casei → Alternative.\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>",
-      "screens": [
-        "hotel.html"
-      ],
-      "round": "unreleased",
-      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/036befcd80930ba9552e249b6124f59c434385e7"
-    },
-    {
-      "sha": "8b8ad81b335e4c768b5fa68cb6c059a863f378d7",
-      "short": "8b8ad81",
-      "date": "2026-07-23",
-      "subject": "Hotel stay-bar inline edit, collapsible flexi, meal filters + checkout editable advance",
-      "body": "Hotel:\n- Date/guests/rooms bar moved directly above the rooms; the flexi price-strip\n  sits just above it. \"Modifică datele\" (and clicking a field) now opens the\n  calendar/guests editor INLINE anchored to the bar and reprices in place —\n  no more redirect to the top search → listing. (placePop takes an explicit\n  host; the calendar/guests openers are exposed and re-anchor the popover.)\n- Flexi price-strip is collapsible: expanded when few rooms are available,\n  collapsed to a \"vezi prețurile ▾\" text toggle when many.\n- Meal chips get a \"Filtre masă:\" label (default Toate); \"Ce include…\" is\n  collapsed behind a \"Vezi ce include fiecare masă\" link.\n\nCheckout:\n- Advance amount is editable (contenteditable) with the minimum (30%) and\n  maximum shown; typing below the minimum clamps on blur.\n\nHomepage C: removed the \"Oferte Litoral 2026\" grid section.\nFooters: currency selector (.f-cur) hidden everywhere via CSS.\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>",
-      "screens": [
-        "checkout.html",
-        "home-c.html",
-        "hotel.html"
-      ],
-      "round": "unreleased",
-      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/8b8ad81b335e4c768b5fa68cb6c059a863f378d7"
-    },
-    {
-      "sha": "5f2a41ffd19e144e69ad8ada5e017ecb2b0ee50a",
-      "short": "5f2a41f",
-      "date": "2026-07-23",
-      "subject": "Hotel & listing-C refinements from workshop feedback",
-      "body": "- Listing C: the room carousel now spans the FULL card width (appended as a\n  full-width grid row, grid-column 1/-1) instead of being squeezed into the\n  middle column; scrolls internally, no page overflow.\n- Hotel rooms: unselected rates show an \"Adaugă cameră\" button (not a 0 ±\n  stepper) — only rooms already picked show the stepper.\n- Hotel gallery now fills the column height to match the taller booking card\n  (hp-grid align-items:stretch; gallery is a flex column, hero grows).\n- Hotel: the promo bands (răsplătește / Jurasica Park / \"datele scumpe\") moved\n  BELOW the room pricelist instead of above it.\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>",
-      "screens": [
-        "hotel.html"
-      ],
-      "round": "unreleased",
-      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/5f2a41ffd19e144e69ad8ada5e017ecb2b0ee50a"
-    },
-    {
-      "sha": "a337b956f4c9c0424b37c97ef85bed2c1e899fa2",
-      "short": "a337b95",
-      "date": "2026-07-23",
-      "subject": "Fix: room carousel (listing C) scrolls inside the card instead of pushing the page horizontally",
-      "body": ".lcard is a grid (252px 1fr 214px); the 1fr .lc-mid defaulted to min-width:auto,\nso the wide .rc-track forced the column — and the whole page — wider despite\noverflow-x:auto. Add min-width:0 to .lc-mid so the carousel is bounded and scrolls\ninternally; move the rc arrows inside the card edges.\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>",
-      "screens": [],
-      "round": "unreleased",
-      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/a337b956f4c9c0424b37c97ef85bed2c1e899fa2"
-    },
-    {
-      "sha": "b618359ad63b74978dd1c83ab81ea0f2a710e4cd",
-      "short": "b618359",
-      "date": "2026-07-23",
-      "subject": "Workshop: hotel booking flow + on-request rooms, listing inventory demo & carousel C, home-C hotel tile",
-      "body": "Hotel page (hotel.html + proto.js + proto.css):\n- \"Alege\" → ± room stepper; after the first pick every online rate shows a\n  stepper (unified), max 4/room; a booking bar slides up from the bottom with\n  the multi-room summary, total and \"Continuă spre rezervare →\" (Szallas model)\n- On-request (indisponibil online) rate rows: greyed, \"Cere prin consultant\"\n  → callback modal; clearly separated from instant-online rooms to steer\n  demand online while still supporting low inventory\n\nListing:\n- Every card now gets \"Vezi toate tipurile de cameră (N)\" (not just the first)\n- Listing variant C (listing-c.html): the room expander opens a CAROUSEL of\n  room cards with photo + description + price (like the hotel page), not a list\n- Listing B: demo inventory switch (Mult/Mediu/Puțin) — shows the \"many vs few\n  results\" states; the date banner appears only when few results\n- 3-way listing switcher (A/B/C) on B and C\n\nHomepage C: one campaign-carousel tile links directly to a hotel (compact,\nrating badge + location), not to the listing.\n\nFix: hotel booking-bar selection no longer overwrites S.rooms (search state).\nindex.html + previews updated. Originals (home, home-b, listing) untouched.\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>",
-      "screens": [
-        "home-c.html",
-        "hotel.html",
-        "index.html",
-        "listing-b.html",
-        "listing-c.html"
-      ],
-      "round": "unreleased",
-      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/b618359ad63b74978dd1c83ab81ea0f2a710e4cd"
-    },
-    {
-      "sha": "35b595f7bc46652ec3551fc9243e51dbe90bc1a3",
-      "short": "35b595f",
-      "date": "2026-07-23",
-      "subject": "Workshop round: homepage C (hero-integrated search) + listing variant B",
-      "body": "Homepage C (home-c.html), built from variant A, kept A/B untouched:\n- Top campaign carousel in \"tiles\" style (≈3 tiles visible + peek, arrows, autoplay)\n- Search integrated into a hero image (\"nu ai găsit? caută\") instead of a separate banner\n- Flexible-date chips moved from the first view into the calendar widget\n- C flow routes to listing variant B\n\nListing variant B (listing-b.html), built from listing.html, A untouched:\n- Compact header (less vertical space, pushes the list up)\n- Slim date banner that appears ONLY when few results — shows \"de la {price}\"\n  and the number of available hotels per date range\n- \"Explorează stațiunile din apropiere\" moved to the bottom of the list\n\nproto.js / proto.css (shared, gated so A/B are unchanged):\n- Listing-card photo galleries: prev/next arrows cycling photos, synced dots\n- Calendar flexible-date chips rendered when body has data-flex-in-cal\n- listingHref() routes variant C to listing-b\n- Flexi-strip renderB() + conditional visibility for data-listing=\"b\"\n\nindex.html: added variant-C and listing-B cards; previews regenerated.\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>",
-      "screens": [
-        "home-c.html",
-        "index.html",
-        "listing-b.html"
-      ],
-      "round": "unreleased",
-      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/35b595f7bc46652ec3551fc9243e51dbe90bc1a3"
     }
   ]
 }

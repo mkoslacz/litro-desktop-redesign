@@ -324,7 +324,9 @@ async function captureEntries(entries, root, outFile, dependencies = {}) {
     browser = await puppeteer.launch({
       executablePath: chrome,
       headless: 'new',
-      args: ['--force-device-scale-factor=1', '--hide-scrollbars'],
+      // Match the other prototype capture tools. Chromium's sandbox cannot
+      // initialise inside several CI and local automation sandboxes.
+      args: ['--no-sandbox', '--force-device-scale-factor=1', '--hide-scrollbars'],
     });
     for (const entry of entries) {
       for (const screen of entry.screens) {

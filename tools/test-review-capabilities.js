@@ -426,6 +426,17 @@ async function testScreenAuthoring(browser, baseUrl, file, viewport) {
     assert.equal(selecting.metrics.addWrites, initial.metrics.addWrites, file + ' writes nothing on entry');
     assert.deepEqual(selecting.listeners, { click: baseline.click + 1, keydown: baseline.keydown + 1 },
       file + ' installs exactly one selection listener pair');
+    const demoChromeHidden = await page.$eval('.proto-tools', node => getComputedStyle(node).display === 'none');
+    assert.equal(demoChromeHidden, true, file + ' hides demo-panel chrome while selecting a product target');
+
+    await page.evaluate(() => {
+      const chrome = document.querySelector('.proto-tools .pt-h');
+      chrome.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+    });
+    selecting = await selectionEvidence(page);
+    assert.equal(selecting.active, true, file + ' ignores demo-panel chrome as a target');
+    assert.equal(selecting.textarea, 0, file + ' demo-panel chrome cannot open a composer');
+    assert.equal(selecting.metrics.addWrites, initial.metrics.addWrites, file + ' demo-panel chrome writes nothing');
 
     await page.click('.proto-comments-selection strong');
     selecting = await selectionEvidence(page);
@@ -464,7 +475,22 @@ async function testScreenAuthoring(browser, baseUrl, file, viewport) {
 
     await page.$eval('.search-hero', (node, marker) => node.setAttribute('data-c', marker), 'screen-comment-' + file);
     await page.click('.pc-add');
-    await page.click('.search-hero h1');
+    const targetPoint = await page.$eval('.search-hero h1', target => {
+      target.scrollIntoView({ block: 'center', inline: 'center' });
+      const rect = target.getBoundingClientRect();
+      const fractions = [0.12, 0.28, 0.5, 0.72, 0.88];
+      for (const yFraction of fractions) {
+        for (const xFraction of fractions) {
+          const x = rect.left + rect.width * xFraction;
+          const y = rect.top + rect.height * yFraction;
+          const top = document.elementFromPoint(x, y);
+          if (top === target || target.contains(top)) return { x, y };
+        }
+      }
+      return null;
+    });
+    assert.ok(targetPoint, file + ' exposes a real product point for comment authoring');
+    await page.mouse.click(targetPoint.x, targetPoint.y);
     await page.waitForSelector('.proto-comments-popover textarea', { visible: true, timeout: 10000 });
     const composed = await selectionEvidence(page);
     assert.equal(composed.active, false, file + ' captures the target before composing');

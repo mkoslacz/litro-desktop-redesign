@@ -24,6 +24,20 @@
   const THREAD_PAGE_SIZE = 50;
   const DETAIL_CONCURRENCY = 4;
   const DELETE_BATCH_SIZE = 400;
+  // Review controls are not product surfaces. A click on them must leave
+  // selection active instead of creating a brittle anchor to the control.
+  const COMMENT_SELECTION_CHROME = [
+    '.proto-comments-tools',
+    '.proto-comments-tray',
+    '.proto-comments-popover',
+    '.proto-comments-selection',
+    '.proto-comment-pin',
+    '.pd-discussion',
+    '.proto-tools',
+    '.proto-rail',
+    '.invdemo',
+    '.vswitch',
+  ].join(', ');
   const ANCHOR_FIELDS = Object.freeze([
     'page', 'viewport', 'lang', 'state', 'selector', 'selectorKind', 'rx', 'ry', 'label', 'text',
   ]);
@@ -1332,7 +1346,7 @@
       this.selectionClick = event => {
         const target = event.target;
         if (!target || typeof target.closest !== 'function') return;
-        if (target.closest('.proto-comments-tools, .proto-comments-tray, .proto-comments-popover, .proto-comments-selection, .proto-comment-pin, .pd-discussion')) return;
+        if (target.closest(COMMENT_SELECTION_CHROME)) return;
         event.preventDefault();
         event.stopPropagation();
         try {

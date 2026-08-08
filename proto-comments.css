@@ -91,6 +91,12 @@ body[data-commenting="1"] .proto-comments-tray,
 body[data-commenting="1"] .proto-comments-popover,
 body[data-commenting="1"] .proto-comments-selection,
 body[data-commenting="1"] .proto-comments-selection * { cursor: default !important; }
+/* The prototype controls are reviewer chrome, not commentable product UI. Hide
+   them while choosing a target so their fixed surfaces cannot mask the page. */
+body[data-commenting="1"] .proto-tools,
+body[data-commenting="1"] .proto-rail,
+body[data-commenting="1"] .invdemo,
+body[data-commenting="1"] .vswitch { display: none !important; }
 .proto-comment-target { outline: 3px solid #F3B81E !important; outline-offset: 3px; }
 @media (max-width: 700px) {
   .proto-comments-tools { right: 12px; bottom: 12px; flex-wrap: wrap; justify-content: flex-end; }
