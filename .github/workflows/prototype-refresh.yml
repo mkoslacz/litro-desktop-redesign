@@ -45,7 +45,7 @@ jobs:
         working-directory: tools
         run: npm ci
 
-      - name: Verify review capabilities and regenerate derived artifacts
+      - name: Regenerate derived artifacts and verify review capabilities
         env:
           # ubuntu-latest supplies this Chrome binary for puppeteer-core.
           CHROME_PATH: /usr/bin/google-chrome
@@ -56,8 +56,8 @@ jobs:
           FRAME_TIMEOUT_MS: '300000'
           REFRESH_DUMP_TIMEOUT_MS: '1800000'
         run: |
-          npm --prefix tools run test:review
           node tools/refresh.js
+          npm --prefix tools run test:review
 
       - name: Remove build-only dependencies
         shell: bash

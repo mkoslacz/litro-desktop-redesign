@@ -966,8 +966,8 @@ function staticContracts() {
   const workflow = fs.readFileSync(path.join(ROOT, '.github/workflows/prototype-refresh.yml'), 'utf8');
   assert.ok(workflow.indexOf('npm --prefix tools run test:review') >= 0,
     'Pages workflow runs the focused review entry point');
-  assert.ok(workflow.indexOf('npm --prefix tools run test:review') < workflow.indexOf('node tools/refresh.js'),
-    'Pages verifies review capabilities before refreshing artifacts');
+  assert.ok(workflow.indexOf('node tools/refresh.js') < workflow.indexOf('npm --prefix tools run test:review'),
+    'Pages regenerates review artifacts before testing their interactive surface');
   assert.match(usecases, /setAttribute\('aria-haspopup', 'dialog'\)/, 'use-case captures provide an accessible full-size preview action');
   assert.match(usecases, /object-fit:\s*cover/, 'use-case captures render compact cropped previews');
   assert.match(usecases, /id="uc-capture-dialog"/, 'use-case captures retain one shared full-size dialog');

@@ -1,9 +1,19 @@
 {
-  "generatedAt": "2026-08-08T06:06:39.062Z",
+  "generatedAt": "2026-08-08T06:16:12.112Z",
   "repository": "https://github.com/mkoslacz/litro-desktop-redesign",
   "limited": true,
   "limit": 50,
   "entries": [
+    {
+      "sha": "ecf53f90a7b0f66370fb91987f265c8431d648d7",
+      "short": "ecf53f9",
+      "date": "2026-08-08",
+      "subject": "fix: keep prototype chrome out of comment targets",
+      "body": "",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/ecf53f90a7b0f66370fb91987f265c8431d648d7"
+    },
     {
       "sha": "1dfc50ce1a07fb61d4f15b2a19edcade42db27de",
       "short": "1dfc50c",
@@ -709,19 +719,6 @@
       ],
       "round": "unreleased",
       "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/db40143ad33b967dc2bba31d61fe2da3ebb2cd18"
-    },
-    {
-      "sha": "db770af0045ede41689fa3b5e1456ccbceb60a9b",
-      "short": "db770af",
-      "date": "2026-07-24",
-      "subject": "Move top nav into the burger menu on homepages; make Home D show the whole inventory with a slimmer bar",
-      "body": "- proto.css: hide the .mainnav bar (it only renders on homepages).\n- proto.js: the burger menu is now built from the .mainnav links, so it follows\n  the page language (RO/EN) automatically; title i18n'd (Meniu/Menu).\n- Home D (RO+EN): the embedded listing now frames the WHOLE inventory, not one\n  city — fixed heading 'Toate ofertele de pe litoral' / 'All seaside offers'\n  (data-fixed so initListing no longer rewrites it to 'Cazare Mamaia'), the\n  res-types and filter chips are dropped, the default pool filter is off (all 6\n  cards show), and card locations span several resorts. Slimmer bar lets a piece\n  of the first card show in the first viewport.\n- proto.js: honor data-fixed on .listing-head h1 and .res-count.\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>",
-      "screens": [
-        "home-d-en.html",
-        "home-d.html"
-      ],
-      "round": "unreleased",
-      "url": "https://github.com/mkoslacz/litro-desktop-redesign/commit/db770af0045ede41689fa3b5e1456ccbceb60a9b"
     }
   ]
 }
