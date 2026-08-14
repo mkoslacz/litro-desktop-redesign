@@ -10,7 +10,8 @@ const { decodeBinarySchema, compileSchema } = require('kiwi-schema');
 const { execSync } = require('child_process');
 
 const SCRATCH = __dirname;
-const ASSETS = '/Users/mkoslacz/Workspaces/claude/litoralul_nop_designs/desktop-redesign/assets';
+const PROJECT_ROOT = path.resolve(SCRATCH, '..');
+const ASSETS = path.join(PROJECT_ROOT, 'assets');
 const outFig = process.argv[2] || 'litro-final.fig';
 
 // ---- load schema from litro canvas.fig (chunk0 verbatim) ----
@@ -361,7 +362,7 @@ const meta = {
 fs.writeFileSync(path.join(stage, 'meta.json'), JSON.stringify(meta));
 // thumbnail from preview-home
 try {
-  execSync(`sips -Z 400 "/Users/mkoslacz/Workspaces/claude/litoralul_nop_designs/desktop-redesign/preview-home-c.png" --out "${stage}/thumbnail.png" >/dev/null 2>&1`);
+  execSync(`sips -Z 400 "${path.join(PROJECT_ROOT, 'preview-home-c.png')}" --out "${stage}/thumbnail.png" >/dev/null 2>&1`);
 } catch (e) { fs.writeFileSync(path.join(stage, 'thumbnail.png'), Buffer.from('89504e470d0a1a0a', 'hex')); }
 for (const [hex, v] of images) fs.writeFileSync(path.join(stage, 'images', hex), v.bytes);
 const outAbs = path.resolve(outFig);
